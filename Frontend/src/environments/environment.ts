@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  // Sử dụng relative URL để tự động dùng host hiện tại
-  apiUrl: '/api/TuVi'
+  // Railway backend URL - update này sau khi deploy backend
+  apiUrl: 'https://tuvi1-production.up.railway.app/api/TuVi'
 };
