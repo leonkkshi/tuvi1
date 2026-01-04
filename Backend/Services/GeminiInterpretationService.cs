@@ -192,6 +192,15 @@ Phong cách: Chuyên nghiệp nhưng gần gũi, tận tâm như thầy hướng
             {
                 sb.AppendLine($"\n【{palace.PalaceName}】 (Vị trí: {GetBranchName(palace.PalaceId)})");
                 
+                // Hiển thị Tuần và Triệt nếu có
+                var specialMarks = new List<string>();
+                if (palace.HasTuan) specialMarks.Add("Tuần");
+                if (palace.HasTriet) specialMarks.Add("Triệt");
+                if (specialMarks.Any())
+                {
+                    sb.AppendLine($"  ⚠️ Đặc điểm: {string.Join(", ", specialMarks)}");
+                }
+                
                 if (palace.Stars.Any())
                 {
                     sb.AppendLine("  Bản cung:");

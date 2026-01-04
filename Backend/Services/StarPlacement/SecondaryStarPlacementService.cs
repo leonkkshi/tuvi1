@@ -113,34 +113,38 @@ public class SecondaryStarPlacementService : IStarPlacementService
         };
         positions[locTonPos].Add(19);
 
+        // Thiên Khôi (20): Theo Can năm sinh
+        // Giáp=Sửu, Ất=Tý, Bính=Hợi, Đinh=Hợi, Mậu=Sửu, Kỷ=Tý, Canh=Ngọ, Tân=Ngọ, Nhâm=Mão, Quý=Mão
         int thienKhoiPos = yearCan switch
         {
-            1 => 2,
-            2 => 1,
-            3 => 12,
-            4 => 11,
-            5 => 10,
-            6 => 8,
-            7 => 7,
-            8 => 6,
-            9 => 5,
-            10 => 4,
+            1 => 2,    // Giáp -> Sửu
+            2 => 1,    // Ất -> Tý
+            3 => 12,   // Bính -> Hợi
+            4 => 12,   // Đinh -> Hợi
+            5 => 2,    // Mậu -> Sửu
+            6 => 1,    // Kỷ -> Tý
+            7 => 7,    // Canh -> Ngọ
+            8 => 7,    // Tân -> Ngọ
+            9 => 4,    // Nhâm -> Mão
+            10 => 4,   // Quý -> Mão
             _ => 2
         };
         positions[thienKhoiPos].Add(20);
 
+        // Thiên Việt (21): Theo Can năm sinh
+        // Giáp=Mùi, Ất=Thân, Bính=Dậu, Đinh=Dậu, Mậu=Mùi, Kỷ=Thân, Canh=Dần, Tân=Dần, Nhâm=Tị, Quý=Tị
         int thienVietPos = yearCan switch
         {
-            1 => 8,
-            2 => 9,
-            3 => 10,
-            4 => 11,
-            5 => 12,
-            6 => 2,
-            7 => 3,
-            8 => 4,
-            9 => 5,
-            10 => 6,
+            1 => 8,    // Giáp -> Mùi
+            2 => 9,    // Ất -> Thân
+            3 => 10,   // Bính -> Dậu
+            4 => 10,   // Đinh -> Dậu
+            5 => 8,    // Mậu -> Mùi
+            6 => 9,    // Kỷ -> Thân
+            7 => 3,    // Canh -> Dần
+            8 => 3,    // Tân -> Dần
+            9 => 6,    // Nhâm -> Tị
+            10 => 6,   // Quý -> Tị
             _ => 8
         };
         positions[thienVietPos].Add(21);
