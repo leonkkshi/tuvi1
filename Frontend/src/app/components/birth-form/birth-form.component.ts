@@ -19,7 +19,7 @@ export class BirthFormComponent {
     hour: 14,
     minute: 30,
     isMale: true,
-    isLunar: false
+    isLunar: true  // Luôn dùng âm lịch
   };
 
   fullName: string = 'Nguyễn Văn Tuấn';
@@ -71,20 +71,10 @@ export class BirthFormComponent {
   }
 
   updateDaysInMonth() {
-    const daysInMonth = this.getDaysInMonth(this.birthInfo.year, this.birthInfo.month, this.birthInfo.isLunar);
-    this.days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
-    if (this.birthInfo.day > daysInMonth) {
-      this.birthInfo.day = daysInMonth;
-    }
-  }
-
-  getDaysInMonth(year: number, month: number, isLunar: boolean): number {
-    if (isLunar) {
-      // Âm lịch: tháng 29 hoặc 30 ngày
-      return 30;
-    } else {
-      // Dương lịch
-      return new Date(year, month, 0).getDate();
+    // Âm lịch luôn có 30 ngày
+    this.days = Array.from({ length: 30 }, (_, i) => i + 1);
+    if (this.birthInfo.day > 30) {
+      this.birthInfo.day = 30;
     }
   }
 

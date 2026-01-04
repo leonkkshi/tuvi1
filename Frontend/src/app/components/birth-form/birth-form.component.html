@@ -20,34 +20,18 @@
       <span class="error-message" *ngIf="errors['fullName']">{{ errors['fullName'] }}</span>
     </div>
 
-    <!-- Giới tính và loại lịch -->
-    <div class="form-row">
-      <div class="form-group half">
-        <label>Giới tính:</label>
-        <div class="radio-group">
-          <label class="radio-label" [class.selected]="birthInfo.isMale">
-            <input type="radio" name="gender" [value]="true" [(ngModel)]="birthInfo.isMale">
-            <span>👨 Nam</span>
-          </label>
-          <label class="radio-label" [class.selected]="!birthInfo.isMale">
-            <input type="radio" name="gender" [value]="false" [(ngModel)]="birthInfo.isMale">
-            <span>👩 Nữ</span>
-          </label>
-        </div>
-      </div>
-
-      <div class="form-group half">
-        <label>Loại lịch:</label>
-        <div class="radio-group">
-          <label class="radio-label" [class.selected]="birthInfo.isLunar">
-            <input type="radio" name="calendarType" [value]="true" [(ngModel)]="birthInfo.isLunar" (change)="updateDaysInMonth()">
-            <span>🌙 Âm lịch</span>
-          </label>
-          <label class="radio-label" [class.selected]="!birthInfo.isLunar">
-            <input type="radio" name="calendarType" [value]="false" [(ngModel)]="birthInfo.isLunar" (change)="updateDaysInMonth()">
-            <span>☀️ Dương lịch</span>
-          </label>
-        </div>
+    <!-- Giới tính -->
+    <div class="form-group">
+      <label>Giới tính:</label>
+      <div class="radio-group">
+        <label class="radio-label" [class.selected]="birthInfo.isMale">
+          <input type="radio" name="gender" [value]="true" [(ngModel)]="birthInfo.isMale">
+          <span>👨 Nam</span>
+        </label>
+        <label class="radio-label" [class.selected]="!birthInfo.isMale">
+          <input type="radio" name="gender" [value]="false" [(ngModel)]="birthInfo.isMale">
+          <span>👩 Nữ</span>
+        </label>
       </div>
     </div>
 

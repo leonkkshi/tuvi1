@@ -19,14 +19,6 @@
       <span class="label">Âm Dương:</span>
       <span class="value">{{ getAmDuong() }}</span>
     </div>
-    <div class="info-item">
-      <span class="label">Triệt:</span>
-      <span class="value">{{ getTrietDisplay() }}</span>
-    </div>
-    <div class="info-item">
-      <span class="label">Tuần:</span>
-      <span class="value">{{ getTuanDisplay() }}</span>
-    </div>
   </div>
   
   <div class="chart-container">
@@ -448,21 +440,6 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- Triệt và Tuần indicators -->
-    <div class="special-positions-overlay" *ngIf="chart">
-      <div class="special-item combined-item" *ngIf="areSamePositions() && getTrietDisplay()">
-        <span class="label">Triệt-Tuần:</span> <span class="value">{{ getTrietDisplay() }}</span>
-      </div>
-      <ng-container *ngIf="!areSamePositions()">
-        <div class="special-item triet-item" *ngIf="getTrietDisplay()">
-          <span class="label">Triệt:</span> <span class="value">{{ getTrietDisplay() }}</span>
-        </div>
-        <div class="special-item tuan-item" *ngIf="getTuanDisplay()">
-          <span class="label">Tuần:</span> <span class="value">{{ getTuanDisplay() }}</span>
-        </div>
-      </ng-container>
     </div>
   </div>
 
