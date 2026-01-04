@@ -13,60 +13,26 @@ public class MainStarPlacementService : IStarPlacementService
         int nguHanhCuc = context.NguHanhCuc;
         int day = context.Day;
 
-        // Tính Tử Vi theo công thức: Ngày sinh / Số cục = N dư X
-        // X (số dư) = đi theo đường gấp khúc Tử Vi
-        // N (thương số) = khởi thuận từ vị trí cuối cùng của X
-        
-        int N = day / nguHanhCuc;  // Thương số
-        int X = day % nguHanhCuc;  // Số dư
-        if (X == 0) { X = nguHanhCuc; N--; }  // Nếu chia hết thì số dư = số cục
-        
-        // Đường gấp khúc Tử Vi (theo thứ tự):
-        // Lục 6 (Hỏa Lục) → Dậu(10)
-        // Ngũ 5 (Thổ Ngũ) → Ngọ(7)
-        // Tứ 4 (Kim Tứ) → Hợi(12)
-        // Tam 3 (Mộc Tam) → Thìn(5)
-        // Nhị 2 (Thủy Nhị) → Sửu(2)
-        // Nhất 1 → Dần(3)
-        int[] gapKhuc = { 10, 7, 12, 5, 2, 3 };  // Dậu, Ngọ, Hợi, Thìn, Sửu, Dần
-        
-        // Tìm vị trí bắt đầu dựa vào cục (6, 5, 4, 3, 2)
-        int startIndex = 6 - nguHanhCuc;  // Lục=0, Ngũ=1, Tứ=2, Tam=3, Nhị=4
-        
-        // Bước 1: Đi theo đường gấp khúc X bước
-        int currentPos = gapKhuc[startIndex];
-        for (int i = 1; i < X; i++)
-        {
-            startIndex++;
-            if (startIndex >= gapKhuc.Length) startIndex = 0;
-            currentPos = gapKhuc[startIndex];
-        }
-        
-        // Bước 2: Từ vị trí cuối, khởi thuận N bước
-        int tuViPos = currentPos;
-        for (int i = 0; i < N; i++)
-        {
-            tuViPos++;
-            if (tuViPos > 12) tuViPos = 1;
-        }
+        // Tra bảng Tử Vi theo ngày sinh và cục
+        int tuViPos = GetTuViPosition(nguHanhCuc, day);
 
         // An 14 chính tinh theo quy tắc từ Tử Vi
         // Nhóm 1: Từ Tử Vi đi ngược chiều kim đồng hồ
         positions[tuViPos].Add(1); // Tử Vi
         
-        int thienCoPos = Prev(tuViPos, 1); // Thiên Cơ: ngược 1 ô (liền kề)
+        int thienCoPos = Prev(tuViPos, 1); // Thiên Cơ: cạnh Tử Vi ngược 1 ô
         positions[thienCoPos].Add(2);
         
-        int thaiDuongPos = Prev(thienCoPos, 2); // Thái Dương: cách Thiên Cơ 1 ô (bỏ qua 1 cung, ngược 2 ô)
+        int thaiDuongPos = Prev(thienCoPos, 1); // Thái Dương: cách Thiên Cơ 1 ô (liền kề)
         positions[thaiDuongPos].Add(3);
         
-        int vuKhucPos = Prev(thaiDuongPos, 1); // Vũ Khúc: ngược thêm 1 ô (liền kề)
+        int vuKhucPos = Prev(thaiDuongPos, 1); // Vũ Khúc: cung tiếp theo (liền kề)
         positions[vuKhucPos].Add(4);
         
-        int thienDongPos = Prev(vuKhucPos, 1); // Thiên Đồng: ngược thêm 1 ô (liền kề)
+        int thienDongPos = Prev(vuKhucPos, 1); // Thiên Đồng: cung tiếp theo (liền kề)
         positions[thienDongPos].Add(5);
         
-        int liemTrinhPos = Prev(thienDongPos, 3); // Liêm Trinh: cách Thiên Đồng 2 ô (bỏ qua 2 cung, ngược 3 ô)
+        int liemTrinhPos = Prev(thienDongPos, 2); // Liêm Trinh: cách Thiên Đồng 2 ô
         positions[liemTrinhPos].Add(6);
 
         // Nhóm 2: Thiên Phủ đối xứng với Tử Vi qua trục Dần(3)-Thân(9)
@@ -96,6 +62,118 @@ public class MainStarPlacementService : IStarPlacementService
         positions[phaQuanPos].Add(14);
 
         return positions;
+    }
+
+    /// <summary>
+    /// Tra bảng Tử Vi dựa vào Cục và Ngày sinh
+    /// Bảng tra cứu chuẩn từ Tử Vi học
+    /// </summary>
+    private int GetTuViPosition(int cuc, int day)
+    {
+        // Bảng tra cứu Tử Vi theo 5 cục
+        // Mỗi cục có các ngày tương ứng với 12 cung (Tý=1, Sửu=2, ... Hợi=12)
+        
+        return cuc switch
+        {
+            2 => GetThuiNhiCuc(day),   // Thủy Nhị Cục
+            3 => GetMocTamCuc(day),    // Mộc Tam Cục
+            4 => GetKimTuCuc(day),     // Kim Tứ Cục
+            5 => GetThoNguCuc(day),    // Thổ Ngũ Cục
+            6 => GetHoaLucCuc(day),    // Hỏa Lục Cục
+            _ => 1 // Mặc định Tý
+        };
+    }
+
+    // Thủy Nhị Cục
+    private int GetThuiNhiCuc(int day)
+    {
+        return day switch
+        {
+            2 or 3 => 1,      // Tý
+            4 or 5 => 2,      // Sửu
+            6 or 7 => 3,      // Dần
+            8 or 9 => 4,      // Mão
+            10 or 11 => 5,    // Thìn
+            12 or 13 => 8,    // Mùi
+            14 or 15 => 9,    // Thân
+            16 or 17 => 10,   // Dậu
+            18 or 19 => 11,   // Tuất
+            20 or 21 => 12,   // Hợi
+            22 or 23 => 6,    // Tị
+            24 or 25 => 7,    // Ngọ
+            26 or 27 => 8,    // Mùi
+            28 or 29 => 9,    // Thân
+            30 => 10,         // Dậu
+            _ => 1
+        };
+    }
+
+    // Mộc Tam Cục
+    private int GetMocTamCuc(int day)
+    {
+        return day switch
+        {
+            3 or 4 or 5 => 1,       // Tý
+            6 or 7 or 8 => 2,       // Sửu
+            9 or 10 or 11 => 3,     // Dần
+            12 or 13 or 14 => 4,    // Mão
+            15 or 16 or 17 => 5,    // Thìn
+            18 or 19 or 20 => 8,    // Mùi
+            21 or 22 or 23 => 9,    // Thân
+            24 or 25 or 26 => 10,   // Dậu
+            27 or 28 or 29 => 11,   // Tuất
+            30 => 12,               // Hợi
+            1 or 2 => 12,           // Hợi
+            _ => 1
+        };
+    }
+
+    // Kim Tứ Cục
+    private int GetKimTuCuc(int day)
+    {
+        return day switch
+        {
+            4 or 5 or 6 or 7 => 1,      // Tý
+            8 or 9 or 10 or 11 => 2,    // Sửu
+            12 or 13 or 14 or 15 => 3,  // Dần
+            16 or 17 or 18 or 19 => 4,  // Mão
+            20 or 21 or 22 or 23 => 5,  // Thìn
+            24 or 25 or 26 or 27 => 8,  // Mùi
+            28 or 29 or 30 => 9,        // Thân
+            1 or 2 or 3 => 12,          // Hợi
+            _ => 1
+        };
+    }
+
+    // Thổ Ngũ Cục
+    private int GetThoNguCuc(int day)
+    {
+        return day switch
+        {
+            5 or 6 or 7 or 8 or 9 => 1,         // Tý
+            10 or 11 or 12 or 13 or 14 => 2,   // Sửu
+            15 or 16 or 17 or 18 or 19 => 3,   // Dần
+            20 or 21 or 22 or 23 or 24 => 4,   // Mão
+            25 or 26 or 27 or 28 or 29 => 5,   // Thìn
+            30 => 8,                            // Mùi
+            1 or 2 or 3 or 4 => 12,             // Hợi
+            _ => 1
+        };
+    }
+
+    // Hỏa Lục Cục
+    private int GetHoaLucCuc(int day)
+    {
+        return day switch
+        {
+            6 or 7 or 8 or 9 or 10 or 11 => 1,      // Tý
+            12 or 13 or 14 or 15 or 16 or 17 => 2,  // Sửu
+            18 or 19 or 20 or 21 or 22 or 23 => 3,  // Dần
+            24 or 25 or 26 or 27 or 28 or 29 => 4,  // Mão
+            30 => 5,                                // Thìn
+            1 or 2 or 3 or 4 or 5 => 12,           // Hợi
+            _ => 1
+        };
     }
 
     // Helper: Đi ngược chiều kim đồng hồ
