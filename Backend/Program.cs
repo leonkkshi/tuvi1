@@ -88,7 +88,9 @@ builder.Services.AddCors(options =>
                     origin.StartsWith("http://192.168.") ||
                     origin.StartsWith("http://10.") ||
                     origin.StartsWith("https://") && origin.Contains(".ngrok") ||
-                    origin.StartsWith("https://") && origin.Contains(".ngrok-free.app"))
+                    origin.StartsWith("https://") && origin.Contains(".ngrok-free.app") ||
+                    origin.StartsWith("https://webapp1st.vercel.app") ||
+                    origin.StartsWith("https://webapp1st") && origin.Contains(".vercel.app"))
                   .AllowAnyHeader()
                   .AllowAnyMethod()
                   .AllowCredentials();
