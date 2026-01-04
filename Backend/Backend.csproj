@@ -8,6 +8,12 @@
 
   <ItemGroup>
     <None Include="convert-lunar.js" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="package.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+
+  <!-- Auto install npm packages after build -->
+  <Target Name="NpmInstall" AfterTargets="Build">
+    <Exec Command="npm install" WorkingDirectory="$(OutputPath)" Condition="!Exists('$(OutputPath)node_modules')" />
+  </Target>
 
 </Project>

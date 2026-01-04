@@ -1,0 +1,9 @@
+{
+  "name": "backend-lunar",
+  "version": "1.0.0",
+  "description": "Lunar calendar converter for backend",
+  "main": "convert-lunar.js",
+  "dependencies": {
+    "vietnamese-lunar-calendar": "^0.0.6"
+  }
+}

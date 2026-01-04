@@ -20,19 +20,19 @@ public class MainStarPlacementService : IStarPlacementService
         // Nhóm 1: Từ Tử Vi đi ngược chiều kim đồng hồ
         positions[tuViPos].Add(1); // Tử Vi
         
-        int thienCoPos = Prev(tuViPos, 1); // Thiên Cơ: cạnh Tử Vi ngược 1 ô
+        int thienCoPos = Prev(tuViPos, 1); // Thiên Cơ: bên cạnh Tử Vi (ngược 1)
         positions[thienCoPos].Add(2);
         
-        int thaiDuongPos = Prev(thienCoPos, 1); // Thái Dương: cách Thiên Cơ 1 ô (liền kề)
+        int thaiDuongPos = Prev(thienCoPos, 2); // Thái Dương: cách Thiên Cơ 1 ô (bỏ qua 1 cung = ngược 2)
         positions[thaiDuongPos].Add(3);
         
-        int vuKhucPos = Prev(thaiDuongPos, 1); // Vũ Khúc: cung tiếp theo (liền kề)
+        int vuKhucPos = Prev(thaiDuongPos, 1); // Vũ Khúc: cung tiếp theo (liền kề, ngược 1)
         positions[vuKhucPos].Add(4);
         
-        int thienDongPos = Prev(vuKhucPos, 1); // Thiên Đồng: cung tiếp theo (liền kề)
+        int thienDongPos = Prev(vuKhucPos, 1); // Thiên Đồng: cung tiếp theo (liền kề, ngược 1)
         positions[thienDongPos].Add(5);
         
-        int liemTrinhPos = Prev(thienDongPos, 2); // Liêm Trinh: cách Thiên Đồng 2 ô
+        int liemTrinhPos = Prev(thienDongPos, 3); // Liêm Trinh: cách Thiên Đồng 2 ô (bỏ qua 2 cung = ngược 3)
         positions[liemTrinhPos].Add(6);
 
         // Nhóm 2: Thiên Phủ đối xứng với Tử Vi qua trục Dần(3)-Thân(9)
