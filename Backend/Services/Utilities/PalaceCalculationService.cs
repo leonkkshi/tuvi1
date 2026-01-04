@@ -73,36 +73,46 @@ public class PalaceCalculationService
 
     /// <summary>
     /// Tính Ngũ Hành Cục theo năm sinh và vị trí cung Mệnh
+    /// Bảng tra theo Can năm và vị trí Mệnh:
+    /// - Cột 1: Tý-Sửu (1-2)
+    /// - Cột 2: Dần-Mão (3-4)
+    /// - Cột 3: Thìn-Tỵ (5-6)
+    /// - Cột 4: Ngọ-Mùi (7-8)
+    /// - Cột 5: Thân-Dậu (9-10)
+    /// - Cột 6: Tuất-Hợi (11-12)
+    /// Giá trị: 2=Thủy nhị, 3=Mộc tam, 4=Kim tứ, 5=Thổ ngũ, 6=Hỏa lục
     /// </summary>
     public int CalculateNguHanhCuc(int lunarYear, int menhPalace)
     {
         int yearCan = (lunarYear - 3) % 10;
         if (yearCan <= 0) yearCan += 10;
 
-        // Bảng Cục: Hành theo Can năm và vị trí Mệnh
-        // 2=Thủy, 3=Mộc, 4=Kim, 5=Thổ, 6=Hỏa
+        // Bảng Cục theo Can năm và Mệnh cung
+        // Hàng: Can năm (1=Giáp, 2=Ất, 3=Bính, 4=Đinh, 5=Mậu, 6=Kỷ, 7=Canh, 8=Tân, 9=Nhâm, 10=Quý)
+        // Cột: Tý-Sửu, Dần-Mão, Thìn-Tỵ, Ngọ-Mùi, Thân-Dậu, Tuất-Hợi
         int[,] cucTable = {
-            {2, 6, 3, 5, 4}, // Giáp (1)
-            {6, 5, 4, 3, 5}, // Ất (2)
-            {5, 3, 2, 4, 6}, // Bính (3)
-            {3, 4, 6, 2, 5}, // Đinh (4)
-            {4, 2, 5, 6, 3}, // Mậu (5)
-            {2, 6, 3, 5, 4}, // Kỷ (6)
-            {6, 5, 4, 3, 5}, // Canh (7)
-            {5, 3, 2, 4, 6}, // Tân (8)
-            {3, 4, 6, 2, 5}, // Nhâm (9)
-            {4, 2, 5, 6, 3}  // Quý (10)
+            {2, 6, 3, 5, 4, 6}, // Giáp (1)
+            {6, 5, 4, 3, 2, 5}, // Ất (2)
+            {5, 3, 2, 4, 6, 3}, // Bính (3)
+            {3, 4, 6, 2, 5, 4}, // Đinh (4)
+            {4, 2, 5, 6, 3, 2}, // Mậu (5)
+            {2, 6, 3, 5, 4, 6}, // Kỷ (6)
+            {6, 5, 4, 3, 2, 5}, // Canh (7)
+            {5, 3, 2, 4, 6, 3}, // Tân (8)
+            {3, 4, 6, 2, 5, 4}, // Nhâm (9)
+            {4, 2, 5, 6, 3, 2}  // Quý (10)
         };
 
-        int wordIndex = 0;
-        if (menhPalace == 1 || menhPalace == 2) wordIndex = 0;
-        else if (menhPalace == 3 || menhPalace == 4) wordIndex = 1;
-        else if (menhPalace == 5 || menhPalace == 6) wordIndex = 2;
-        else if (menhPalace == 7 || menhPalace == 8) wordIndex = 3;
-        else if (menhPalace == 9 || menhPalace == 10) wordIndex = 4;
-        else if (menhPalace == 11 || menhPalace == 12) wordIndex = 1;
+        // Xác định cột index theo vị trí Mệnh
+        int colIndex = 0;
+        if (menhPalace == 1 || menhPalace == 2) colIndex = 0;      // Tý-Sửu
+        else if (menhPalace == 3 || menhPalace == 4) colIndex = 1; // Dần-Mão
+        else if (menhPalace == 5 || menhPalace == 6) colIndex = 2; // Thìn-Tỵ
+        else if (menhPalace == 7 || menhPalace == 8) colIndex = 3; // Ngọ-Mùi
+        else if (menhPalace == 9 || menhPalace == 10) colIndex = 4; // Thân-Dậu
+        else if (menhPalace == 11 || menhPalace == 12) colIndex = 5; // Tuất-Hợi
 
-        return cucTable[yearCan - 1, wordIndex];
+        return cucTable[yearCan - 1, colIndex];
     }
 
     /// <summary>
