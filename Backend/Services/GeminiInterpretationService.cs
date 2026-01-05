@@ -336,13 +336,10 @@ Phong cách: Chuyên nghiệp nhưng gần gũi, tận tâm như thầy hướng
             // 1. Thông tin cơ bản
             sb.Append(BuildBasicInfo(request.Chart));
             
-            // 2. Tổng quan lá số
-            sb.Append(BuildOverallPrompt(request.Chart));
-
-            // 3. Chi tiết từng cung
+            // 2. Luận giải chi tiết TẤT CẢ 12 cung (bao gồm Mệnh và Thân)
             sb.Append(BuildAllPalacesPrompt(request.Chart));
 
-            // 4. Yêu cầu cụ thể
+            // 3. Yêu cầu format output
             sb.Append(BuildRequestFormat(request.FocusArea));
 
             return sb.ToString();
@@ -369,52 +366,15 @@ Phong cách: Chuyên nghiệp nhưng gần gũi, tận tâm như thầy hướng
             return sb.ToString();
         }
 
-        private string BuildOverallPrompt(TuViChart chart)
-        {
-            var sb = new StringBuilder();
-            sb.AppendLine("=== TỔNG QUAN LÁ SỐ ===");
-            sb.AppendLine();
-            
-            // Lấy thông tin cung Mệnh
-            var menhPalace = chart.PalaceStars.FirstOrDefault(p => p.PalaceName == "Mệnh");
-            var thanPalace = chart.PalaceStars.FirstOrDefault(p => p.PalaceId == chart.ThanPalace);
-            
-            if (menhPalace != null)
-            {
-                sb.AppendLine("▶ CUNG MỆNH (Bản ngã, tính cách):");
-                sb.AppendLine(TuViChartAnalyzer.BuildPalaceAnalysis(menhPalace, chart, includeNhiHop: true));
-                sb.AppendLine();
-            }
-            
-            if (thanPalace != null && thanPalace.PalaceName != "Mệnh")
-            {
-                sb.AppendLine("▶ CUNG THÂN (Hành động, biểu hiện bên ngoài):");
-                sb.AppendLine(TuViChartAnalyzer.BuildPalaceAnalysis(thanPalace, chart, includeNhiHop: true));
-                sb.AppendLine();
-            }
-
-            sb.AppendLine("📋 YÊU CẦU: Hãy tổng hợp luận giải về:");
-            sb.AppendLine("   - Cục diện tổng thể của lá số (Tốt/Xấu/Trung bình)");
-            sb.AppendLine("   - Đặc điểm tính cách chính từ Mệnh và Thân");
-            sb.AppendLine("   - Điểm mạnh và điểm yếu nổi bật");
-            sb.AppendLine("   - Hướng phát triển phù hợp");
-            sb.AppendLine();
-            
-            return sb.ToString();
-        }
-
         private string BuildAllPalacesPrompt(TuViChart chart)
         {
             var sb = new StringBuilder();
-            sb.AppendLine("=== LUẬN GIẢI CHI TIẾT 12 CUNG ===");
+            sb.AppendLine("=== LUẬN GIẢI CHI TIẾT TẤT CẢ 12 CUNG ===");
             sb.AppendLine();
 
+            // Luận tất cả 12 cung, Mệnh và Thân có thêm nhị hợp + cung liền kề
             foreach (var palace in chart.PalaceStars.OrderBy(p => p.PalaceId))
             {
-                // Bỏ qua Mệnh và Thân vì đã luận ở tổng quan
-                if (palace.PalaceName == "Mệnh" || palace.PalaceId == chart.ThanPalace)
-                    continue;
-
                 sb.Append(BuildPalacePrompt(palace, chart));
                 sb.AppendLine();
             }
