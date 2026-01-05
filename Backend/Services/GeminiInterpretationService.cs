@@ -339,9 +339,8 @@ Phong cách: Chuyên nghiệp nhưng gần gũi, tận tâm như thầy hướng
             // 2. Luận giải chi tiết TẤT CẢ 12 cung (bao gồm Mệnh và Thân)
             sb.Append(BuildAllPalacesPrompt(request.Chart));
 
-            // 3. Yêu cầu format output
-            sb.Append(BuildRequestFormat(request.FocusArea));
-
+          
+       
             return sb.ToString();
         }
 
@@ -446,60 +445,7 @@ Phong cách: Chuyên nghiệp nhưng gần gũi, tận tâm như thầy hướng
             };
         }
 
-        private string BuildRequestFormat(string focusArea)
-        {
-            var sb = new StringBuilder();
-            sb.AppendLine("=== YÊU CẦU ĐỊNH DẠNG TRẢ LỜI ===");
-            sb.AppendLine($"Lĩnh vực tập trung: {GetFocusAreaName(focusArea)}");
-            sb.AppendLine();
-            sb.AppendLine("Hãy tổng hợp và trả lời theo định dạng sau:");
-            sb.AppendLine();
-            sb.AppendLine("## LUẬN CHI TIẾT 12 CUNG");
-            sb.AppendLine("### Cung Phụ Mẫu");
-            sb.AppendLine("[Luận giải ngắn gọn]");
-            sb.AppendLine();
-            sb.AppendLine("### Cung Phúc Đức");
-            sb.AppendLine("[Luận giải ngắn gọn]");
-            sb.AppendLine();
-            sb.AppendLine("### Cung Điền Trạch");
-            sb.AppendLine("[Luận giải ngắn gọn]");
-            sb.AppendLine();
-            sb.AppendLine("### Cung Quan Lộc");
-            sb.AppendLine("[Luận giải ngắn gọn]");
-            sb.AppendLine();
-            sb.AppendLine("### Cung Nô Bộc");
-            sb.AppendLine("[Luận giải ngắn gọn]");
-            sb.AppendLine();
-            sb.AppendLine("### Cung Thiên Di");
-            sb.AppendLine("[Luận giải ngắn gọn]");
-            sb.AppendLine();
-            sb.AppendLine("### Cung Tật Ách");
-            sb.AppendLine("[Luận giải ngắn gọn]");
-            sb.AppendLine();
-            sb.AppendLine("### Cung Tài Bạch");
-            sb.AppendLine("[Luận giải ngắn gọn]");
-            sb.AppendLine();
-            sb.AppendLine("### Cung Tử Tức");
-            sb.AppendLine("[Luận giải ngắn gọn]");
-            sb.AppendLine();
-            sb.AppendLine("### Cung Phu Thê");
-            sb.AppendLine("[Luận giải ngắn gọn]");
-            sb.AppendLine();
-            sb.AppendLine("### Cung Huynh Đệ");
-            sb.AppendLine("[Luận giải ngắn gọn]");
-            sb.AppendLine();
-            sb.AppendLine("## ĐIỂM ĐẶC BIỆT");
-            sb.AppendLine("- [Những điểm nổi bật, đặc biệt trong lá số]");
-            sb.AppendLine();
-            sb.AppendLine("## CẢNH BÁO");
-            sb.AppendLine("- [Những điều cần lưu ý, cảnh báo]");
-            sb.AppendLine();
-            sb.AppendLine("## KHUYẾN NGHỊ");
-            sb.AppendLine("- [Lời khuyên, hướng phát triển]");
-            sb.AppendLine();
-            return sb.ToString();
-        }
-
+       
         // Helper methods đã được di chuyển vào TuViChartAnalyzer
 
         private string GetNguHanhCucName(int cuc)
