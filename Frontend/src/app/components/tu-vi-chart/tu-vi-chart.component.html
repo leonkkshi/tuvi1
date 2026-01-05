@@ -477,27 +477,27 @@
     <div *ngIf="interpretation && !isLoadingInterpretation" class="interpretation-result">
       <div class="interpretation-overview">
         <h4>Tổng Quan</h4>
-        <p>{{ interpretation.overallInterpretation }}</p>
+        <p [innerHTML]="parseMarkdown(interpretation.overallInterpretation)"></p>
       </div>
 
       <div *ngIf="interpretation.keyInsights.length > 0" class="interpretation-insights">
         <h4>Điểm Nổi Bật</h4>
         <ul>
-          <li *ngFor="let insight of interpretation.keyInsights">{{ insight }}</li>
+          <li *ngFor="let insight of interpretation.keyInsights" [innerHTML]="parseMarkdown(insight)"></li>
         </ul>
       </div>
 
       <div *ngIf="interpretation.warnings.length > 0" class="interpretation-warnings">
         <h4>⚠️ Cảnh Báo</h4>
         <ul>
-          <li *ngFor="let warning of interpretation.warnings">{{ warning }}</li>
+          <li *ngFor="let warning of interpretation.warnings" [innerHTML]="parseMarkdown(warning)"></li>
         </ul>
       </div>
 
       <div *ngIf="interpretation.recommendations.length > 0" class="interpretation-recommendations">
         <h4>💡 Khuyến Nghị</h4>
         <ul>
-          <li *ngFor="let rec of interpretation.recommendations">{{ rec }}</li>
+          <li *ngFor="let rec of interpretation.recommendations" [innerHTML]="parseMarkdown(rec)"></li>
         </ul>
       </div>
 
@@ -505,7 +505,7 @@
         <h4>Chi Tiết 12 Cung</h4>
         <div *ngFor="let palace of interpretation.palaceInterpretations" class="palace-detail">
           <h5>{{ palace.palaceName }}</h5>
-          <p>{{ palace.interpretation }}</p>
+          <p [innerHTML]="parseMarkdown(palace.interpretation)"></p>
           <div *ngIf="palace.influencingStars.length > 0" class="influencing-stars">
             <strong>Sao ảnh hưởng:</strong> {{ palace.influencingStars.join(', ') }}
           </div>

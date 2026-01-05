@@ -288,5 +288,34 @@ export class TuViChartComponent {
   onFocusAreaChange(event: any): void {
     this.focusArea = event.target.value;
   }
+
+  // Parse markdown text thành HTML
+  parseMarkdown(text: string): string {
+    if (!text) return '';
+    
+    let html = text;
+    
+    // Convert headers (phải làm trước để tránh conflict với bold)
+    html = html.replace(/^######\s+(.+)$/gm, '<h6>$1</h6>');
+    html = html.replace(/^#####\s+(.+)$/gm, '<h5>$1</h5>');
+    html = html.replace(/^####\s+(.+)$/gm, '<h4>$1</h4>');
+    html = html.replace(/^###\s+(.+)$/gm, '<h3>$1</h3>');
+    html = html.replace(/^##\s+(.+)$/gm, '<h2>$1</h2>');
+    html = html.replace(/^#\s+(.+)$/gm, '<h1>$1</h1>');
+    
+    // Convert **text** thành <strong>text</strong>
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    
+    // Convert *text* thành <em>text</em>
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    
+    // Convert line breaks thành <br>
+    html = html.replace(/\n/g, '<br>');
+    
+    // Convert - item thành list items (basic support)
+    html = html.replace(/^- (.+)$/gm, '• $1');
+    
+    return html;
+  }
 }
 

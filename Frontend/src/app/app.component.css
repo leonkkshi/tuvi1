@@ -40,3 +40,48 @@ header h1 {
   background-color: #ffebee;
   color: #c62828;
 }
+
+/* Responsive cho mobile */
+@media (max-width: 768px) {
+  .app-container {
+    padding: 10px;
+  }
+
+  header {
+    padding: 20px 10px;
+    margin-bottom: 20px;
+    border-radius: 0;
+  }
+
+  header h1 {
+    font-size: 1.8rem;
+  }
+
+  .content {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-container {
+    padding: 5px;
+  }
+
+  header {
+    padding: 15px 5px;
+    margin-bottom: 15px;
+  }
+
+  header h1 {
+    font-size: 1.5rem;
+  }
+
+  .content {
+    gap: 15px;
+  }
+
+  .loading, .error {
+    padding: 15px;
+    font-size: 1rem;
+  }
+}

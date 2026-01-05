@@ -93,7 +93,17 @@ builder.Services.AddCors(options =>
                            (origin.StartsWith("https://") && origin.Contains(".ngrok")) ||
                            (origin.StartsWith("https://") && origin.Contains(".ngrok-free.app")) ||
                            origin == "https://tuvi1.vercel.app" ||
-                           (origin.StartsWith("https://tuvi1") && origin.Contains(".vercel.app"));
+                           (origin.StartsWith("https://tuvi1") && origin.Contains(".vercel.app")) ||
+                           // Facebook domains
+                           origin.Contains("facebook.com") ||
+                           origin.Contains("fb.com") ||
+                           origin.Contains("fbcdn.net") ||
+                           origin.Contains("messenger.com") ||
+                           origin.Contains("m.me") ||
+                           // Zalo domains
+                           origin.Contains("zalo.me") ||
+                           origin.Contains("zaloapp.com") ||
+                           origin.Contains("zdn.vn");
                 })
                   .AllowAnyHeader()
                   .AllowAnyMethod()
