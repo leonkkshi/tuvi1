@@ -26,32 +26,50 @@ export class PalaceInterpretationModalComponent implements OnChanges {
   constructor(private tuViService: TuViService) {}
 
   ngOnChanges(changes: SimpleChanges) {
-    // Chỉ xử lý khi modal được mở và có palace
-    if (!this.isOpen || !this.chart || !this.palace) {
+    console.log('[Modal] ngOnChanges', {
+      isOpen: this.isOpen,
+      palace: this.palace?.palaceName,
+      hasCache: !!this.cachedInterpretation,
+      changes: Object.keys(changes)
+    });
+
+    // Reset khi modal đóng
+    if (!this.isOpen) {
       return;
     }
 
-    // Kiểm tra nếu palace thay đổi hoặc modal mới mở
-    const palaceChanged = changes['palace'] && this.palace;
-    const modalOpened = changes['isOpen'] && this.isOpen;
-
-    if (palaceChanged || modalOpened) {
-      // Kiểm tra có cached interpretation không
-      if (this.cachedInterpretation && this.cachedInterpretation.PalaceName === this.palace.palaceName) {
-        // Dùng cache
+    // Khi modal mở và có palace
+    if (this.isOpen && this.palace && this.chart) {
+      const currentPalaceName = this.palace.palaceName;
+      
+      // Kiểm tra cache trước
+      if (this.cachedInterpretation && this.cachedInterpretation.PalaceName === currentPalaceName) {
+        console.log('[Modal] Using cached interpretation for:', currentPalaceName);
         this.interpretation = this.cachedInterpretation;
         this.isLoading = false;
         this.error = '';
-        this.lastLoadedPalaceName = this.palace.palaceName;
-      } else if (this.lastLoadedPalaceName !== this.palace.palaceName && !this.isLoading) {
-        // Chỉ load nếu chưa load cung này và không đang loading
+        this.lastLoadedPalaceName = currentPalaceName;
+        return;
+      }
+      
+      // Nếu chưa load cung này thì load
+      if (this.lastLoadedPalaceName !== currentPalaceName) {
+        console.log('[Modal] Need to load interpretation for:', currentPalaceName);
         this.loadInterpretation();
       }
     }
   }
 
   loadInterpretation() {
-    if (!this.chart || !this.palace || this.isLoading) return;
+    if (!this.chart || !this.palace) {
+      console.log('[Modal] Cannot load: missing chart or palace');
+      return;
+    }
+    
+    if (this.isLoading) {
+      console.log('[Modal] Already loading, skip');
+      return;
+    }
 
     const palaceName = this.palace.palaceName;
     this.lastLoadedPalaceName = palaceName;
@@ -59,22 +77,24 @@ export class PalaceInterpretationModalComponent implements OnChanges {
     this.error = '';
     this.interpretation = null;
 
-    console.log(`[Modal] Loading interpretation for: ${palaceName}`);
+    console.log(`[Modal] Starting API call for: ${palaceName}`);
 
     this.tuViService.interpretPalace(this.chart, palaceName).subscribe({
       next: (result) => {
-        console.log(`[Modal] Received result:`, result);
+        console.log(`[Modal] API response for ${palaceName}:`, result);
         // Chỉ cập nhật nếu vẫn đang xem cùng cung
         if (this.palace && this.palace.palaceName === palaceName) {
           this.interpretation = result;
           this.isLoading = false;
           // Emit để parent component cache lại
           this.interpretationLoaded.emit(result);
-          console.log(`[Modal] Set interpretation, isLoading=${this.isLoading}, hasInterpretation=${!!this.interpretation}`);
+          console.log(`[Modal] Updated state - isLoading: ${this.isLoading}, interpretation:`, this.interpretation);
+        } else {
+          console.log(`[Modal] Palace changed, ignoring result for ${palaceName}`);
         }
       },
       error: (err) => {
-        console.error('[Modal] Error loading palace interpretation:', err);
+        console.error('[Modal] API error:', err);
         if (this.palace && this.palace.palaceName === palaceName) {
           this.error = 'Không thể tải luận giải cho cung này. Vui lòng thử lại.';
           this.isLoading = false;

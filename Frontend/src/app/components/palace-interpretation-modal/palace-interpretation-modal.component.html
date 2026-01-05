@@ -6,8 +6,15 @@
     </div>
 
     <div class="modal-body">
-      <!-- Debug info (xóa sau khi fix) -->
-      <p style="color: red; font-size: 12px;">Debug: isLoading={{isLoading}}, hasInterpretation={{!!interpretation}}, hasError={{!!error}}</p>
+      <!-- Debug info -->
+      <div style="background: #f0f0f0; padding: 10px; margin-bottom: 10px; font-size: 11px; border: 1px solid #ccc;">
+        <strong>Debug Info:</strong><br>
+        isLoading: {{isLoading}}<br>
+        hasInterpretation: {{!!interpretation}}<br>
+        hasError: {{!!error}}<br>
+        interpretationText length: {{interpretation?.Interpretation?.length || 0}}<br>
+        palaceName: {{interpretation?.PalaceName || 'N/A'}}
+      </div>
       
       <!-- Loading state -->
       <div *ngIf="isLoading" class="loading-container">
