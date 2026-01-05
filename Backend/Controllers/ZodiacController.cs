@@ -107,9 +107,17 @@ namespace Backend.Controllers
         {
             try
             {
+                if (request.Chart == null || string.IsNullOrWhiteSpace(request.PalaceName))
+                {
+                    return BadRequest(new { error = "Thông tin lá số hoặc tên cung không hợp lệ" });
+                }
+
                 var startTime = DateTime.UtcNow;
                 
-                // Sử dụng method riêng để luận giải một cung với đầy đủ tam phương tứ chính và nhị hợp
+                Console.WriteLine($"[AI Palace Request] Bắt đầu luận giải cung: {request.PalaceName}");
+                
+                // Sử dụng method riêng để luận giải một cung với đầy đủ tam phương tứ chính
+                // Đối với Mệnh và Thân thì có thêm nhị hợp
                 var interpretation = await _aiInterpretationService.InterpretSinglePalaceAsync(
                     request.Chart, 
                     request.PalaceName);
@@ -122,12 +130,13 @@ namespace Backend.Controllers
                 };
                 
                 var duration = (DateTime.UtcNow - startTime).TotalMilliseconds;
-                Console.WriteLine($"[AI Palace Request] Palace: {request.PalaceName}, Duration: {duration}ms");
+                Console.WriteLine($"[AI Palace Request] Hoàn thành cung {request.PalaceName}, Duration: {duration}ms");
                 
                 return Ok(result);
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"[AI Palace Request] Lỗi: {ex.Message}");
                 return StatusCode(500, new { error = $"Lỗi khi luận giải cung {request.PalaceName}", details = ex.Message });
             }
         }

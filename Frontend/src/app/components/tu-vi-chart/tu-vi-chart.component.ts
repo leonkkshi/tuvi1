@@ -1,8 +1,8 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TuViChart, PalaceStar } from '../../models/tu-vi.models';
-import { TuViService } from '../../services/tu-vi.service';
+import { TuViService, PalaceInterpretationResult } from '../../services/tu-vi.service';
 import { InterpretationResponse } from '../../models/interpretation.models';
 import { PalaceInterpretationModalComponent } from '../palace-interpretation-modal/palace-interpretation-modal.component';
 
@@ -12,7 +12,7 @@ import { PalaceInterpretationModalComponent } from '../palace-interpretation-mod
   templateUrl: './tu-vi-chart.component.html',
   styleUrl: './tu-vi-chart.component.css'
 })
-export class TuViChartComponent {
+export class TuViChartComponent implements OnChanges {
   @Input() chart: TuViChart | null = null;
 
   // AI Interpretation properties
@@ -24,8 +24,20 @@ export class TuViChartComponent {
   // Palace interpretation modal
   selectedPalace: PalaceStar | null = null;
   isModalOpen = false;
+  
+  // Cache cho palace interpretations - lưu theo palaceName
+  palaceInterpretationsCache: Map<string, PalaceInterpretationResult> = new Map();
 
   constructor(private tuViService: TuViService) {}
+
+  // Theo dõi thay đổi của chart để clear cache khi lập lá số mới
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['chart'] && !changes['chart'].firstChange) {
+      // Clear cache khi chart thay đổi (lập lá số mới)
+      this.palaceInterpretationsCache.clear();
+      this.interpretation = null;
+    }
+  }
 
   // Mapping địa chi theo vị trí
   private branchNames = ['Tý', 'Sửu', 'Dần', 'Mão', 'Thìn', 'Tỵ', 'Ngọ', 'Mùi', 'Thân', 'Dậu', 'Tuất', 'Hợi'];
@@ -334,7 +346,17 @@ export class TuViChartComponent {
 
   closeModal() {
     this.isModalOpen = false;
-    this.selectedPalace = null;
+    // Không xóa selectedPalace để giữ cache interpretation
+  }
+
+  // Lấy cached interpretation nếu có
+  getCachedInterpretation(palaceName: string): PalaceInterpretationResult | null {
+    return this.palaceInterpretationsCache.get(palaceName) || null;
+  }
+
+  // Lưu interpretation vào cache
+  setCachedInterpretation(palaceName: string, result: PalaceInterpretationResult) {
+    this.palaceInterpretationsCache.set(palaceName, result);
   }
 
   getPalaceIcon(palaceName: string): string {

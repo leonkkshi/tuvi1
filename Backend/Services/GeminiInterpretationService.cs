@@ -133,11 +133,18 @@ namespace Backend.Services
         {
             try
             {
-                var palace = chart.PalaceStars.FirstOrDefault(p => p.PalaceName == palaceName);
+                // Tìm cung theo tên, trim khoảng trắng để tránh lỗi
+                var palace = chart.PalaceStars.FirstOrDefault(p => 
+                    p.PalaceName.Trim().Equals(palaceName.Trim(), StringComparison.OrdinalIgnoreCase));
+                
                 if (palace == null)
                 {
-                    return $"Không tìm thấy cung {palaceName} trong lá số.";
+                    _logger.LogWarning($"Không tìm thấy cung '{palaceName}'. Danh sách cung có: {string.Join(", ", chart.PalaceStars.Select(p => $"'{p.PalaceName}'"))}");
+                    return $"Không tìm thấy cung {palaceName} trong lá số. Vui lòng kiểm tra lại tên cung.";
                 }
+
+                _logger.LogInformation($"Đang luận giải cung {palace.PalaceName} (ID: {palace.PalaceId})");
+                
 
                 // Xây dựng prompt cho một cung cụ thể
                 var systemPrompt = GetSystemPrompt();
@@ -243,18 +250,28 @@ namespace Backend.Services
             sb.AppendLine($"{palaceInfo.Icon} {palaceInfo.Meaning}");
             sb.AppendLine();
 
-            // Luôn bao gồm tam phương tứ chính và nhị hợp cho mọi cung
-            sb.AppendLine(TuViChartAnalyzer.BuildPalaceAnalysis(palace, chart, includeNhiHop: true));
+            // Chỉ Mệnh và Thân cần xét nhị hợp
+            bool isMenhOrThan = palace.PalaceName == "Mệnh" || palace.PalaceId == chart.ThanPalace;
+            sb.AppendLine(TuViChartAnalyzer.BuildPalaceAnalysis(palace, chart, includeNhiHop: isMenhOrThan));
             
             sb.AppendLine();
             sb.AppendLine("=== YÊU CẦU LUẬN GIẢI ===");
             sb.AppendLine($"Hãy luận giải chi tiết và toàn diện cung {palace.PalaceName} với:");
             sb.AppendLine("1. Phân tích các sao trong bản cung và ý nghĩa của chúng");
-            sb.AppendLine("2. Ảnh hưởng của tam phương tứ chính (Đối cung, Tam hợp trái, Tam hợp phải)");
-            sb.AppendLine("3. Tác động của nhị hợp (cung hợp khí)");
-            sb.AppendLine("4. Ảnh hưởng từ cung liền kề");
-            sb.AppendLine("5. Tổng hợp và kết luận về cung này");
-            sb.AppendLine($"6. {palaceInfo.Requirement}");
+            sb.AppendLine("2. ⚠️ BẮT BUỘC: Ảnh hưởng của tam phương tứ chính (Đối cung, Tam hợp trái, Tam hợp phải)");
+            if (isMenhOrThan)
+            {
+                sb.AppendLine("3. ⚠️ ĐẶC BIỆT (Mệnh/Thân): Tác động của nhị hợp (cung hợp khí)");
+                sb.AppendLine("4. Ảnh hưởng từ cung liền kề");
+                sb.AppendLine("5. Tổng hợp và kết luận về cung này");
+                sb.AppendLine($"6. {palaceInfo.Requirement}");
+            }
+            else
+            {
+                sb.AppendLine("3. Ảnh hưởng từ cung liền kề");
+                sb.AppendLine("4. Tổng hợp và kết luận về cung này");
+                sb.AppendLine($"5. {palaceInfo.Requirement}");
+            }
             sb.AppendLine();
             sb.AppendLine("Trả lời chi tiết, rõ ràng, dễ hiểu cho người không chuyên.");
 
@@ -265,20 +282,24 @@ namespace Backend.Services
         {
             return @"Bạn là Thầy Tử Vi - một chuyên gia Tử Vi Đẩu Số hàng đầu với hơn 40 năm kinh nghiệm.
 
-NGUYÊN TẮC LUẬN ĐOÁN TỬ VI:
+NGUYÊN TẮC LUẬN ĐOÁN TỬ VI - QUAN TRỌNG:
 
-1. TAM PHƯƠNG TỨ CHÍNH (Bắt buộc cho mọi cung):
+1. TAM PHƯƠNG TỨ CHÍNH (BẮT BUỘC cho MỌI cung):
    - Bản cung: Cung đang xét
    - Đối cung: Cung đối diện (cách 6 vị trí) - ảnh hưởng mạnh nhất
-   - Tam hợp trái & phải: 2 cung tạo tam giác (cách 4 và 8 vị trí)
-   - Các sao ở tam phương tứ chính CHIẾU vào bản cung, ảnh hưởng trực tiếp
-   - Không được luận riêng bản cung mà bỏ qua tam phương!
+   - Tam hợp trái: Cung cách 4 vị trí
+   - Tam hợp phải: Cung cách 8 vị trí
+   ⚠️ CỰC KỲ QUAN TRỌNG: Các sao ở tam phương tứ chính CHIẾU vào bản cung, ảnh hưởng trực tiếp
+   ⚠️ TUYỆT ĐỐI KHÔNG được luận riêng bản cung mà bỏ qua tam phương tứ chính!
+   ⚠️ Phải phân tích đầy đủ 4 cung (bản cung + 3 cung tam phương) mới có luận đoán chính xác
 
-2. NHỊ HỢP (Đặc biệt cho Mệnh & Thân):
-   - Cặp đôi địa chi hợp khí theo ngũ hành
+2. NHỊ HỢP (ĐẶC BIỆT quan trọng cho cung Mệnh & Thân):
+   - Cặp đôi địa chi hợp khí theo ngũ hành (Tý-Sửu, Dần-Hợi, Mão-Tuất, Thìn-Dậu, Tị-Thân, Ngọ-Mùi)
    - Ảnh hưởng đến bản chất sâu xa, vận khí tổng thể
+   - Đối với Mệnh và Thân: PHẢI xét nhị hợp để hiểu đầy đủ cục diện
+   - Đối với các cung khác: Không cần thiết phải xét nhị hợp
 
-3. CUNG LIỀN KỀ (Đặc biệt cho Mệnh & Thân):
+3. CUNG LIỀN KỀ:
    - 2 cung kề bên (trước và sau)
    - Ảnh hưởng đến hoàn cảnh, môi trường sống
    - Sao ở đây tác động gần gũi, thường trực
@@ -295,11 +316,12 @@ NGUYÊN TẮC LUẬN ĐOÁN TỬ VI:
    - Hung + Hung = Đại hung
    - Hóa Lộc, Hóa Quyền, Hóa Khoa giải hung
    - Hóa Kỵ làm hung thêm
+   - Trường hợp đặc biệt, Tham Lang gặp Hỏa Tinh, Linh Tinh, Địa Không, Địa Kiếp là phú quý, Phá Quân gặp Không Kiếp là cách cục bạo phát
 
 HÃY LUẬN GIẢI:
 - Chi tiết, cụ thể từng cung
-- Liên hệ tam phương tứ chính rõ ràng
-- Với Mệnh & Thân: nhất định phải xét nhị hợp và cung liền kề
+- ⚠️ BẮT BUỘC: Phải liên hệ tam phương tứ chính rõ ràng cho MỌI cung
+- ⚠️ ĐẶC BIỆT: Với cung Mệnh & Thân nhất định phải xét thêm nhị hợp và cung liền kề
 - Dùng thuật ngữ Tử Vi chính xác
 - Giải thích dễ hiểu, thiết thực
 - Đưa ra lời khuyên cụ thể
@@ -408,7 +430,7 @@ Phong cách: Chuyên nghiệp nhưng gần gũi, tận tâm như thầy hướng
             var palaceInfo = GetPalaceInfo(palace.PalaceName);
             sb.AppendLine($"▶ {palaceInfo.Icon} CUNG {palace.PalaceName.ToUpper()} - {palaceInfo.Meaning}");
             
-            // Sử dụng helper để build phân tích
+            // Chỉ Mệnh và Thân mới cần xét nhị hợp
             bool includeNhiHop = palace.PalaceName == "Mệnh" || palace.PalaceId == chart.ThanPalace;
             sb.AppendLine(TuViChartAnalyzer.BuildPalaceAnalysis(palace, chart, includeNhiHop));
             

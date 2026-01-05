@@ -448,7 +448,9 @@
     [chart]="chart"
     [palace]="selectedPalace"
     [isOpen]="isModalOpen"
-    (close)="closeModal()">
+    [cachedInterpretation]="selectedPalace ? getCachedInterpretation(selectedPalace.palaceName) : null"
+    (close)="closeModal()"
+    (interpretationLoaded)="selectedPalace && setCachedInterpretation(selectedPalace.palaceName, $event)">
   </app-palace-interpretation-modal>
 </div>
   <!-- Palace Interpretation Buttons Section -->

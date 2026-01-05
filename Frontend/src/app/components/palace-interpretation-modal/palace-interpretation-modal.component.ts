@@ -14,7 +14,9 @@ export class PalaceInterpretationModalComponent {
   @Input() chart: TuViChart | null = null;
   @Input() palace: PalaceStar | null = null;
   @Input() isOpen: boolean = false;
+  @Input() cachedInterpretation: PalaceInterpretationResult | null = null;
   @Output() close = new EventEmitter<void>();
+  @Output() interpretationLoaded = new EventEmitter<PalaceInterpretationResult>();
 
   interpretation: PalaceInterpretationResult | null = null;
   isLoading: boolean = false;
@@ -23,8 +25,17 @@ export class PalaceInterpretationModalComponent {
   constructor(private tuViService: TuViService) {}
 
   ngOnChanges() {
-    if (this.isOpen && this.chart && this.palace && !this.interpretation) {
-      this.loadInterpretation();
+    if (this.isOpen && this.chart && this.palace) {
+      // Kiểm tra có cached interpretation không
+      if (this.cachedInterpretation && this.cachedInterpretation.PalaceName === this.palace.palaceName) {
+        // Dùng cache
+        this.interpretation = this.cachedInterpretation;
+        this.isLoading = false;
+        this.error = '';
+      } else if (!this.interpretation || this.interpretation.PalaceName !== this.palace.palaceName) {
+        // Chưa có hoặc cung khác, load mới
+        this.loadInterpretation();
+      }
     }
   }
 
@@ -38,6 +49,8 @@ export class PalaceInterpretationModalComponent {
       next: (result) => {
         this.interpretation = result;
         this.isLoading = false;
+        // Emit để parent component cache lại
+        this.interpretationLoaded.emit(result);
       },
       error: (err) => {
         console.error('Error loading palace interpretation:', err);
@@ -48,8 +61,7 @@ export class PalaceInterpretationModalComponent {
   }
 
   closeModal() {
-    this.interpretation = null;
-    this.error = '';
+    // Không xóa interpretation để giữ cache khi đóng modal
     this.close.emit();
   }
 
