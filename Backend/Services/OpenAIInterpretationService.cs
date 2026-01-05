@@ -391,7 +391,7 @@ Phong cách: Chuyên nghiệp nhưng gần gũi, tận tâm như thầy hướng
             
             var response = new InterpretationResponse
             {
-                OverallInterpretation = aiResponse,
+                OverallInterpretation = aiResponse, // Giữ toàn bộ luận giải từ AI
                 PalaceInterpretations = new(),
                 KeyInsights = new(),
                 Warnings = new(),
