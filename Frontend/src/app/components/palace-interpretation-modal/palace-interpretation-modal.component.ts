@@ -59,21 +59,22 @@ export class PalaceInterpretationModalComponent implements OnChanges {
     this.error = '';
     this.interpretation = null;
 
-    console.log(`Loading interpretation for: ${palaceName}`);
+    console.log(`[Modal] Loading interpretation for: ${palaceName}`);
 
     this.tuViService.interpretPalace(this.chart, palaceName).subscribe({
       next: (result) => {
+        console.log(`[Modal] Received result:`, result);
         // Chỉ cập nhật nếu vẫn đang xem cùng cung
         if (this.palace && this.palace.palaceName === palaceName) {
           this.interpretation = result;
           this.isLoading = false;
           // Emit để parent component cache lại
           this.interpretationLoaded.emit(result);
-          console.log(`Loaded interpretation for: ${palaceName}`);
+          console.log(`[Modal] Set interpretation, isLoading=${this.isLoading}, hasInterpretation=${!!this.interpretation}`);
         }
       },
       error: (err) => {
-        console.error('Error loading palace interpretation:', err);
+        console.error('[Modal] Error loading palace interpretation:', err);
         if (this.palace && this.palace.palaceName === palaceName) {
           this.error = 'Không thể tải luận giải cho cung này. Vui lòng thử lại.';
           this.isLoading = false;

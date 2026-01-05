@@ -6,6 +6,9 @@
     </div>
 
     <div class="modal-body">
+      <!-- Debug info (xóa sau khi fix) -->
+      <p style="color: red; font-size: 12px;">Debug: isLoading={{isLoading}}, hasInterpretation={{!!interpretation}}, hasError={{!!error}}</p>
+      
       <!-- Loading state -->
       <div *ngIf="isLoading" class="loading-container">
         <div class="spinner"></div>
@@ -37,20 +40,6 @@
                 <span *ngIf="palace?.hasTuan" class="badge">Tuần</span>
                 <span *ngIf="palace?.hasTriet" class="badge">Triệt</span>
               </span>
-            </div>
-          </div>
-
-          <div class="stars-list" *ngIf="palace && palace.stars && palace.stars.length > 0">
-            <h4>⭐ Các sao trong cung:</h4>
-            <div class="stars-grid">
-              <div *ngFor="let star of palace.stars" 
-                   class="star-item"
-                   [class.cat]="star.nature === 'Cát'"
-                   [class.hung]="star.nature === 'Hung'">
-                <span class="star-name">{{ star.starName }}</span>
-                <span class="star-hoa" *ngIf="star.hoa">{{ star.hoa }}</span>
-                <span class="star-brightness">{{ star.brightness }}</span>
-              </div>
             </div>
           </div>
         </div>
