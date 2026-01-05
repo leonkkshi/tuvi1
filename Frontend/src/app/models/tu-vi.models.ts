@@ -35,6 +35,7 @@ export interface PalaceStar {
 
 export interface TuViChart {
   id: string;
+  fullName: string;
   birthDate: string;
   birthTime: string;
   isMale: boolean;
@@ -50,6 +51,7 @@ export interface TuViChart {
 }
 
 export interface ChartRequest {
+  fullName?: string;
   year: number;
   month: number;
   day: number;

@@ -16,6 +16,7 @@ namespace Backend.Models
     public class TuViChart
     {
         public Guid Id { get; set; }
+        public string FullName { get; set; } = string.Empty;
         public DateTime BirthDate { get; set; }
         public TimeSpan BirthTime { get; set; }
         public bool IsMale { get; set; }

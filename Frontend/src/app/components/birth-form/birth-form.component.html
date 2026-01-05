@@ -89,37 +89,13 @@
           name="hourBranch" 
           [(ngModel)]="selectedHourBranch"
           (change)="onHourBranchChange()"
-          class="select-large">
+          class="select-large"
+          [class.error]="errors['hourBranch']">
           <option *ngFor="let branch of hourBranches" [value]="branch.name">
             {{ branch.name }} ({{ branch.displayTime }})
           </option>
         </select>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group half">
-          <label for="hour">Hoặc nhập giờ cụ thể:</label>
-          <input 
-            type="number" 
-            id="hour" 
-            name="hour" 
-            [(ngModel)]="birthInfo.hour" 
-            min="0" 
-            max="23"
-            placeholder="Giờ (0-23)">
-        </div>
-
-        <div class="form-group half">
-          <label for="minute">Phút:</label>
-          <input 
-            type="number" 
-            id="minute" 
-            name="minute" 
-            [(ngModel)]="birthInfo.minute" 
-            min="0" 
-            max="59"
-            placeholder="Phút (0-59)">
-        </div>
+        <span class="error-message" *ngIf="errors['hourBranch']">{{ errors['hourBranch'] }}</span>
       </div>
     </div>
 

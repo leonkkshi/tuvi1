@@ -146,6 +146,7 @@ public class TuViService : ITuViService
         return new TuViChart
         {
             Id = Guid.NewGuid(),
+            FullName = request.FullName ?? string.Empty,
             BirthDate = birthDate,
             BirthTime = birthTime,
             IsMale = request.IsMale,

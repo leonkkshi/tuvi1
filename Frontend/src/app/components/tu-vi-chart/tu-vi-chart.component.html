@@ -192,7 +192,7 @@
     <div class="center-info" colspan="2">
       <div class="info-section">
         <h3>Thông Tin Sinh</h3>
-        <p><strong>Họ tên:</strong> Nguyễn Văn A</p>
+        <p><strong>Họ tên:</strong> {{ chart.fullName || 'Chưa có' }}</p>
         <p><strong>Năm:</strong> {{ chart.lunarYear }}</p>
         <p><strong>Tháng:</strong> {{ chart.lunarMonth }}</p>
         <p><strong>Ngày:</strong> {{ chart.lunarDay }}</p>

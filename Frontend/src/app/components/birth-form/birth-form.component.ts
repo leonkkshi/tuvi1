@@ -55,6 +55,8 @@ export class BirthFormComponent {
       this.years.push(year);
     }
     this.updateDaysInMonth();
+    // Đặt giờ phút mặc định từ địa chi đã chọn
+    this.onHourBranchChange();
   }
 
   onHourBranchChange() {
@@ -102,6 +104,11 @@ export class BirthFormComponent {
       isValid = false;
     }
 
+    if (!this.selectedHourBranch) {
+      this.errors['hourBranch'] = 'Vui lòng chọn giờ sinh';
+      isValid = false;
+    }
+
     if (!this.viewYear || this.viewYear < 1900 || this.viewYear > 2100) {
       this.errors['viewYear'] = 'Năm xem không hợp lệ';
       isValid = false;
@@ -112,7 +119,11 @@ export class BirthFormComponent {
 
   onSubmit() {
     if (this.validateForm()) {
-      this.chartGenerated.emit(this.birthInfo);
+      const request = {
+        ...this.birthInfo,
+        fullName: this.fullName
+      };
+      this.chartGenerated.emit(request);
     }
   }
 
@@ -130,5 +141,7 @@ export class BirthFormComponent {
     this.viewYear = new Date().getFullYear();
     this.selectedHourBranch = 'Tý';
     this.errors = {};
+    // Đặt lại giờ phút từ địa chi
+    this.onHourBranchChange();
   }
 }
