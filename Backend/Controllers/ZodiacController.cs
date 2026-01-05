@@ -109,25 +109,16 @@ namespace Backend.Controllers
             {
                 var startTime = DateTime.UtcNow;
                 
-                // Tạo request để luận giải, focus vào cung cụ thể
-                var interpretRequest = new InterpretationRequest
-                {
-                    Chart = request.Chart,
-                    FocusArea = "general"
-                };
-                
-                var interpretation = await _aiInterpretationService.InterpretChartAsync(interpretRequest);
-                
-                // Tìm luận giải cho cung được yêu cầu
-                var palaceInterp = interpretation.PalaceInterpretations
-                    .FirstOrDefault(p => p.PalaceName == request.PalaceName);
+                // Sử dụng method riêng để luận giải một cung với đầy đủ tam phương tứ chính và nhị hợp
+                var interpretation = await _aiInterpretationService.InterpretSinglePalaceAsync(
+                    request.Chart, 
+                    request.PalaceName);
                 
                 var result = new PalaceInterpretationResult
                 {
                     PalaceName = request.PalaceName,
-                    Interpretation = palaceInterp?.Interpretation ?? 
-                        $"Chưa có luận giải chi tiết cho cung {request.PalaceName}. Vui lòng thử lại.",
-                    InfluencingStars = palaceInterp?.InfluencingStars ?? new List<string>()
+                    Interpretation = interpretation,
+                    InfluencingStars = new List<string>() // TODO: Parse từ response nếu cần
                 };
                 
                 var duration = (DateTime.UtcNow - startTime).TotalMilliseconds;

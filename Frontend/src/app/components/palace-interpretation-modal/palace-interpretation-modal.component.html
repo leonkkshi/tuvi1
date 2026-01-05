@@ -57,13 +57,13 @@
 
         <div class="interpretation-content">
           <h3>📜 Luận giải chi tiết</h3>
-          <div class="interpretation-text" [innerHTML]="parseMarkdown(interpretation.interpretation)"></div>
+          <div class="interpretation-text" [innerHTML]="parseMarkdown(interpretation.Interpretation)"></div>
         </div>
 
-        <div class="influencing-stars" *ngIf="interpretation.influencingStars && interpretation.influencingStars.length > 0">
+        <div class="influencing-stars" *ngIf="interpretation.InfluencingStars && interpretation.InfluencingStars.length > 0">
           <h4>🌟 Các sao ảnh hưởng:</h4>
           <div class="star-tags">
-            <span *ngFor="let star of interpretation.influencingStars" class="star-tag">{{ star }}</span>
+            <span *ngFor="let star of interpretation.InfluencingStars" class="star-tag">{{ star }}</span>
           </div>
         </div>
       </div>

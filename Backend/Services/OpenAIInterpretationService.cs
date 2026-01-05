@@ -37,6 +37,15 @@ namespace Backend.Services
             });
         }
 
+        public async Task<string> InterpretSinglePalaceAsync(TuViChart chart, string palaceName)
+        {
+            // Sử dụng throttler để giới hạn concurrent requests
+            return await _throttler.ExecuteAsync(async () =>
+            {
+                return await Task.FromResult($"Luận giải cung {palaceName} chưa được implement cho OpenAI service. Vui lòng sử dụng Gemini service.");
+            });
+        }
+
         private async Task<InterpretationResponse> ExecuteInterpretationAsync(InterpretationRequest request)
         {
             try

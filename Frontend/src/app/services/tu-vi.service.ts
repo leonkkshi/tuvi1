@@ -31,14 +31,14 @@ export class TuViService {
 
   interpretPalace(chart: TuViChart, palaceName: string): Observable<PalaceInterpretationResult> {
     return this.http.post<PalaceInterpretationResult>(`${this.apiUrl}/ai-interpret-palace`, {
-      chart: chart,
-      palaceName: palaceName
+      Chart: chart,
+      PalaceName: palaceName
     });
   }
 }
 
 export interface PalaceInterpretationResult {
-  palaceName: string;
-  interpretation: string;
-  influencingStars: string[];
+  PalaceName: string;
+  Interpretation: string;
+  InfluencingStars: string[];
 }

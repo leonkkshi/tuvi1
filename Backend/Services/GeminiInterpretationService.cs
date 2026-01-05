@@ -36,6 +36,15 @@ namespace Backend.Services
             });
         }
 
+        public async Task<string> InterpretSinglePalaceAsync(TuViChart chart, string palaceName)
+        {
+            // Sử dụng throttler để giới hạn concurrent requests
+            return await _throttler.ExecuteAsync(async () =>
+            {
+                return await ExecuteSinglePalaceInterpretationAsync(chart, palaceName);
+            });
+        }
+
         private async Task<InterpretationResponse> ExecuteInterpretationAsync(InterpretationRequest request)
         {
             try
@@ -118,6 +127,138 @@ namespace Backend.Services
                     Recommendations = new()
                 };
             }
+        }
+
+        private async Task<string> ExecuteSinglePalaceInterpretationAsync(TuViChart chart, string palaceName)
+        {
+            try
+            {
+                var palace = chart.PalaceStars.FirstOrDefault(p => p.PalaceName == palaceName);
+                if (palace == null)
+                {
+                    return $"Không tìm thấy cung {palaceName} trong lá số.";
+                }
+
+                // Xây dựng prompt cho một cung cụ thể
+                var systemPrompt = GetSystemPrompt();
+                var userPrompt = BuildSinglePalacePrompt(palace, chart);
+                var fullPrompt = $"{systemPrompt}\n\n{userPrompt}";
+
+                // Gọi Gemini API
+                var geminiRequest = new
+                {
+                    contents = new[]
+                    {
+                        new
+                        {
+                            role = "user",
+                            parts = new[]
+                            {
+                                new { text = fullPrompt }
+                            }
+                        }
+                    },
+                    generationConfig = new
+                    {
+                        temperature = 0.7,
+                        maxOutputTokens = 8000,
+                        topK = 40,
+                        topP = 0.95
+                    },
+                    safetySettings = new[]
+                    {
+                        new { category = "HARM_CATEGORY_HARASSMENT", threshold = "BLOCK_NONE" },
+                        new { category = "HARM_CATEGORY_HATE_SPEECH", threshold = "BLOCK_NONE" },
+                        new { category = "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold = "BLOCK_NONE" },
+                        new { category = "HARM_CATEGORY_DANGEROUS_CONTENT", threshold = "BLOCK_NONE" }
+                    }
+                };
+
+                var json = JsonSerializer.Serialize(geminiRequest);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var url = $"https://generativelanguage.googleapis.com/v1beta/models/{_model}:generateContent?key={_apiKey}";
+                
+                _logger.LogInformation("Calling Gemini API for single palace: {PalaceName}", palaceName);
+                
+                var response = await _httpClient.PostAsync(url, content);
+                var responseJson = await response.Content.ReadAsStringAsync();
+                
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogError("Gemini API error: {StatusCode} - {Response}", response.StatusCode, responseJson);
+                    throw new Exception($"Gemini API trả về lỗi {response.StatusCode}: {responseJson}");
+                }
+
+                var result = JsonSerializer.Deserialize<GeminiResponse>(responseJson, new JsonSerializerOptions 
+                { 
+                    PropertyNameCaseInsensitive = true 
+                });
+
+                if (result?.Candidates == null || result.Candidates.Length == 0)
+                {
+                    throw new Exception("Không nhận được phản hồi từ Gemini AI");
+                }
+
+                return result.Candidates[0].Content.Parts[0].Text;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi gọi Gemini API cho cung {PalaceName}", palaceName);
+                return $"Xin lỗi, hiện không thể luận giải cung {palaceName}. Vui lòng thử lại sau. Lỗi: {ex.Message}";
+            }
+        }
+
+        private string BuildSinglePalacePrompt(PalaceStar palace, TuViChart chart)
+        {
+            var sb = new StringBuilder();
+
+            sb.AppendLine("=== THÔNG TIN LÁ SỐ TỬ VI ===");
+            sb.AppendLine($"Ngày sinh: {chart.BirthDate:dd/MM/yyyy}");
+            sb.AppendLine($"Giờ sinh: {chart.BirthTime}");
+            sb.Append("Giới tính: ");
+            sb.AppendLine(chart.IsMale ? "Nam" : "Nữ");
+            sb.AppendLine($"Âm Dương: {chart.AmDuong}");
+            sb.AppendLine($"Ngũ Hành Cục: {GetNguHanhCucName(chart.NguHanhCuc)}");
+            sb.AppendLine($"Năm âm lịch: {chart.LunarYear}");
+            sb.AppendLine();
+
+            // Thông tin cung Mệnh và Thân để có context
+            var menhPalace = chart.PalaceStars.FirstOrDefault(p => p.PalaceName == "Mệnh");
+            var thanPalace = chart.PalaceStars.FirstOrDefault(p => p.PalaceId == chart.ThanPalace);
+            
+            if (menhPalace != null)
+            {
+                sb.AppendLine($"Cung Mệnh: {TuViChartAnalyzer.GetBranchName(menhPalace.PalaceId)} - Sao chính: {TuViChartAnalyzer.FormatStarList(menhPalace.Stars)}");
+            }
+            if (thanPalace != null)
+            {
+                sb.AppendLine($"Cung Thân: {thanPalace.PalaceName} ({TuViChartAnalyzer.GetBranchName(chart.ThanPalace)}) - Sao chính: {TuViChartAnalyzer.FormatStarList(thanPalace.Stars)}");
+            }
+            sb.AppendLine();
+
+            // Chi tiết cung cần luận giải
+            var palaceInfo = GetPalaceInfo(palace.PalaceName);
+            sb.AppendLine($"=== LUẬN GIẢI CHI TIẾT CUNG {palace.PalaceName.ToUpper()} ===");
+            sb.AppendLine($"{palaceInfo.Icon} {palaceInfo.Meaning}");
+            sb.AppendLine();
+
+            // Luôn bao gồm tam phương tứ chính và nhị hợp cho mọi cung
+            sb.AppendLine(TuViChartAnalyzer.BuildPalaceAnalysis(palace, chart, includeNhiHop: true));
+            
+            sb.AppendLine();
+            sb.AppendLine("=== YÊU CẦU LUẬN GIẢI ===");
+            sb.AppendLine($"Hãy luận giải chi tiết và toàn diện cung {palace.PalaceName} với:");
+            sb.AppendLine("1. Phân tích các sao trong bản cung và ý nghĩa của chúng");
+            sb.AppendLine("2. Ảnh hưởng của tam phương tứ chính (Đối cung, Tam hợp trái, Tam hợp phải)");
+            sb.AppendLine("3. Tác động của nhị hợp (cung hợp khí)");
+            sb.AppendLine("4. Ảnh hưởng từ cung liền kề");
+            sb.AppendLine("5. Tổng hợp và kết luận về cung này");
+            sb.AppendLine($"6. {palaceInfo.Requirement}");
+            sb.AppendLine();
+            sb.AppendLine("Trả lời chi tiết, rõ ràng, dễ hiểu cho người không chuyên.");
+
+            return sb.ToString();
         }
 
         private string GetSystemPrompt()
