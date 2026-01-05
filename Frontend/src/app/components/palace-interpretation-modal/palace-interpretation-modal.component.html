@@ -1,0 +1,76 @@
+<div class="modal-backdrop" *ngIf="isOpen" (click)="handleBackdropClick($event)">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>🔮 Luận Giải Cung {{ palace?.palaceName }}</h2>
+      <button class="close-btn" (click)="closeModal()" aria-label="Đóng">×</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Loading state -->
+      <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Đang phân tích cung {{ palace?.palaceName }}...</p>
+      </div>
+
+      <!-- Error state -->
+      <div *ngIf="error && !isLoading" class="error-container">
+        <p class="error-message">{{ error }}</p>
+        <button class="retry-btn" (click)="loadInterpretation()">Thử lại</button>
+      </div>
+
+      <!-- Content -->
+      <div *ngIf="interpretation && !isLoading" class="interpretation-container">
+        <div class="palace-info">
+          <h3>📍 Thông tin cung</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">Tên cung:</span>
+              <span class="value">{{ palace?.palaceName }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Vị trí:</span>
+              <span class="value">{{ getBranchName(palace?.palaceId || 0) }}</span>
+            </div>
+            <div class="info-item" *ngIf="palace?.hasTuan || palace?.hasTriet">
+              <span class="label">Đặc điểm:</span>
+              <span class="value special">
+                <span *ngIf="palace?.hasTuan" class="badge">Tuần</span>
+                <span *ngIf="palace?.hasTriet" class="badge">Triệt</span>
+              </span>
+            </div>
+          </div>
+
+          <div class="stars-list" *ngIf="palace && palace.stars && palace.stars.length > 0">
+            <h4>⭐ Các sao trong cung:</h4>
+            <div class="stars-grid">
+              <div *ngFor="let star of palace.stars" 
+                   class="star-item"
+                   [class.cat]="star.nature === 'Cát'"
+                   [class.hung]="star.nature === 'Hung'">
+                <span class="star-name">{{ star.starName }}</span>
+                <span class="star-hoa" *ngIf="star.hoa">{{ star.hoa }}</span>
+                <span class="star-brightness">{{ star.brightness }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="interpretation-content">
+          <h3>📜 Luận giải chi tiết</h3>
+          <div class="interpretation-text" [innerHTML]="parseMarkdown(interpretation.interpretation)"></div>
+        </div>
+
+        <div class="influencing-stars" *ngIf="interpretation.influencingStars && interpretation.influencingStars.length > 0">
+          <h4>🌟 Các sao ảnh hưởng:</h4>
+          <div class="star-tags">
+            <span *ngFor="let star of interpretation.influencingStars" class="star-tag">{{ star }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="close-footer-btn" (click)="closeModal()">Đóng</button>
+    </div>
+  </div>
+</div>

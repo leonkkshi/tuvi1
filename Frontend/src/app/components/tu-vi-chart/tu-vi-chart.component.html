@@ -443,9 +443,36 @@
     </div>
   </div>
 
+  <!-- Palace Interpretation Modal -->
+  <app-palace-interpretation-modal
+    [chart]="chart"
+    [palace]="selectedPalace"
+    [isOpen]="isModalOpen"
+    (close)="closeModal()">
+  </app-palace-interpretation-modal>
+</div>
+  <!-- Palace Interpretation Buttons Section -->
+  <div class="palace-interpretation-buttons" *ngIf="chart">
+    <h3>🔮 Luận Giải Chi Tiết Từng Cung</h3>
+    <p class="section-description">Nhấp vào cung bạn muốn xem luận giải chi tiết với phân tích tam phương tứ chính, nhị hợp và các yếu tố ảnh hưởng</p>
+    <div class="palace-buttons-grid">
+      <button 
+        *ngFor="let palace of chart.palaceStars" 
+        class="palace-interpret-btn"
+        [class.menh]="palace.palaceName === 'Mệnh'"
+        [class.than]="palace.palaceId === chart.thanPalace"
+        (click)="openPalaceInterpretation(palace.palaceId)">
+        <span class="palace-icon">{{ getPalaceIcon(palace.palaceName) }}</span>
+        <span class="palace-btn-name">{{ palace.palaceName }}</span>
+        <span class="palace-branch-small">{{ getPalaceBranchByPosition(palace.palaceId) }}</span>
+        <span class="palace-star-count" *ngIf="palace.stars.length > 0">{{ palace.stars.length }} sao</span>
+      </button>
+    </div>
+  </div>
+
   <!-- AI Interpretation Section -->
-  <div class="ai-interpretation-section">
-    <h3>🤖 Luận Giải AI</h3>
+  <div class="ai-interpretation-section" *ngIf="chart">
+    <h3>🤖 Luận Giải Tổng Quan AI</h3>
     
     <div class="interpretation-controls">
       <label for="focusArea">Lĩnh vực:</label>

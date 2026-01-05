@@ -10,12 +10,8 @@ Full-stack horoscope application with:
 - `/Backend` - ASP.NET Core Web API
 - `/Frontend` - Angular application
 
-## Completed Steps
-- ✓ Created workspace structure
-- ✓ Created copilot-instructions.md
+## Lưu ý quan trọng
+- Không tạo tài liệu hướng dẫn, tóm tắt
+-Tìm thông tin trên mạng nếu cần thiết
 
-## Next Steps
-- Scaffold ASP.NET Core backend
-- Scaffold Angular frontend
-- Add Vietnamese localization
-- Test application
+

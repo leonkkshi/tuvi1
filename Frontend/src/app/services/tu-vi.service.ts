@@ -28,4 +28,17 @@ export class TuViService {
   interpretChart(request: InterpretationRequest): Observable<InterpretationResponse> {
     return this.http.post<InterpretationResponse>(`${this.apiUrl}/ai-interpret`, request);
   }
+
+  interpretPalace(chart: TuViChart, palaceName: string): Observable<PalaceInterpretationResult> {
+    return this.http.post<PalaceInterpretationResult>(`${this.apiUrl}/ai-interpret-palace`, {
+      chart: chart,
+      palaceName: palaceName
+    });
+  }
+}
+
+export interface PalaceInterpretationResult {
+  palaceName: string;
+  interpretation: string;
+  influencingStars: string[];
 }

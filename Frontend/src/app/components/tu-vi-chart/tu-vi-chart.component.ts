@@ -4,10 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { TuViChart, PalaceStar } from '../../models/tu-vi.models';
 import { TuViService } from '../../services/tu-vi.service';
 import { InterpretationResponse } from '../../models/interpretation.models';
+import { PalaceInterpretationModalComponent } from '../palace-interpretation-modal/palace-interpretation-modal.component';
 
 @Component({
   selector: 'app-tu-vi-chart',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PalaceInterpretationModalComponent],
   templateUrl: './tu-vi-chart.component.html',
   styleUrl: './tu-vi-chart.component.css'
 })
@@ -19,6 +20,10 @@ export class TuViChartComponent {
   isLoadingInterpretation = false;
   interpretationError = '';
   focusArea = 'general';
+
+  // Palace interpretation modal
+  selectedPalace: PalaceStar | null = null;
+  isModalOpen = false;
 
   constructor(private tuViService: TuViService) {}
 
@@ -316,6 +321,38 @@ export class TuViChartComponent {
     html = html.replace(/^- (.+)$/gm, '• $1');
     
     return html;
+  }
+
+  // Palace interpretation modal methods
+  openPalaceInterpretation(palaceId: number) {
+    const palace = this.getPalaceByPosition(palaceId);
+    if (palace) {
+      this.selectedPalace = palace;
+      this.isModalOpen = true;
+    }
+  }
+
+  closeModal() {
+    this.isModalOpen = false;
+    this.selectedPalace = null;
+  }
+
+  getPalaceIcon(palaceName: string): string {
+    const icons: {[key: string]: string} = {
+      'Mệnh': '🎯',
+      'Phụ Mẫu': '👨‍👩‍👦',
+      'Phúc Đức': '🎭',
+      'Điền Trạch': '🏠',
+      'Quan Lộc': '💼',
+      'Nô Bộc': '👥',
+      'Thiên Di': '✈️',
+      'Tật Ách': '⚕️',
+      'Tài Bạch': '💰',
+      'Tử Tức': '👶',
+      'Phu Thê': '💑',
+      'Huynh Đệ': '👫'
+    };
+    return icons[palaceName] || '⭐';
   }
 }
 

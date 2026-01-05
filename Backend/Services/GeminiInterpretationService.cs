@@ -1,4 +1,5 @@
 using Backend.Models;
+using Backend.Services.Helpers;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -167,153 +168,212 @@ Phong cách: Chuyên nghiệp nhưng gần gũi, tận tâm như thầy hướng
 
         private string BuildPrompt(InterpretationRequest request)
         {
-            var chart = request.Chart;
             var sb = new StringBuilder();
 
-            sb.AppendLine("=== THÔNG TIN LÁ SỐ TỬ VI ===");
-            sb.AppendLine($"Ngày sinh: {chart.BirthDate:dd/MM/yyyy}");
-            sb.AppendLine($"Giờ sinh: {chart.BirthTime}");
-            sb.AppendLine($"Giới tính: {(chart.IsMale ? "Nam" : "Nữ")}");
-            sb.AppendLine($"Âm Dương: {chart.AmDuong}");
-            sb.AppendLine($"Ngũ Hành Cục: {GetNguHanhCucName(chart.NguHanhCuc)}");
-            sb.AppendLine($"Năm âm lịch: {chart.LunarYear}");
+            // 1. Thông tin cơ bản
+            sb.Append(BuildBasicInfo(request.Chart));
             
-            // Tìm tên cung Thân
-            var thanPalace = chart.PalaceStars.FirstOrDefault(p => p.PalaceId == chart.ThanPalace);
-            if (thanPalace != null)
-            {
-                sb.AppendLine($"Cung Thân: {thanPalace.PalaceName} (Địa chi: {GetBranchName(chart.ThanPalace)})");
-            }
-            
-            sb.AppendLine();
+            // 2. Tổng quan lá số
+            sb.Append(BuildOverallPrompt(request.Chart));
 
-            sb.AppendLine("=== PHÂN BỐ SAO TRONG 12 CUNG VỚI TAM PHƯƠNG TỨ CHÍNH ===");
-            foreach (var palace in chart.PalaceStars.OrderBy(p => p.PalaceId))
-            {
-                sb.AppendLine($"\n【{palace.PalaceName}】 (Vị trí: {GetBranchName(palace.PalaceId)})");
-                
-                // Hiển thị Tuần và Triệt nếu có
-                var specialMarks = new List<string>();
-                if (palace.HasTuan) specialMarks.Add("Tuần");
-                if (palace.HasTriet) specialMarks.Add("Triệt");
-                if (specialMarks.Any())
-                {
-                    sb.AppendLine($"  ⚠️ Đặc điểm: {string.Join(", ", specialMarks)}");
-                }
-                
-                if (palace.Stars.Any())
-                {
-                    sb.AppendLine("  Bản cung:");
-                    foreach (var star in palace.Stars)
-                    {
-                        var hoaInfo = !string.IsNullOrEmpty(star.Hoa) ? $" - {star.Hoa}" : "";
-                        sb.AppendLine($"    - {star.StarName}{hoaInfo} ({star.Type}, {star.Element}, {star.Nature}, Độ sáng: {star.Brightness})");
-                    }
-                }
-                else
-                {
-                    sb.AppendLine("  Bản cung: (Không có sao chính)");
-                }
+            // 3. Chi tiết từng cung
+            sb.Append(BuildAllPalacesPrompt(request.Chart));
 
-                var tamPhuong = GetTamPhuongTuChinh(palace.PalaceId, chart);
-                sb.AppendLine($"\n  Tam phương tứ chính:");
-                sb.AppendLine($"    - Đối cung ({tamPhuong.DoiCung.Name}): {FormatStarList(tamPhuong.DoiCung.Stars)}");
-                sb.AppendLine($"    - Tam hợp trái ({tamPhuong.TamHopTrai.Name}): {FormatStarList(tamPhuong.TamHopTrai.Stars)}");
-                sb.AppendLine($"    - Tam hợp phải ({tamPhuong.TamHopPhai.Name}): {FormatStarList(tamPhuong.TamHopPhai.Stars)}");
-
-                if (palace.PalaceName == "Mệnh" || palace.PalaceId == chart.ThanPalace)
-                {
-                    var nhiHop = GetNhiHop(palace.PalaceId, chart);
-                    sb.AppendLine($"\n  Nhị hợp (cặp đôi hợp khí):");
-                    sb.AppendLine($"    - Cung hợp ({nhiHop.CungTruoc.Name}): {FormatStarList(nhiHop.CungTruoc.Stars)}");
-                    
-                    var lienKe = GetCungLienKe(palace.PalaceId, chart);
-                    sb.AppendLine($"\n  Cung liền kề (2 bên):");
-                    sb.AppendLine($"    - Cung trước ({lienKe.CungTruoc.Name}): {FormatStarList(lienKe.CungTruoc.Stars)}");
-                    sb.AppendLine($"    - Cung sau ({lienKe.CungSau.Name}): {FormatStarList(lienKe.CungSau.Stars)}");
-                }
-            }
-
-            sb.AppendLine();
-            sb.AppendLine("=== YÊU CẦU LUẬN GIẢI CHI TIẾT ===");
-            sb.AppendLine($"Lĩnh vực tập trung: {GetFocusAreaName(request.FocusArea)}");
-            sb.AppendLine();
-            sb.AppendLine("Hãy phân tích và luận giải lá số theo cấu trúc:");
-            sb.AppendLine("1. TỔNG QUAN LÁ SỐ");
-            sb.AppendLine("2. LUẬN CHI TIẾT 12 CUNG (nhớ xem tam phương tứ chính, nhị hợp, cung liền kề)");
-            sb.AppendLine("3. ĐIỂM ĐẶC BIỆT");
-            sb.AppendLine("4. CẢNH BÁO");
-            sb.AppendLine("5. KHUYẾN NGHỊ");
+            // 4. Yêu cầu cụ thể
+            sb.Append(BuildRequestFormat(request.FocusArea));
 
             return sb.ToString();
         }
 
-        private TamPhuongTuChinh GetTamPhuongTuChinh(int palaceId, TuViChart chart)
+        private string BuildBasicInfo(TuViChart chart)
         {
-            var doiCungId = ((palaceId + 5) % 12) + 1;
-            var tamHopTraiId = ((palaceId + 3) % 12) + 1;
-            var tamHopPhaiId = ((palaceId + 7) % 12) + 1;
-
-            var doiCung = chart.PalaceStars.FirstOrDefault(p => p.PalaceId == doiCungId);
-            var tamHopTrai = chart.PalaceStars.FirstOrDefault(p => p.PalaceId == tamHopTraiId);
-            var tamHopPhai = chart.PalaceStars.FirstOrDefault(p => p.PalaceId == tamHopPhaiId);
-
-            return new TamPhuongTuChinh
+            var sb = new StringBuilder();
+            sb.AppendLine("=== THÔNG TIN LÁ SỐ TỬ VI ===");
+            sb.AppendLine($"Ngày sinh: {chart.BirthDate:dd/MM/yyyy}");
+            sb.AppendLine($"Giờ sinh: {chart.BirthTime}");
+            sb.Append("Giới tính: ");
+            sb.AppendLine(chart.IsMale ? "Nam" : "Nữ");
+            sb.AppendLine($"Âm Dương: {chart.AmDuong}");
+            sb.AppendLine($"Ngũ Hành Cục: {GetNguHanhCucName(chart.NguHanhCuc)}");
+            sb.AppendLine($"Năm âm lịch: {chart.LunarYear}");
+            
+            var thanPalace = chart.PalaceStars.FirstOrDefault(p => p.PalaceId == chart.ThanPalace);
+            if (thanPalace != null)
             {
-                DoiCung = new CungInfo { Name = doiCung?.PalaceName ?? "", Stars = doiCung?.Stars ?? new List<StarInPalace>() },
-                TamHopTrai = new CungInfo { Name = tamHopTrai?.PalaceName ?? "", Stars = tamHopTrai?.Stars ?? new List<StarInPalace>() },
-                TamHopPhai = new CungInfo { Name = tamHopPhai?.PalaceName ?? "", Stars = tamHopPhai?.Stars ?? new List<StarInPalace>() }
+                sb.AppendLine($"Cung Thân: {thanPalace.PalaceName} (Địa chi: {TuViChartAnalyzer.GetBranchName(chart.ThanPalace)})");
+            }
+            sb.AppendLine();
+            return sb.ToString();
+        }
+
+        private string BuildOverallPrompt(TuViChart chart)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("=== TỔNG QUAN LÁ SỐ ===");
+            sb.AppendLine();
+            
+            // Lấy thông tin cung Mệnh
+            var menhPalace = chart.PalaceStars.FirstOrDefault(p => p.PalaceName == "Mệnh");
+            var thanPalace = chart.PalaceStars.FirstOrDefault(p => p.PalaceId == chart.ThanPalace);
+            
+            if (menhPalace != null)
+            {
+                sb.AppendLine("▶ CUNG MỆNH (Bản ngã, tính cách):");
+                sb.AppendLine(TuViChartAnalyzer.BuildPalaceAnalysis(menhPalace, chart, includeNhiHop: true));
+                sb.AppendLine();
+            }
+            
+            if (thanPalace != null && thanPalace.PalaceName != "Mệnh")
+            {
+                sb.AppendLine("▶ CUNG THÂN (Hành động, biểu hiện bên ngoài):");
+                sb.AppendLine(TuViChartAnalyzer.BuildPalaceAnalysis(thanPalace, chart, includeNhiHop: true));
+                sb.AppendLine();
+            }
+
+            sb.AppendLine("📋 YÊU CẦU: Hãy tổng hợp luận giải về:");
+            sb.AppendLine("   - Cục diện tổng thể của lá số (Tốt/Xấu/Trung bình)");
+            sb.AppendLine("   - Đặc điểm tính cách chính từ Mệnh và Thân");
+            sb.AppendLine("   - Điểm mạnh và điểm yếu nổi bật");
+            sb.AppendLine("   - Hướng phát triển phù hợp");
+            sb.AppendLine();
+            
+            return sb.ToString();
+        }
+
+        private string BuildAllPalacesPrompt(TuViChart chart)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("=== LUẬN GIẢI CHI TIẾT 12 CUNG ===");
+            sb.AppendLine();
+
+            foreach (var palace in chart.PalaceStars.OrderBy(p => p.PalaceId))
+            {
+                // Bỏ qua Mệnh và Thân vì đã luận ở tổng quan
+                if (palace.PalaceName == "Mệnh" || palace.PalaceId == chart.ThanPalace)
+                    continue;
+
+                sb.Append(BuildPalacePrompt(palace, chart));
+                sb.AppendLine();
+            }
+
+            return sb.ToString();
+        }
+
+        private string BuildPalacePrompt(PalaceStar palace, TuViChart chart)
+        {
+            var sb = new StringBuilder();
+            
+            // Icon và ý nghĩa cho từng cung
+            var palaceInfo = GetPalaceInfo(palace.PalaceName);
+            sb.AppendLine($"▶ {palaceInfo.Icon} CUNG {palace.PalaceName.ToUpper()} - {palaceInfo.Meaning}");
+            
+            // Sử dụng helper để build phân tích
+            bool includeNhiHop = palace.PalaceName == "Mệnh" || palace.PalaceId == chart.ThanPalace;
+            sb.AppendLine(TuViChartAnalyzer.BuildPalaceAnalysis(palace, chart, includeNhiHop));
+            
+            // Yêu cầu luận giải cụ thể cho từng cung
+            sb.AppendLine();
+            sb.AppendLine($"📋 YÊU CẦU: {palaceInfo.Requirement}");
+            sb.AppendLine();
+            
+            return sb.ToString();
+        }
+
+        private (string Icon, string Meaning, string Requirement) GetPalaceInfo(string palaceName)
+        {
+            return palaceName switch
+            {
+                "Mệnh" => ("🎯", "Bản ngã, tính cách, số mệnh", 
+                    "Luận về tính cách, vận mệnh, hướng phát triển. Xét tam phương tứ chính, nhị hợp, cung liền kề."),
+                
+                "Phụ Mẫu" => ("👨‍👩‍👦", "Quan hệ với cha mẹ, học vấn, bề trên", 
+                    "Luận về quan hệ cha mẹ, duyên phận với gia đình, học vấn, quan hệ với bề trên. Xét tam phương tứ chính."),
+                
+                "Phúc Đức" => ("🎭", "Tinh thần, tâm hồn, sở thích", 
+                    "Luận về tinh thần, tư tưởng, sở thích, hưởng thụ, phúc đức tích lũy. Xét tam phương tứ chính."),
+                
+                "Điền Trạch" => ("🏠", "Nhà cửa, tài sản, môi trường sống", 
+                    "Luận về nhà cửa, đất đai, tài sản bất động sản, môi trường sống. Xét tam phương tứ chính."),
+                
+                "Quan Lộc" => ("💼", "Sự nghiệp, công việc, địa vị", 
+                    "Luận về sự nghiệp, công danh, nghề nghiệp phù hợp, địa vị xã hội. Xét tam phương tứ chính."),
+                
+                "Nô Bộc" => ("👥", "Bạn bè, nhân duyên, nhân viên", 
+                    "Luận về bạn bè, đồng nghiệp, nhân duyên quý nhân, cấp dưới. Xét tam phương tứ chính."),
+                
+                "Thiên Di" => ("✈️", "Di chuyển, du lịch, môi trường bên ngoài", 
+                    "Luận về di chuyển, đi xa, môi trường bên ngoài, hoạt động xã hội. Xét tam phương tứ chính."),
+                
+                "Tật Ách" => ("⚕️", "Sức khỏe, bệnh tật, tai nạn", 
+                    "Luận về sức khỏe, bệnh tật, tai nạn, điều cần lưu ý. Xét tam phương tứ chính."),
+                
+                "Tài Bạch" => ("💰", "Tài chính, tiền bạc, của cải", 
+                    "Luận về tài lộc, khả năng kiếm tiền, tiêu tiền, đầu tư. Xét tam phương tứ chính."),
+                
+                "Tử Tức" => ("👶", "Con cái, tình duyên với con", 
+                    "Luận về con cái, duyên phận với con, khả năng sinh sản, giáo dục. Xét tam phương tứ chính."),
+                
+                "Phu Thê" => ("💑", "Tình duyên, hôn nhân, vợ chồng", 
+                    "Luận về tình duyên, hôn nhân, đối tượng phù hợp, đời sống vợ chồng. Xét tam phương tứ chính."),
+                
+                "Huynh Đệ" => ("👫", "Anh em, bạn bè thân thiết", 
+                    "Luận về anh em ruột, bạn bè thân, hỗ trợ lẫn nhau. Xét tam phương tứ chính."),
+                
+                _ => ("⭐", "Cung chưa xác định", "Luận giải theo tam phương tứ chính.")
             };
         }
 
-        private NhiHop GetNhiHop(int palaceId, TuViChart chart)
+        private string BuildRequestFormat(string focusArea)
         {
-            var nhiHopPairs = new Dictionary<int, int>
-            {
-                { 1, 2 }, { 2, 1 }, { 3, 12 }, { 12, 3 }, { 4, 11 }, { 11, 4 },
-                { 5, 10 }, { 10, 5 }, { 6, 9 }, { 9, 6 }, { 7, 8 }, { 8, 7 }
-            };
-
-            int nhiHopId = nhiHopPairs[palaceId];
-            var nhiHopCung = chart.PalaceStars.FirstOrDefault(p => p.PalaceId == nhiHopId);
-
-            return new NhiHop
-            {
-                CungTruoc = new CungInfo { Name = nhiHopCung?.PalaceName ?? "", Stars = nhiHopCung?.Stars ?? new List<StarInPalace>() },
-                CungSau = new CungInfo { Name = "", Stars = new List<StarInPalace>() }
-            };
+            var sb = new StringBuilder();
+            sb.AppendLine("=== CẤU TRÚC LUẬN GIẢI ===");
+            sb.AppendLine($"Lĩnh vực tập trung: {GetFocusAreaName(focusArea)}");
+            sb.AppendLine();
+            sb.AppendLine("Hãy trả lời theo định dạng:");
+            sb.AppendLine();
+            sb.AppendLine("## 1. TỔNG QUAN LÁ SỐ");
+            sb.AppendLine("[Luận giải tổng quan từ Mệnh và Thân]");
+            sb.AppendLine();
+            sb.AppendLine("## 2. LUẬN CHI TIẾT 12 CUNG");
+            sb.AppendLine("### 2.1 Cung Phụ Mẫu");
+            sb.AppendLine("[Luận giải]");
+            sb.AppendLine("### 2.2 Cung Phúc Đức");
+            sb.AppendLine("[Luận giải]");
+            sb.AppendLine("### 2.3 Cung Điền Trạch");
+            sb.AppendLine("[Luận giải]");
+            sb.AppendLine("### 2.4 Cung Quan Lộc");
+            sb.AppendLine("[Luận giải]");
+            sb.AppendLine("### 2.5 Cung Nô Bộc");
+            sb.AppendLine("[Luận giải]");
+            sb.AppendLine("### 2.6 Cung Thiên Di");
+            sb.AppendLine("[Luận giải]");
+            sb.AppendLine("### 2.7 Cung Tật Ách");
+            sb.AppendLine("[Luận giải]");
+            sb.AppendLine("### 2.8 Cung Tài Bạch");
+            sb.AppendLine("[Luận giải]");
+            sb.AppendLine("### 2.9 Cung Tử Tức");
+            sb.AppendLine("[Luận giải]");
+            sb.AppendLine("### 2.10 Cung Phu Thê");
+            sb.AppendLine("[Luận giải]");
+            sb.AppendLine("### 2.11 Cung Huynh Đệ");
+            sb.AppendLine("[Luận giải]");
+            sb.AppendLine();
+            sb.AppendLine("## 3. ĐIỂM ĐẶC BIỆT");
+            sb.AppendLine("- [Điểm 1]");
+            sb.AppendLine("- [Điểm 2]");
+            sb.AppendLine();
+            sb.AppendLine("## 4. CẢNH BÁO");
+            sb.AppendLine("- [Cảnh báo 1]");
+            sb.AppendLine("- [Cảnh báo 2]");
+            sb.AppendLine();
+            sb.AppendLine("## 5. KHUYẾN NGHỊ");
+            sb.AppendLine("- [Khuyến nghị 1]");
+            sb.AppendLine("- [Khuyến nghị 2]");
+            sb.AppendLine();
+            return sb.ToString();
         }
 
-        private CungLienKe GetCungLienKe(int palaceId, TuViChart chart)
-        {
-            var cungTruocId = palaceId == 1 ? 12 : palaceId - 1;
-            var cungSauId = palaceId == 12 ? 1 : palaceId + 1;
-
-            var cungTruoc = chart.PalaceStars.FirstOrDefault(p => p.PalaceId == cungTruocId);
-            var cungSau = chart.PalaceStars.FirstOrDefault(p => p.PalaceId == cungSauId);
-
-            return new CungLienKe
-            {
-                CungTruoc = new CungInfo { Name = cungTruoc?.PalaceName ?? "", Stars = cungTruoc?.Stars ?? new List<StarInPalace>() },
-                CungSau = new CungInfo { Name = cungSau?.PalaceName ?? "", Stars = cungSau?.Stars ?? new List<StarInPalace>() }
-            };
-        }
-
-        private string FormatStarList(List<StarInPalace> stars)
-        {
-            if (!stars.Any()) return "(Không có sao chính)";
-            return string.Join(", ", stars.Select(s => 
-            {
-                var hoaInfo = !string.IsNullOrEmpty(s.Hoa) ? $"-{s.Hoa}" : "";
-                return $"{s.StarName}{hoaInfo}({s.Nature})";
-            }));
-        }
-
-        private string GetBranchName(int palaceId)
-        {
-            var branches = new[] { "Tý", "Sửu", "Dần", "Mão", "Thìn", "Tị", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi" };
-            return branches[palaceId - 1];
-        }
+        // Helper methods đã được di chuyển vào TuViChartAnalyzer
 
         private string GetNguHanhCucName(int cuc)
         {
@@ -354,6 +414,8 @@ Phong cách: Chuyên nghiệp nhưng gần gũi, tận tâm như thầy hướng
             try
             {
                 var sections = aiResponse.Split(new[] { "###", "##" }, StringSplitOptions.RemoveEmptyEntries);
+                string currentPalace = "";
+                var palaceContent = new StringBuilder();
                 
                 foreach (var section in sections)
                 {
@@ -361,19 +423,64 @@ Phong cách: Chuyên nghiệp nhưng gần gũi, tận tâm như thầy hướng
                     if (lines.Length == 0) continue;
 
                     var title = lines[0].Trim().ToLower();
+                    var content = string.Join("\n", lines.Skip(1));
                     
-                    if (title.Contains("chú ý") || title.Contains("điểm nổi bật") || title.Contains("đặc biệt"))
+                    // Parse từng cung
+                    if (title.Contains("cung "))
                     {
-                        response.KeyInsights.AddRange(lines.Skip(1).Select(l => l.Trim('-', ' ', '*').Trim()));
+                        // Lưu cung trước đó nếu có
+                        if (!string.IsNullOrEmpty(currentPalace))
+                        {
+                            response.PalaceInterpretations.Add(new PalaceInterpretation
+                            {
+                                PalaceName = currentPalace,
+                                Interpretation = palaceContent.ToString().Trim()
+                            });
+                            palaceContent.Clear();
+                        }
+                        
+                        // Xác định tên cung mới
+                        currentPalace = ExtractPalaceName(title);
+                        palaceContent.Append(content);
+                    }
+                    else if (!string.IsNullOrEmpty(currentPalace))
+                    {
+                        // Nội dung tiếp theo của cung hiện tại
+                        palaceContent.AppendLine();
+                        palaceContent.Append(content);
+                    }
+                    else if (title.Contains("tổng quan"))
+                    {
+                        response.OverallInterpretation = content;
+                    }
+                    else if (title.Contains("chú ý") || title.Contains("điểm nổi bật") || title.Contains("đặc biệt"))
+                    {
+                        response.KeyInsights.AddRange(lines.Skip(1)
+                            .Where(l => !string.IsNullOrWhiteSpace(l))
+                            .Select(l => l.Trim('-', ' ', '*').Trim()));
                     }
                     else if (title.Contains("cảnh báo") || title.Contains("lưu ý"))
                     {
-                        response.Warnings.AddRange(lines.Skip(1).Select(l => l.Trim('-', ' ', '*').Trim()));
+                        response.Warnings.AddRange(lines.Skip(1)
+                            .Where(l => !string.IsNullOrWhiteSpace(l))
+                            .Select(l => l.Trim('-', ' ', '*').Trim()));
                     }
                     else if (title.Contains("khuyến nghị") || title.Contains("lời khuyên"))
                     {
-                        response.Recommendations.AddRange(lines.Skip(1).Select(l => l.Trim('-', ' ', '*').Trim()));
+                        response.Recommendations.AddRange(lines.Skip(1)
+                            .Where(l => !string.IsNullOrWhiteSpace(l))
+                            .Select(l => l.Trim('-', ' ', '*').Trim()));
                     }
+                }
+                
+                // Lưu cung cuối cùng
+                if (!string.IsNullOrEmpty(currentPalace))
+                {
+                    response.PalaceInterpretations.Add(new PalaceInterpretation
+                    {
+                        PalaceName = currentPalace,
+                        Interpretation = palaceContent.ToString().Trim()
+                    });
                 }
             }
             catch (Exception ex)
@@ -384,30 +491,19 @@ Phong cách: Chuyên nghiệp nhưng gần gũi, tận tâm như thầy hướng
             return response;
         }
 
-        // Helper classes
-        private class TamPhuongTuChinh
+        private string ExtractPalaceName(string title)
         {
-            public CungInfo DoiCung { get; set; } = new();
-            public CungInfo TamHopTrai { get; set; } = new();
-            public CungInfo TamHopPhai { get; set; } = new();
-        }
-
-        private class NhiHop
-        {
-            public CungInfo CungTruoc { get; set; } = new();
-            public CungInfo CungSau { get; set; } = new();
-        }
-
-        private class CungLienKe
-        {
-            public CungInfo CungTruoc { get; set; } = new();
-            public CungInfo CungSau { get; set; } = new();
-        }
-
-        private class CungInfo
-        {
-            public string Name { get; set; } = string.Empty;
-            public List<StarInPalace> Stars { get; set; } = new();
+            var palaceNames = new[] { "Mệnh", "Phụ Mẫu", "Phúc Đức", "Điền Trạch", "Quan Lộc", 
+                                      "Nô Bộc", "Thiên Di", "Tật Ách", "Tài Bạch", 
+                                      "Tử Tức", "Phu Thê", "Huynh Đệ" };
+            
+            foreach (var name in palaceNames)
+            {
+                if (title.Contains(name.ToLower()))
+                    return name;
+            }
+            
+            return "Unknown";
         }
 
         // Gemini API response models

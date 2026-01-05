@@ -933,3 +933,139 @@
     margin: 1px 0;
   }
 }
+
+/* Palace Interpretation Buttons Section */
+.palace-interpretation-buttons {
+  margin: 40px 0;
+  padding: 30px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.palace-interpretation-buttons h3 {
+  color: #333;
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.section-description {
+  text-align: center;
+  color: #666;
+  font-size: 16px;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+.palace-buttons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.palace-interpret-btn {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 20px 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.palace-interpret-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border-color: #667eea;
+}
+
+.palace-interpret-btn.menh {
+  background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+  border-color: #19547b;
+  color: white;
+}
+
+.palace-interpret-btn.menh .palace-btn-name,
+.palace-interpret-btn.menh .palace-branch-small {
+  color: white;
+}
+
+.palace-interpret-btn.than {
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  border-color: #a8edea;
+}
+
+.palace-icon {
+  font-size: 32px;
+  margin-bottom: 4px;
+}
+
+.palace-btn-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #333;
+}
+
+.palace-branch-small {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.palace-star-count {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #667eea;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .palace-interpretation-buttons {
+    padding: 20px;
+    margin: 20px 0;
+  }
+
+  .palace-interpretation-buttons h3 {
+    font-size: 22px;
+  }
+
+  .section-description {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+  .palace-buttons-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+  }
+
+  .palace-interpret-btn {
+    padding: 16px 12px;
+  }
+
+  .palace-icon {
+    font-size: 28px;
+  }
+
+  .palace-btn-name {
+    font-size: 16px;
+  }
+
+  .palace-branch-small {
+    font-size: 12px;
+  }
+}

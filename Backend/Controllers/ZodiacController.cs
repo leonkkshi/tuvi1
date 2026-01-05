@@ -101,6 +101,46 @@ namespace Backend.Controllers
             }
         }
 
+        [HttpPost("ai-interpret-palace")]
+        [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("ai-limit")]
+        public async Task<ActionResult<PalaceInterpretationResult>> AIInterpretPalace([FromBody] PalaceInterpretationRequest request)
+        {
+            try
+            {
+                var startTime = DateTime.UtcNow;
+                
+                // Tạo request để luận giải, focus vào cung cụ thể
+                var interpretRequest = new InterpretationRequest
+                {
+                    Chart = request.Chart,
+                    FocusArea = "general"
+                };
+                
+                var interpretation = await _aiInterpretationService.InterpretChartAsync(interpretRequest);
+                
+                // Tìm luận giải cho cung được yêu cầu
+                var palaceInterp = interpretation.PalaceInterpretations
+                    .FirstOrDefault(p => p.PalaceName == request.PalaceName);
+                
+                var result = new PalaceInterpretationResult
+                {
+                    PalaceName = request.PalaceName,
+                    Interpretation = palaceInterp?.Interpretation ?? 
+                        $"Chưa có luận giải chi tiết cho cung {request.PalaceName}. Vui lòng thử lại.",
+                    InfluencingStars = palaceInterp?.InfluencingStars ?? new List<string>()
+                };
+                
+                var duration = (DateTime.UtcNow - startTime).TotalMilliseconds;
+                Console.WriteLine($"[AI Palace Request] Palace: {request.PalaceName}, Duration: {duration}ms");
+                
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = $"Lỗi khi luận giải cung {request.PalaceName}", details = ex.Message });
+            }
+        }
+
         [HttpGet("test-lunar/{day}/{month}/{year}")]
         public ActionResult<object> TestLunarConversion(int day, int month, int year)
         {
@@ -118,5 +158,18 @@ namespace Backend.Controllers
     {
         public int PalaceId { get; set; }
         public List<StarInPalace> Stars { get; set; } = new();
+    }
+
+    public class PalaceInterpretationRequest
+    {
+        public TuViChart Chart { get; set; } = null!;
+        public string PalaceName { get; set; } = string.Empty;
+    }
+
+    public class PalaceInterpretationResult
+    {
+        public string PalaceName { get; set; } = string.Empty;
+        public string Interpretation { get; set; } = string.Empty;
+        public List<string> InfluencingStars { get; set; } = new();
     }
 }
