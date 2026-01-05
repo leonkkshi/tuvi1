@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, SimpleChanges, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TuViChart, PalaceStar } from '../../models/tu-vi.models';
 import { TuViService, PalaceInterpretationResult } from '../../services/tu-vi.service';
@@ -10,7 +10,7 @@ import { TuViService, PalaceInterpretationResult } from '../../services/tu-vi.se
   templateUrl: './palace-interpretation-modal.component.html',
   styleUrl: './palace-interpretation-modal.component.css'
 })
-export class PalaceInterpretationModalComponent {
+export class PalaceInterpretationModalComponent implements OnChanges {
   @Input() chart: TuViChart | null = null;
   @Input() palace: PalaceStar | null = null;
   @Input() isOpen: boolean = false;
@@ -21,41 +21,63 @@ export class PalaceInterpretationModalComponent {
   interpretation: PalaceInterpretationResult | null = null;
   isLoading: boolean = false;
   error: string = '';
+  private lastLoadedPalaceName: string = '';
 
   constructor(private tuViService: TuViService) {}
 
-  ngOnChanges() {
-    if (this.isOpen && this.chart && this.palace) {
+  ngOnChanges(changes: SimpleChanges) {
+    // Chỉ xử lý khi modal được mở và có palace
+    if (!this.isOpen || !this.chart || !this.palace) {
+      return;
+    }
+
+    // Kiểm tra nếu palace thay đổi hoặc modal mới mở
+    const palaceChanged = changes['palace'] && this.palace;
+    const modalOpened = changes['isOpen'] && this.isOpen;
+
+    if (palaceChanged || modalOpened) {
       // Kiểm tra có cached interpretation không
       if (this.cachedInterpretation && this.cachedInterpretation.PalaceName === this.palace.palaceName) {
         // Dùng cache
         this.interpretation = this.cachedInterpretation;
         this.isLoading = false;
         this.error = '';
-      } else if (!this.interpretation || this.interpretation.PalaceName !== this.palace.palaceName) {
-        // Chưa có hoặc cung khác, load mới
+        this.lastLoadedPalaceName = this.palace.palaceName;
+      } else if (this.lastLoadedPalaceName !== this.palace.palaceName && !this.isLoading) {
+        // Chỉ load nếu chưa load cung này và không đang loading
         this.loadInterpretation();
       }
     }
   }
 
   loadInterpretation() {
-    if (!this.chart || !this.palace) return;
+    if (!this.chart || !this.palace || this.isLoading) return;
 
+    const palaceName = this.palace.palaceName;
+    this.lastLoadedPalaceName = palaceName;
     this.isLoading = true;
     this.error = '';
+    this.interpretation = null;
 
-    this.tuViService.interpretPalace(this.chart, this.palace.palaceName).subscribe({
+    console.log(`Loading interpretation for: ${palaceName}`);
+
+    this.tuViService.interpretPalace(this.chart, palaceName).subscribe({
       next: (result) => {
-        this.interpretation = result;
-        this.isLoading = false;
-        // Emit để parent component cache lại
-        this.interpretationLoaded.emit(result);
+        // Chỉ cập nhật nếu vẫn đang xem cùng cung
+        if (this.palace && this.palace.palaceName === palaceName) {
+          this.interpretation = result;
+          this.isLoading = false;
+          // Emit để parent component cache lại
+          this.interpretationLoaded.emit(result);
+          console.log(`Loaded interpretation for: ${palaceName}`);
+        }
       },
       error: (err) => {
         console.error('Error loading palace interpretation:', err);
-        this.error = 'Không thể tải luận giải cho cung này. Vui lòng thử lại.';
-        this.isLoading = false;
+        if (this.palace && this.palace.palaceName === palaceName) {
+          this.error = 'Không thể tải luận giải cho cung này. Vui lòng thử lại.';
+          this.isLoading = false;
+        }
       }
     });
   }
