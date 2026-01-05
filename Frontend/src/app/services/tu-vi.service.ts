@@ -38,7 +38,7 @@ export class TuViService {
 }
 
 export interface PalaceInterpretationResult {
-  PalaceName: string;
-  Interpretation: string;
-  InfluencingStars: string[];
+  palaceName: string;
+  interpretation: string;
+  influencingStars: string[];
 }

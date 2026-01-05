@@ -43,7 +43,7 @@ export class PalaceInterpretationModalComponent implements OnChanges {
       const currentPalaceName = this.palace.palaceName;
       
       // Kiểm tra cache trước
-      if (this.cachedInterpretation && this.cachedInterpretation.PalaceName === currentPalaceName) {
+      if (this.cachedInterpretation && this.cachedInterpretation.palaceName === currentPalaceName) {
         console.log('[Modal] Using cached interpretation for:', currentPalaceName);
         this.interpretation = this.cachedInterpretation;
         this.isLoading = false;
