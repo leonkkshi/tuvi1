@@ -25,7 +25,7 @@ export class BirthFormComponent {
     isLunar: true  // Luôn dùng âm lịch
   };
 
-  fullName: string = 'Nguyễn Văn Tuấn';
+  fullName: string = 'Tử Vi';
   viewYear: number = 2026;
   selectedHourBranch: string = 'Mùi'; // Giờ 14:30
   errors: { [key: string]: string } = {};
