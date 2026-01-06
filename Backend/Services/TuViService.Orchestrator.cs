@@ -125,7 +125,7 @@ public class TuViService : ITuViService
             AddUnique(starIds, truongSinhStars[pos]);
 
             var starsInPalace = starIds
-                .Select(ToStarInPalace)
+                .Select(id => ToStarInPalace(id, pos))
                 .Where(s => s != null)
                 .Cast<StarInPalace>()
                 .ToList();
@@ -173,7 +173,7 @@ public class TuViService : ITuViService
         return result;
     }
 
-    private StarInPalace? ToStarInPalace(int starId)
+    private StarInPalace? ToStarInPalace(int starId, int palacePosition)
     {
         if (!_starById.TryGetValue(starId, out var star))
         {
@@ -188,11 +188,14 @@ public class TuViService : ITuViService
             };
         }
 
+        // Điều chỉnh độ sáng theo cung
+        int adjustedBrightness = _catalogService.GetAdjustedBrightness(star.Name, palacePosition, star.Brightness);
+
         return new StarInPalace
         {
             StarId = star.Id,
             StarName = star.Name,
-            Brightness = star.Brightness,
+            Brightness = adjustedBrightness,
             Element = star.Element,
             Nature = star.Nature,
             Type = star.Type

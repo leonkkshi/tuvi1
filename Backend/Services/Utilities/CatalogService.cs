@@ -178,4 +178,165 @@ public class CatalogService
             Nature = nature,
             Brightness = brightness
         };
+
+    /// <summary>
+    /// Điều chỉnh độ sáng của sao theo cung (Miếu Vượng, Đắc địa, Bình hòa, Hãm địa)
+    /// </summary>
+    /// <param name="starName">Tên sao</param>
+    /// <param name="palacePosition">Vị trí cung (1-12): 1=Tý, 2=Sửu, 3=Dần, 4=Mão, 5=Thìn, 6=Tỵ, 7=Ngọ, 8=Mùi, 9=Thân, 10=Dậu, 11=Tuất, 12=Hợi</param>
+    /// <param name="baseBrightness">Độ sáng cơ bản của sao</param>
+    /// <returns>Độ sáng đã được điều chỉnh</returns>
+    public int GetAdjustedBrightness(string starName, int palacePosition, int baseBrightness)
+    {
+        // Ánh xạ vị trí cung sang tên địa chi
+        var branchNames = new[] { "", "Tý", "Sửu", "Dần", "Mão", "Thìn", "Tỵ", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi" };
+        if (palacePosition < 1 || palacePosition > 12) return baseBrightness;
+        
+        var branch = branchNames[palacePosition];
+
+        return starName switch
+        {
+            "Tử Vi" => branch switch
+            {
+                // Miếu Vượng: Tỵ, Ngọ, Dần, Thân, Thìn, Tuất
+                "Tỵ" or "Ngọ" or "Dần" or "Thân" or "Thìn" or "Tuất" => 100,
+                // Đắc địa: Sửu, Mùi, Hợi, Tý
+                "Sửu" or "Mùi" or "Hợi" or "Tý" => 90,
+                // Bình hòa: Mão, Dậu
+                "Mão" or "Dậu" => 75,
+                _ => baseBrightness
+            },
+            "Thiên Phủ" => branch switch
+            {
+                // Miếu Vượng: Dần, Thân, Tý, Ngọ, Thìn, Tuất
+                "Dần" or "Thân" or "Tý" or "Ngọ" or "Thìn" or "Tuất" => 100,
+                // Đắc địa: Mùi, Hợi
+                "Mùi" or "Hợi" => 90,
+                // Bình hòa: Sửu, Mão, Dậu
+                "Sửu" or "Mão" or "Dậu" => 75,
+                _ => baseBrightness
+            },
+            "Vũ Khúc" => branch switch
+            {
+                // Miếu Vượng: Thìn, Tuất, Sửu, Mùi, Dần, Thân, Tý, Ngọ
+                "Thìn" or "Tuất" or "Sửu" or "Mùi" or "Dần" or "Thân" or "Tý" or "Ngọ" => 100,
+                // Đắc địa: Mão, Dậu
+                "Mão" or "Dậu" => 90,
+                // Hãm địa: Tỵ, Hợi
+                "Tỵ" or "Hợi" => 60,
+                _ => baseBrightness
+            },
+            "Thiên Tướng" => branch switch
+            {
+                // Miếu Vượng: Dần, Thân, Tý, Ngọ, Thìn, Tuất
+                "Dần" or "Thân" or "Tý" or "Ngọ" or "Thìn" or "Tuất" => 100,
+                // Đắc địa: Sửu, Mùi, Tỵ, Hợi
+                "Sửu" or "Mùi" or "Tỵ" or "Hợi" => 90,
+                // Hãm địa: Mão, Dậu
+                "Mão" or "Dậu" => 60,
+                _ => baseBrightness
+            },
+            "Thất Sát" => branch switch
+            {
+                // Miếu Vượng: Dần, Thân, Tý, Ngọ, Tỵ, Hợi
+                "Dần" or "Thân" or "Tý" or "Ngọ" or "Tỵ" or "Hợi" => 100,
+                // Đắc địa: Sửu, Mùi
+                "Sửu" or "Mùi" => 90,
+                // Hãm địa: Mão, Dậu, Thìn, Tuất
+                "Mão" or "Dậu" or "Thìn" or "Tuất" => 60,
+                _ => baseBrightness
+            },
+            "Phá Quân" => branch switch
+            {
+                // Miếu Vượng: Tý, Ngọ, Sửu, Mùi
+                "Tý" or "Ngọ" or "Sửu" or "Mùi" => 100,
+                // Đắc địa: Thìn, Tuất
+                "Thìn" or "Tuất" => 90,
+                // Hãm địa: Dần, Thân, Tỵ, Hợi, Mão, Dậu
+                "Dần" or "Thân" or "Tỵ" or "Hợi" or "Mão" or "Dậu" => 60,
+                _ => baseBrightness
+            },
+            "Liêm Trinh" => branch switch
+            {
+                // Miếu Vượng: Dần, Thân, Tý, Ngọ, Thìn, Tuất
+                "Dần" or "Thân" or "Tý" or "Ngọ" or "Thìn" or "Tuất" => 100,
+                // Đắc địa: Sửu, Mùi
+                "Sửu" or "Mùi" => 90,
+                // Hãm địa: Tỵ, Hợi, Mão, Dậu
+                "Tỵ" or "Hợi" or "Mão" or "Dậu" => 60,
+                _ => baseBrightness
+            },
+            "Tham Lang" => branch switch
+            {
+                // Miếu Vượng: Thìn, Tuất, Sửu, Mùi
+                "Thìn" or "Tuất" or "Sửu" or "Mùi" => 100,
+                // Đắc địa: Dần, Thân
+                "Dần" or "Thân" => 90,
+                // Hãm địa: Tỵ, Hợi, Tý, Ngọ, Mão, Dậu
+                "Tỵ" or "Hợi" or "Tý" or "Ngọ" or "Mão" or "Dậu" => 60,
+                _ => baseBrightness
+            },
+            "Thiên Cơ" => branch switch
+            {
+                // Miếu Vượng: Thìn, Tuất, Mão, Dậu, Tỵ, Thân, Mùi
+                "Thìn" or "Tuất" or "Mão" or "Dậu" or "Tỵ" or "Thân" or "Mùi" => 100,
+                // Đắc địa: Ngọ, Tý, Sửu
+                "Ngọ" or "Tý" or "Sửu" => 90,
+                // Hãm địa: Dần, Hợi
+                "Dần" or "Hợi" => 60,
+                _ => baseBrightness
+            },
+            "Thái Âm" => branch switch
+            {
+                // Miếu Vượng: Thân, Dậu, Tuất, Hợi, Tý
+                "Thân" or "Dậu" or "Tuất" or "Hợi" or "Tý" => 100,
+                // Đắc địa: Sửu, Mùi
+                "Sửu" or "Mùi" => 90,
+                // Hãm địa: Dần, Mão, Thìn, Tỵ, Ngọ
+                "Dần" or "Mão" or "Thìn" or "Tỵ" or "Ngọ" => 60,
+                _ => baseBrightness
+            },
+            "Thiên Đồng" => branch switch
+            {
+                // Miếu Vượng: Tý, Dần, Thân
+                "Tý" or "Dần" or "Thân" => 100,
+                // Đắc địa: Mão, Tỵ, Hợi
+                "Mão" or "Tỵ" or "Hợi" => 90,
+                // Hãm địa: Ngọ, Dậu, Thìn, Tuất, Sửu, Mùi
+                "Ngọ" or "Dậu" or "Thìn" or "Tuất" or "Sửu" or "Mùi" => 60,
+                _ => baseBrightness
+            },
+            "Thiên Lương" => branch switch
+            {
+                // Miếu Vượng: Dần, Thân, Tý, Ngọ, Thìn, Tuất, Mão
+                "Dần" or "Thân" or "Tý" or "Ngọ" or "Thìn" or "Tuất" or "Mão" => 100,
+                // Đắc địa: Sửu, Mùi
+                "Sửu" or "Mùi" => 90,
+                // Hãm địa: Tỵ, Hợi, Dậu
+                "Tỵ" or "Hợi" or "Dậu" => 60,
+                _ => baseBrightness
+            },
+            "Cự Môn" => branch switch
+            {
+                // Miếu Vượng: Tý, Ngọ, Mão, Dậu, Dần
+                "Tý" or "Ngọ" or "Mão" or "Dậu" or "Dần" => 100,
+                // Đắc địa: Thân, Hợi
+                "Thân" or "Hợi" => 90,
+                // Hãm địa: Tỵ, Thìn, Tuất, Sửu, Mùi
+                "Tỵ" or "Thìn" or "Tuất" or "Sửu" or "Mùi" => 60,
+                _ => baseBrightness
+            },
+            "Thái Dương" => branch switch
+            {
+                // Miếu Vượng: Dần, Mão, Thìn, Tỵ, Ngọ
+                "Dần" or "Mão" or "Thìn" or "Tỵ" or "Ngọ" => 100,
+                // Đắc địa: Sửu, Mùi
+                "Sửu" or "Mùi" => 90,
+                // Hãm địa: Thân, Dậu, Tuất, Hợi, Tý
+                "Thân" or "Dậu" or "Tuất" or "Hợi" or "Tý" => 60,
+                _ => baseBrightness
+            },
+            _ => baseBrightness
+        };
+    }
 }
