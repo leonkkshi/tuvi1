@@ -5,6 +5,24 @@
   </div>
 
   <form (ngSubmit)="onSubmit()" #birthForm="ngForm">
+    <!-- Tab Selector -->
+    <div class="calendar-tabs">
+      <button 
+        type="button" 
+        class="tab-button" 
+        [class.active]="calendarType === 'lunar'"
+        (click)="switchCalendarType('lunar')">
+        🌙 Âm lịch
+      </button>
+      <button 
+        type="button" 
+        class="tab-button" 
+        [class.active]="calendarType === 'solar'"
+        (click)="switchCalendarType('solar')">
+        ☀️ Dương lịch
+      </button>
+    </div>
+
     <!-- Họ và tên -->
     <div class="form-group">
       <label for="fullName">
@@ -35,8 +53,8 @@
       </div>
     </div>
 
-    <!-- Ngày tháng năm sinh -->
-    <div class="form-section">
+    <!-- Ngày tháng năm sinh - Âm lịch -->
+    <div class="form-section" *ngIf="calendarType === 'lunar'">
       <h3>📅 Ngày Sinh Âm lịch</h3>
       <div class="form-row">
         <div class="form-group third">
@@ -76,6 +94,54 @@
           </select>
           <span class="error-message" *ngIf="errors['day']">{{ errors['day'] }}</span>
         </div>
+      </div>
+    </div>
+
+    <!-- Ngày tháng năm sinh - Dương lịch -->
+    <div class="form-section" *ngIf="calendarType === 'solar'">
+      <h3>📅 Ngày Sinh Dương lịch</h3>
+      <div class="form-row">
+        <div class="form-group third">
+          <label for="solarYear">Năm:</label>
+          <select 
+            id="solarYear" 
+            name="solarYear" 
+            [(ngModel)]="solarDate.year"
+            (change)="onSolarDateChange()"
+            [class.error]="errors['year']">
+            <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+          </select>
+          <span class="error-message" *ngIf="errors['year']">{{ errors['year'] }}</span>
+        </div>
+
+        <div class="form-group third">
+          <label for="solarMonth">Tháng:</label>
+          <select 
+            id="solarMonth" 
+            name="solarMonth" 
+            [(ngModel)]="solarDate.month"
+            (change)="onSolarDateChange()"
+            [class.error]="errors['month']">
+            <option *ngFor="let m of months" [value]="m">Tháng {{ m }}</option>
+          </select>
+          <span class="error-message" *ngIf="errors['month']">{{ errors['month'] }}</span>
+        </div>
+
+        <div class="form-group third">
+          <label for="solarDay">Ngày:</label>
+          <select 
+            id="solarDay" 
+            name="solarDay" 
+            [(ngModel)]="solarDate.day"
+            (change)="onSolarDateChange()"
+            [class.error]="errors['day']">
+            <option *ngFor="let d of solarDays" [value]="d">Ngày {{ d }}</option>
+          </select>
+          <span class="error-message" *ngIf="errors['day']">{{ errors['day'] }}</span>
+        </div>
+      </div>
+      <div class="conversion-info" *ngIf="lunarConversionText">
+        <span class="info-icon">ℹ️</span> {{ lunarConversionText }}
       </div>
     </div>
 

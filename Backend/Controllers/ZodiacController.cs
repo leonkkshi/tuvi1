@@ -152,6 +152,29 @@ namespace Backend.Controllers
                 leapMonth = lunar[3]
             });
         }
+        
+        [HttpGet("solar-to-lunar")]
+        public ActionResult<object> SolarToLunar([FromQuery] int year, [FromQuery] int month, [FromQuery] int day)
+        {
+            try
+            {
+                var lunar = _tuViService.TestConvertSolar2Lunar(day, month, year);
+                return Ok(new
+                {
+                    solarDay = day,
+                    solarMonth = month,
+                    solarYear = year,
+                    lunarDay = lunar[0],
+                    lunarMonth = lunar[1],
+                    lunarYear = lunar[2],
+                    leapMonth = lunar[3]
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = "Không thể chuyển đổi ngày tháng", details = ex.Message });
+            }
+        }
     }
 
     public class InterpretRequest

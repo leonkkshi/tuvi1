@@ -2,6 +2,8 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChartRequest } from '../../models/tu-vi.models';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-birth-form',
@@ -26,6 +28,19 @@ export class BirthFormComponent {
   viewYear: number = 2026;
   selectedHourBranch: string = 'Mùi'; // Giờ 14:30
   errors: { [key: string]: string } = {};
+  
+  // Tab selection
+  calendarType: 'lunar' | 'solar' = 'lunar';
+  
+  // Solar date inputs (for conversion)
+  solarDate = {
+    year: 2005,
+    month: 8,
+    day: 17
+  };
+  
+  solarDays: number[] = [];
+  lunarConversionText: string = '';
 
   // Danh sách giờ địa chi
   hourBranches = [
@@ -48,15 +63,51 @@ export class BirthFormComponent {
   months: number[] = Array.from({ length: 12 }, (_, i) => i + 1);
   days: number[] = Array.from({ length: 30 }, (_, i) => i + 1);
 
-  constructor() {
+  constructor(private http: HttpClient) {
     // Tạo danh sách năm từ 1920 đến hiện tại + 10 năm
     const currentYear = new Date().getFullYear();
     for (let year = currentYear + 10; year >= 1920; year--) {
       this.years.push(year);
     }
     this.updateDaysInMonth();
+    this.updateSolarDaysInMonth();
     // Đặt giờ phút mặc định từ địa chi đã chọn
     this.onHourBranchChange();
+  }
+
+  switchCalendarType(type: 'lunar' | 'solar') {
+    this.calendarType = type;
+    if (type === 'solar') {
+      this.onSolarDateChange();
+    }
+  }
+
+  onSolarDateChange() {
+    this.updateSolarDaysInMonth();
+    
+    // Gọi API để chuyển đổi dương lịch sang âm lịch
+    const apiUrl = `${environment.apiUrl}/api/zodiac/solar-to-lunar?year=${this.solarDate.year}&month=${this.solarDate.month}&day=${this.solarDate.day}`;
+    
+    this.http.get<any>(apiUrl).subscribe({
+      next: (result) => {
+        this.birthInfo.year = result.lunarYear;
+        this.birthInfo.month = result.lunarMonth;
+        this.birthInfo.day = result.lunarDay;
+        this.lunarConversionText = `Âm lịch: ${result.lunarDay}/${result.lunarMonth}/${result.lunarYear}`;
+      },
+      error: (err) => {
+        console.error('Error converting solar to lunar:', err);
+        this.lunarConversionText = 'Không thể chuyển đổi';
+      }
+    });
+  }
+
+  updateSolarDaysInMonth() {
+    const daysInMonth = new Date(this.solarDate.year, this.solarDate.month, 0).getDate();
+    this.solarDays = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+    if (this.solarDate.day > daysInMonth) {
+      this.solarDate.day = daysInMonth;
+    }
   }
 
   onHourBranchChange() {
