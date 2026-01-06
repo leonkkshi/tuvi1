@@ -95,17 +95,18 @@ export class BirthFormComponent {
   onSolarDateChange() {
     this.updateSolarDaysInMonth();
     
-    // Chuyển đổi dương lịch sang âm lịch ngay ở frontend
-    const lunarResult = this.lunarConverter.convertSolarToLunar(
-      this.solarDate.day,
-      this.solarDate.month,
-      this.solarDate.year
-    );
+    // Đảm bảo các giá trị là number (vì select trả về string)
+    const day = Number(this.solarDate.day);
+    const month = Number(this.solarDate.month);
+    const year = Number(this.solarDate.year);
     
-    // Cập nhật birthInfo với ngày dương lịch (gửi lên backend)
-    this.birthInfo.year = this.solarDate.year;
-    this.birthInfo.month = this.solarDate.month;
-    this.birthInfo.day = this.solarDate.day;
+    // Chuyển đổi dương lịch sang âm lịch ngay ở frontend
+    const lunarResult = this.lunarConverter.convertSolarToLunar(day, month, year);
+    
+    // Cập nhật birthInfo với ngày dương lịch (gửi lên backend) - ép về number
+    this.birthInfo.year = year;
+    this.birthInfo.month = month;
+    this.birthInfo.day = day;
     
     // Hiển thị thông tin âm lịch tương ứng
     const leapText = lunarResult.isLeapMonth ? ' (Nhuận)' : '';
@@ -180,8 +181,14 @@ export class BirthFormComponent {
 
   onSubmit() {
     if (this.validateForm()) {
+      // Đảm bảo tất cả các giá trị số là number chứ không phải string
       const request = {
         ...this.birthInfo,
+        year: Number(this.birthInfo.year),
+        month: Number(this.birthInfo.month),
+        day: Number(this.birthInfo.day),
+        hour: Number(this.birthInfo.hour),
+        minute: Number(this.birthInfo.minute),
         fullName: this.fullName
       };
       this.chartGenerated.emit(request);
