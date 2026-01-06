@@ -140,6 +140,9 @@
           <span class="error-message" *ngIf="errors['day']">{{ errors['day'] }}</span>
         </div>
       </div>
+      <div class="conversion-info" *ngIf="lunarConversionText">
+        <span class="info-icon">ℹ️</span> {{ lunarConversionText }}
+      </div>
     </div>
 
     <!-- Giờ sinh -->

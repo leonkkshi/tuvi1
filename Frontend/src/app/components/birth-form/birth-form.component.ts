@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ChartRequest } from '../../models/tu-vi.models';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { LunarConverterService } from '../../services/lunar-converter.service';
 
 @Component({
   selector: 'app-birth-form',
@@ -40,6 +41,7 @@ export class BirthFormComponent {
   };
   
   solarDays: number[] = [];
+  lunarConversionText: string = '';
 
   // Danh sách giờ địa chi
   hourBranches = [
@@ -62,7 +64,10 @@ export class BirthFormComponent {
   months: number[] = Array.from({ length: 12 }, (_, i) => i + 1);
   days: number[] = Array.from({ length: 30 }, (_, i) => i + 1);
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    private lunarConverter: LunarConverterService
+  ) {
     // Tạo danh sách năm từ 1920 đến hiện tại + 10 năm
     const currentYear = new Date().getFullYear();
     for (let year = currentYear + 10; year >= 1920; year--) {
@@ -89,10 +94,21 @@ export class BirthFormComponent {
 
   onSolarDateChange() {
     this.updateSolarDaysInMonth();
-    // Cập nhật birthInfo với ngày dương lịch
+    
+    // Chuyển đổi dương lịch sang âm lịch ngay ở frontend
+    const lunarResult = this.lunarConverter.convertSolarToLunar(
+      this.solarDate.day,
+      this.solarDate.month,
+      this.solarDate.year
+    );
+    
+    // Cập nhật birthInfo với ngày dương lịch (gửi lên backend)
     this.birthInfo.year = this.solarDate.year;
     this.birthInfo.month = this.solarDate.month;
     this.birthInfo.day = this.solarDate.day;
+    
+    // Hiển thị thông tin âm lịch tương ứng
+    this.lunarConversionText = `Âm lịch: ${lunarResult.day}/${lunarResult.month}/${lunarResult.year}`;
   }
 
   updateSolarDaysInMonth() {
