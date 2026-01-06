@@ -508,13 +508,6 @@
         <p [innerHTML]="parseMarkdown(interpretation.overallInterpretation)"></p>
       </div>
 
-      <div *ngIf="interpretation.keyInsights.length > 0" class="interpretation-insights">
-        <h4>Điểm Nổi Bật</h4>
-        <ul>
-          <li *ngFor="let insight of interpretation.keyInsights" [innerHTML]="parseMarkdown(insight)"></li>
-        </ul>
-      </div>
-
       <div *ngIf="interpretation.warnings.length > 0" class="interpretation-warnings">
         <h4>⚠️ Cảnh Báo</h4>
         <ul>
