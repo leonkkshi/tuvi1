@@ -40,7 +40,6 @@ export class BirthFormComponent {
   };
   
   solarDays: number[] = [];
-  lunarConversionText: string = '';
 
   // Danh sách giờ địa chi
   hourBranches = [
@@ -77,29 +76,23 @@ export class BirthFormComponent {
 
   switchCalendarType(type: 'lunar' | 'solar') {
     this.calendarType = type;
+    this.birthInfo.isLunar = (type === 'lunar');
+    
     if (type === 'solar') {
-      this.onSolarDateChange();
+      // Sync solarDate với birthInfo
+      this.solarDate.year = this.birthInfo.year;
+      this.solarDate.month = this.birthInfo.month;
+      this.solarDate.day = this.birthInfo.day;
+      this.updateSolarDaysInMonth();
     }
   }
 
   onSolarDateChange() {
     this.updateSolarDaysInMonth();
-    
-    // Gọi API để chuyển đổi dương lịch sang âm lịch
-    const apiUrl = `${environment.apiUrl}/api/tuvi/solar-to-lunar?year=${this.solarDate.year}&month=${this.solarDate.month}&day=${this.solarDate.day}`;
-    
-    this.http.get<any>(apiUrl).subscribe({
-      next: (result) => {
-        this.birthInfo.year = result.lunarYear;
-        this.birthInfo.month = result.lunarMonth;
-        this.birthInfo.day = result.lunarDay;
-        this.lunarConversionText = `Âm lịch: ${result.lunarDay}/${result.lunarMonth}/${result.lunarYear}`;
-      },
-      error: (err) => {
-        console.error('Error converting solar to lunar:', err);
-        this.lunarConversionText = `Không thể chuyển đổi (${err.message || 'Lỗi kết nối'})`;
-      }
-    });
+    // Cập nhật birthInfo với ngày dương lịch
+    this.birthInfo.year = this.solarDate.year;
+    this.birthInfo.month = this.solarDate.month;
+    this.birthInfo.day = this.solarDate.day;
   }
 
   updateSolarDaysInMonth() {
