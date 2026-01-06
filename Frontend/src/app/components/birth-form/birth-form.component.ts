@@ -86,7 +86,7 @@ export class BirthFormComponent {
     this.updateSolarDaysInMonth();
     
     // Gọi API để chuyển đổi dương lịch sang âm lịch
-    const apiUrl = `${environment.apiUrl}/api/zodiac/solar-to-lunar?year=${this.solarDate.year}&month=${this.solarDate.month}&day=${this.solarDate.day}`;
+    const apiUrl = `${environment.apiUrl}/api/tuvi/solar-to-lunar?year=${this.solarDate.year}&month=${this.solarDate.month}&day=${this.solarDate.day}`;
     
     this.http.get<any>(apiUrl).subscribe({
       next: (result) => {
@@ -97,7 +97,7 @@ export class BirthFormComponent {
       },
       error: (err) => {
         console.error('Error converting solar to lunar:', err);
-        this.lunarConversionText = 'Không thể chuyển đổi';
+        this.lunarConversionText = `Không thể chuyển đổi (${err.message || 'Lỗi kết nối'})`;
       }
     });
   }
