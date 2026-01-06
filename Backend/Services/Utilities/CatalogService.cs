@@ -201,9 +201,9 @@ public class CatalogService
                 // Miếu Vượng: Tỵ, Ngọ, Dần, Thân, Thìn, Tuất
                 "Tỵ" or "Ngọ" or "Dần" or "Thân" or "Thìn" or "Tuất" => 100,
                 // Đắc địa: Sửu, Mùi, Hợi, Tý
-                "Sửu" or "Mùi" or "Hợi" or "Tý" => 90,
+                "Sửu" or "Mùi" or "Hợi" or "Tý" => 60,
                 // Bình hòa: Mão, Dậu
-                "Mão" or "Dậu" => 75,
+                "Mão" or "Dậu" => 50,
                 _ => baseBrightness
             },
             "Thiên Phủ" => branch switch
@@ -211,9 +211,9 @@ public class CatalogService
                 // Miếu Vượng: Dần, Thân, Tý, Ngọ, Thìn, Tuất
                 "Dần" or "Thân" or "Tý" or "Ngọ" or "Thìn" or "Tuất" => 100,
                 // Đắc địa: Mùi, Hợi
-                "Mùi" or "Hợi" => 90,
+                "Mùi" or "Hợi" => 60,
                 // Bình hòa: Sửu, Mão, Dậu
-                "Sửu" or "Mão" or "Dậu" => 75,
+                "Sửu" or "Mão" or "Dậu" => 50,
                 _ => baseBrightness
             },
             "Vũ Khúc" => branch switch
@@ -221,9 +221,9 @@ public class CatalogService
                 // Miếu Vượng: Thìn, Tuất, Sửu, Mùi, Dần, Thân, Tý, Ngọ
                 "Thìn" or "Tuất" or "Sửu" or "Mùi" or "Dần" or "Thân" or "Tý" or "Ngọ" => 100,
                 // Đắc địa: Mão, Dậu
-                "Mão" or "Dậu" => 90,
+                "Mão" or "Dậu" => 60,
                 // Hãm địa: Tỵ, Hợi
-                "Tỵ" or "Hợi" => 60,
+                "Tỵ" or "Hợi" => 40,
                 _ => baseBrightness
             },
             "Thiên Tướng" => branch switch
@@ -231,9 +231,9 @@ public class CatalogService
                 // Miếu Vượng: Dần, Thân, Tý, Ngọ, Thìn, Tuất
                 "Dần" or "Thân" or "Tý" or "Ngọ" or "Thìn" or "Tuất" => 100,
                 // Đắc địa: Sửu, Mùi, Tỵ, Hợi
-                "Sửu" or "Mùi" or "Tỵ" or "Hợi" => 90,
+                "Sửu" or "Mùi" or "Tỵ" or "Hợi" => 60,
                 // Hãm địa: Mão, Dậu
-                "Mão" or "Dậu" => 60,
+                "Mão" or "Dậu" => 40,
                 _ => baseBrightness
             },
             "Thất Sát" => branch switch
@@ -241,9 +241,9 @@ public class CatalogService
                 // Miếu Vượng: Dần, Thân, Tý, Ngọ, Tỵ, Hợi
                 "Dần" or "Thân" or "Tý" or "Ngọ" or "Tỵ" or "Hợi" => 100,
                 // Đắc địa: Sửu, Mùi
-                "Sửu" or "Mùi" => 90,
+                "Sửu" or "Mùi" => 60,
                 // Hãm địa: Mão, Dậu, Thìn, Tuất
-                "Mão" or "Dậu" or "Thìn" or "Tuất" => 60,
+                "Mão" or "Dậu" or "Thìn" or "Tuất" => 40,
                 _ => baseBrightness
             },
             "Phá Quân" => branch switch
@@ -251,9 +251,9 @@ public class CatalogService
                 // Miếu Vượng: Tý, Ngọ, Sửu, Mùi
                 "Tý" or "Ngọ" or "Sửu" or "Mùi" => 100,
                 // Đắc địa: Thìn, Tuất
-                "Thìn" or "Tuất" => 90,
+                "Thìn" or "Tuất" => 60,
                 // Hãm địa: Dần, Thân, Tỵ, Hợi, Mão, Dậu
-                "Dần" or "Thân" or "Tỵ" or "Hợi" or "Mão" or "Dậu" => 60,
+                "Dần" or "Thân" or "Tỵ" or "Hợi" or "Mão" or "Dậu" => 40,
                 _ => baseBrightness
             },
             "Liêm Trinh" => branch switch
@@ -261,9 +261,9 @@ public class CatalogService
                 // Miếu Vượng: Dần, Thân, Tý, Ngọ, Thìn, Tuất
                 "Dần" or "Thân" or "Tý" or "Ngọ" or "Thìn" or "Tuất" => 100,
                 // Đắc địa: Sửu, Mùi
-                "Sửu" or "Mùi" => 90,
+                "Sửu" or "Mùi" => 60,
                 // Hãm địa: Tỵ, Hợi, Mão, Dậu
-                "Tỵ" or "Hợi" or "Mão" or "Dậu" => 60,
+                "Tỵ" or "Hợi" or "Mão" or "Dậu" => 40,
                 _ => baseBrightness
             },
             "Tham Lang" => branch switch
@@ -271,9 +271,9 @@ public class CatalogService
                 // Miếu Vượng: Thìn, Tuất, Sửu, Mùi
                 "Thìn" or "Tuất" or "Sửu" or "Mùi" => 100,
                 // Đắc địa: Dần, Thân
-                "Dần" or "Thân" => 90,
+                "Dần" or "Thân" => 60,
                 // Hãm địa: Tỵ, Hợi, Tý, Ngọ, Mão, Dậu
-                "Tỵ" or "Hợi" or "Tý" or "Ngọ" or "Mão" or "Dậu" => 60,
+                "Tỵ" or "Hợi" or "Tý" or "Ngọ" or "Mão" or "Dậu" => 40,
                 _ => baseBrightness
             },
             "Thiên Cơ" => branch switch
@@ -281,9 +281,9 @@ public class CatalogService
                 // Miếu Vượng: Thìn, Tuất, Mão, Dậu, Tỵ, Thân, Mùi
                 "Thìn" or "Tuất" or "Mão" or "Dậu" or "Tỵ" or "Thân" or "Mùi" => 100,
                 // Đắc địa: Ngọ, Tý, Sửu
-                "Ngọ" or "Tý" or "Sửu" => 90,
+                "Ngọ" or "Tý" or "Sửu" => 60,
                 // Hãm địa: Dần, Hợi
-                "Dần" or "Hợi" => 60,
+                "Dần" or "Hợi" => 40,
                 _ => baseBrightness
             },
             "Thái Âm" => branch switch
@@ -291,9 +291,9 @@ public class CatalogService
                 // Miếu Vượng: Thân, Dậu, Tuất, Hợi, Tý
                 "Thân" or "Dậu" or "Tuất" or "Hợi" or "Tý" => 100,
                 // Đắc địa: Sửu, Mùi
-                "Sửu" or "Mùi" => 90,
+                "Sửu" or "Mùi" => 60,
                 // Hãm địa: Dần, Mão, Thìn, Tỵ, Ngọ
-                "Dần" or "Mão" or "Thìn" or "Tỵ" or "Ngọ" => 60,
+                "Dần" or "Mão" or "Thìn" or "Tỵ" or "Ngọ" => 40,
                 _ => baseBrightness
             },
             "Thiên Đồng" => branch switch
@@ -301,9 +301,9 @@ public class CatalogService
                 // Miếu Vượng: Tý, Dần, Thân
                 "Tý" or "Dần" or "Thân" => 100,
                 // Đắc địa: Mão, Tỵ, Hợi
-                "Mão" or "Tỵ" or "Hợi" => 90,
+                "Mão" or "Tỵ" or "Hợi" => 60,
                 // Hãm địa: Ngọ, Dậu, Thìn, Tuất, Sửu, Mùi
-                "Ngọ" or "Dậu" or "Thìn" or "Tuất" or "Sửu" or "Mùi" => 60,
+                "Ngọ" or "Dậu" or "Thìn" or "Tuất" or "Sửu" or "Mùi" => 40,
                 _ => baseBrightness
             },
             "Thiên Lương" => branch switch
@@ -311,9 +311,9 @@ public class CatalogService
                 // Miếu Vượng: Dần, Thân, Tý, Ngọ, Thìn, Tuất, Mão
                 "Dần" or "Thân" or "Tý" or "Ngọ" or "Thìn" or "Tuất" or "Mão" => 100,
                 // Đắc địa: Sửu, Mùi
-                "Sửu" or "Mùi" => 90,
+                "Sửu" or "Mùi" => 60,
                 // Hãm địa: Tỵ, Hợi, Dậu
-                "Tỵ" or "Hợi" or "Dậu" => 60,
+                "Tỵ" or "Hợi" or "Dậu" => 40,
                 _ => baseBrightness
             },
             "Cự Môn" => branch switch
@@ -321,9 +321,9 @@ public class CatalogService
                 // Miếu Vượng: Tý, Ngọ, Mão, Dậu, Dần
                 "Tý" or "Ngọ" or "Mão" or "Dậu" or "Dần" => 100,
                 // Đắc địa: Thân, Hợi
-                "Thân" or "Hợi" => 90,
+                "Thân" or "Hợi" => 60,
                 // Hãm địa: Tỵ, Thìn, Tuất, Sửu, Mùi
-                "Tỵ" or "Thìn" or "Tuất" or "Sửu" or "Mùi" => 60,
+                "Tỵ" or "Thìn" or "Tuất" or "Sửu" or "Mùi" => 40,
                 _ => baseBrightness
             },
             "Thái Dương" => branch switch
@@ -331,9 +331,9 @@ public class CatalogService
                 // Miếu Vượng: Dần, Mão, Thìn, Tỵ, Ngọ
                 "Dần" or "Mão" or "Thìn" or "Tỵ" or "Ngọ" => 100,
                 // Đắc địa: Sửu, Mùi
-                "Sửu" or "Mùi" => 90,
+                "Sửu" or "Mùi" => 60,
                 // Hãm địa: Thân, Dậu, Tuất, Hợi, Tý
-                "Thân" or "Dậu" or "Tuất" or "Hợi" or "Tý" => 60,
+                "Thân" or "Dậu" or "Tuất" or "Hợi" or "Tý" => 40,
                 _ => baseBrightness
             },
             _ => baseBrightness
