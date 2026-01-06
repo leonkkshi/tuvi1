@@ -108,7 +108,8 @@ export class BirthFormComponent {
     this.birthInfo.day = this.solarDate.day;
     
     // Hiển thị thông tin âm lịch tương ứng
-    this.lunarConversionText = `Âm lịch: ${lunarResult.day}/${lunarResult.month}/${lunarResult.year}`;
+    const leapText = lunarResult.isLeapMonth ? ' (Nhuận)' : '';
+    this.lunarConversionText = `Âm lịch: ${lunarResult.day}/${lunarResult.month}/${lunarResult.year}${leapText}`;
   }
 
   updateSolarDaysInMonth() {
