@@ -182,15 +182,18 @@ export class BirthFormComponent {
   onSubmit() {
     if (this.validateForm()) {
       // Đảm bảo tất cả các giá trị số là number chứ không phải string
+      // Và giữ đúng giá trị isLunar theo tab hiện tại
       const request = {
-        ...this.birthInfo,
         year: Number(this.birthInfo.year),
         month: Number(this.birthInfo.month),
         day: Number(this.birthInfo.day),
         hour: Number(this.birthInfo.hour),
         minute: Number(this.birthInfo.minute),
+        isMale: this.birthInfo.isMale,
+        isLunar: this.calendarType === 'lunar', // Lấy từ tab hiện tại
         fullName: this.fullName
       };
+      console.log('Submitting request:', request); // Debug
       this.chartGenerated.emit(request);
     }
   }
