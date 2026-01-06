@@ -103,10 +103,11 @@ export class BirthFormComponent {
     // Chuyển đổi dương lịch sang âm lịch ngay ở frontend
     const lunarResult = this.lunarConverter.convertSolarToLunar(day, month, year);
     
-    // Cập nhật birthInfo với ngày dương lịch (gửi lên backend) - ép về number
-    this.birthInfo.year = year;
-    this.birthInfo.month = month;
-    this.birthInfo.day = day;
+    // CẬP NHẬT birthInfo với ngày ÂM LỊCH đã chuyển đổi
+    // Vì backend trên production không có Node.js để chuyển đổi
+    this.birthInfo.year = lunarResult.year;
+    this.birthInfo.month = lunarResult.month;
+    this.birthInfo.day = lunarResult.day;
     
     // Hiển thị thông tin âm lịch tương ứng
     const leapText = lunarResult.isLeapMonth ? ' (Nhuận)' : '';
@@ -181,8 +182,8 @@ export class BirthFormComponent {
 
   onSubmit() {
     if (this.validateForm()) {
-      // Đảm bảo tất cả các giá trị số là number chứ không phải string
-      // Và giữ đúng giá trị isLunar theo tab hiện tại
+      // Khi ở tab dương lịch: birthInfo đã được chuyển đổi sang âm lịch trong onSolarDateChange
+      // Vì vậy luôn gửi isLunar = true (backend không cần chuyển đổi nữa)
       const request = {
         year: Number(this.birthInfo.year),
         month: Number(this.birthInfo.month),
@@ -190,7 +191,7 @@ export class BirthFormComponent {
         hour: Number(this.birthInfo.hour),
         minute: Number(this.birthInfo.minute),
         isMale: this.birthInfo.isMale,
-        isLunar: this.calendarType === 'lunar', // Lấy từ tab hiện tại
+        isLunar: true, // Luôn gửi true vì đã chuyển đổi ở frontend
         fullName: this.fullName
       };
       console.log('Submitting request:', request); // Debug
