@@ -21,6 +21,7 @@
 .palace-cell {
     border: 1px solid #777;
     padding: 6px;
+    padding-bottom: 28px; /* Reserve space for fixed footer */
     position: relative;
     background-color: #fff;
     display: flex;
@@ -45,29 +46,29 @@
 /* Vertical Barrier (Left Border) - Anchored Bottom (for Top Row) */
 .barrier-ver-bottom {
     left: 0;
-    top: 100%;
+    top: 100%; /* Anchor to bottom (Inner Edge) */
     transform: translate(-50%, -50%);
 }
 
 /* Vertical Barrier (Left Border) - Anchored Top (for Bottom Row) */
 .barrier-ver-top {
     left: 0;
+    top: 0; /* Anchor to top (Inner Edge) */
+    transform: translate(-50%, -50%);
+}
+
+/* Horizontal Barrier (Top Border) - Anchored Right (for Left Column) */
+.barrier-hor-right {
     top: 0;
+    left: 50%; /* Center of horizontal border */
     transform: translate(-50%, -50%);
 }
 
 /* Horizontal Barrier (Top Border) - Anchored Left (for Right Column) */
 .barrier-hor-left {
     top: 0;
-    left: 0;
-    transform: translate(-50%, -50%); /* Center on the corner */
-}
-
-/* Horizontal Barrier (Top Border) - Anchored Right (for Left Column) */
-.barrier-hor-right {
-    top: 0;
-    left: 100%;
-    transform: translate(-50%, -50%); /* Center on the corner */
+    left: 50%; /* Center of horizontal border */
+    transform: translate(-50%, -50%);
 }
 
 /* Center Panel (2x2) */
@@ -201,14 +202,17 @@
 
 /* --- Palace Footer --- */
 .palace-footer {
-    margin-top: auto;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 26px;
     border-top: 1px dotted #ccc;
-    padding-top: 4px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-left: 4px;
-    padding-right: 4px;
+    padding: 0 4px;
+    background-color: transparent;
 }
 
 .footer-left, .footer-right {
