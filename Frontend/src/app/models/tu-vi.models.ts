@@ -48,6 +48,7 @@ export interface TuViChart {
   palaceStars: PalaceStar[];
   trietBetween: string; // VD: "Thân-Dậu" (2 cung)
   tuanPositions: string; // VD: "Thân,Dậu" (2 cung)
+  daiVan: { [key: number]: number }; // Key = Palace Position (1-12), Value = Tuổi bắt đầu Đại Vận
 }
 
 export interface ChartRequest {

@@ -359,6 +359,20 @@ export class TuViChartComponent implements OnChanges {
     this.palaceInterpretationsCache.set(palaceName, result);
   }
 
+  getDaiVan(palaceId: number): number | string {
+    if (!this.chart || !this.chart.daiVan) return '';
+    return this.chart.daiVan[palaceId] || '';
+  }
+
+  getBrightnessText(brightness: number): string {
+    if (brightness === undefined || brightness === null) return '';
+    if (brightness >= 90) return '(M)';
+    if (brightness >= 80) return '(V)';
+    if (brightness >= 60) return '(Đ)';
+    if (brightness >= 50) return '(B)';
+    return '(H)';
+  }
+
   getPalaceIcon(palaceName: string): string {
     const icons: {[key: string]: string} = {
       'Mệnh': '🎯',

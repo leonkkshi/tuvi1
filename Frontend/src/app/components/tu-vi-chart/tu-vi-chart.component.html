@@ -1,446 +1,131 @@
 <div class="tu-vi-chart" *ngIf="chart">
-  <h2>LÁ SỐ TỬ VI</h2>
-  
-  <!-- Thông tin cơ bản -->
-  <div class="chart-info">
-    <div class="info-item">
-      <span class="label">Cung Mệnh:</span>
-      <span class="value">{{ getMenhBranch() }}</span>
-    </div>
-    <div class="info-item">
-      <span class="label">Cung Thân:</span>
-      <span class="value">{{ getThanBranch() }}</span>
-    </div>
-    <div class="info-item">
-      <span class="label">Cục:</span>
-      <span class="value">{{ getCuc() }}</span>
-    </div>
-    <div class="info-item">
-      <span class="label">Âm Dương:</span>
-      <span class="value">{{ getAmDuong() }}</span>
-    </div>
+  <div class="chart-header-mobile">
+    <h2>LÁ SỐ TỬ VI</h2>
   </div>
   
+  <div class="chart-info">
+     <!-- Basic info summary visible on mobile mostly, or consistent with old layout -->
+     <!-- Removed if specific request is just for the grid look, which has info in center. -->
+     <!-- Keeping it hidden or styled appropriately via CSS if needed. -->
+     <!-- Actually the requested image has info INSIDE the chart. So general top info is redundant. -->
+  </div>
+
   <div class="chart-container">
-    <!-- Hàng 1: Tị - Ngọ - Mùi - Thân -->
-    <div class="palace-cell" [attr.data-palace]="getPalaceByPosition(6)?.palaceName">
-      <div class="palace-content">
-        <div class="palace-header">
-          <span class="palace-branch">{{ getPalaceBranchByPosition(6) }}</span>
-          <span class="palace-name">{{ getPalaceByPosition(6)?.palaceName }}</span>
-          <span class="palace-than" *ngIf="isThanPalace(6)">&lt;Thân&gt;</span>
-        </div>
-        <div class="palace-stars">
-          <div class="palace-stars-left">
-            <div *ngFor="let star of getCatStars(6)" 
-                 class="star" 
-                 [ngClass]="getStarClass(star.starName, star.element)">
-              {{ star.starName }}
+    <!-- Template for Palace Cell -->
+    <ng-template #palaceTemplate let-id="id">
+      <div class="palace-cell" [ngClass]="'p' + id" [attr.data-palace]="getPalaceByPosition(id)?.palaceName">
+        <div class="palace-content">
+          <!-- Header: Branch - Name - DaiVan -->
+          <div class="palace-header">
+            <div class="header-left">
+              <span class="palace-branch-label">{{ getPalaceBranchByPosition(id) }}</span>
+            </div>
+            <div class="header-center">
+              <span class="palace-name">{{ getPalaceByPosition(id)?.palaceName }}</span>
+              <span class="palace-than" *ngIf="isThanPalace(id)">(Thân)</span>
+            </div>
+            <div class="header-right">
+              <span class="daivan-number">{{ getDaiVan(id) }}</span>
             </div>
           </div>
-          <div class="palace-stars-right">
-            <div *ngFor="let star of getHungStars(6)" 
-                 class="star" 
-                 [ngClass]="getStarClass(star.starName, star.element)">
-              {{ star.starName }}
-            </div>
+          
+          <!-- Stars Section -->
+          <div class="palace-body">
+             <!-- Major Stars (Chính tinh) -->
+             <div class="major-stars">
+               <div *ngFor="let star of getChinhTinh(id)" 
+                    class="star-item star-main" 
+                    [ngClass]="getStarClass(star.starName, star.element)">
+                 {{ star.starName }} <span class="brightness">{{ getBrightnessText(star.brightness) }}</span>
+               </div>
+             </div>
+
+             <!-- Minor Stars Grid (Left/Right) -->
+             <div class="minor-stars-container">
+               <div class="stars-col left">
+                 <div *ngFor="let star of getPhuTinhCat(id)" 
+                      class="star-item star-good"
+                      [ngClass]="getStarClass(star.starName, star.element)">
+                   {{ star.starName }}
+                 </div>
+               </div>
+               <div class="stars-col right">
+                 <div *ngFor="let star of getPhuTinhHung(id)" 
+                      class="star-item star-bad"
+                      [ngClass]="getStarClass(star.starName, star.element)">
+                   {{ star.starName }}
+                 </div>
+               </div>
+             </div>
           </div>
-        </div>
-        <div class="truong-sinh-section">
-          <div *ngFor="let star of getTruongSinhStars(6)" 
-               class="star" 
-               [ngClass]="getStarClass(star.starName, star.element)">
-            {{ star.starName }}
+
+          <!-- Bottom: Life Stage -->
+          <div class="palace-footer">
+            <div class="footer-center">
+               <div *ngFor="let star of getTruongSinhStars(id)" class="star-truongsinh">
+                 {{ star.starName }}
+               </div>
+            </div>
           </div>
         </div>
       </div>
+    </ng-template>
+
+    <!-- Grid Layout Order -->
+    <!-- Row 1: 6, 7, 8, 9 -->
+    <ng-container *ngTemplateOutlet="palaceTemplate; context: {id: 6}"></ng-container>
+    <ng-container *ngTemplateOutlet="palaceTemplate; context: {id: 7}"></ng-container>
+    <ng-container *ngTemplateOutlet="palaceTemplate; context: {id: 8}"></ng-container>
+    <ng-container *ngTemplateOutlet="palaceTemplate; context: {id: 9}"></ng-container>
+
+    <!-- Row 2: 5, Center, 10 -->
+    <ng-container *ngTemplateOutlet="palaceTemplate; context: {id: 5}"></ng-container>
+
+    <!-- Center Info Panel (Spans 2x2) -->
+    <div class="center-info-panel">
+        <div class="center-content">
+            <div class="center-header">
+                <h3>THIÊN BÀN</h3>
+            </div>
+            
+            <div class="personal-info-grid">
+                 <div class="info-row full-width">
+                     <strong>Họ tên:</strong> {{ chart.fullName || '---' }}
+                 </div>
+                 <div class="info-row">
+                     <strong>Năm:</strong> {{ chart.lunarYear }}
+                 </div>
+                 <div class="info-row">
+                     <strong>Tháng:</strong> {{ chart.lunarMonth }}
+                 </div>
+                 <div class="info-row">
+                     <strong>Ngày:</strong> {{ chart.lunarDay }}
+                 </div>
+                 <div class="info-row">
+                     <strong>Giờ:</strong> {{ formatTime(chart.birthTime) }}
+                 </div>
+            </div>
+
+            <div class="chart-summary">
+                 <div class="info-row"><strong>Âm Dương:</strong> {{ getAmDuong() }}</div>
+                 <div class="info-row"><strong>Mệnh:</strong> {{ getMenh() }}</div>
+                 <div class="info-row"><strong>Cục:</strong> {{ getCuc() }}</div>
+            </div>
+        </div>
     </div>
 
-    <div class="palace-cell" [attr.data-palace]="getPalaceByPosition(7)?.palaceName">
-      <div class="palace-content">
-        <div class="palace-header">
-          <span class="palace-branch">{{ getPalaceBranchByPosition(7) }}</span>
-          <span class="palace-name">{{ getPalaceByPosition(7)?.palaceName }}</span>
-          <span class="palace-than" *ngIf="isThanPalace(7)">&lt;Thân&gt;</span>
-        </div>
-        <div class="palace-stars">
-          <div class="palace-stars-left">
-            <div *ngFor="let star of getCatStars(7)" 
-                 class="star" 
-                 [ngClass]="getStarClass(star.starName, star.element)">
-              {{ star.starName }}
-            </div>
-          </div>
-          <div class="palace-stars-right">
-            <div *ngFor="let star of getHungStars(7)" 
-                 class="star" 
-                 [ngClass]="getStarClass(star.starName, star.element)">
-              {{ star.starName }}
-            </div>
-          </div>
-        </div>
-        <div class="truong-sinh-section">
-          <div *ngFor="let star of getTruongSinhStars(7)" 
-               class="star" 
-               [ngClass]="getStarClass(star.starName, star.element)">
-            {{ star.starName }}
-          </div>
-        </div>
-      </div>
-    </div>
+    <ng-container *ngTemplateOutlet="palaceTemplate; context: {id: 10}"></ng-container>
 
-    <div class="palace-cell" [attr.data-palace]="getPalaceByPosition(8)?.palaceName">
-      <div class="palace-content">
-        <div class="palace-header">
-          <span class="palace-branch">{{ getPalaceBranchByPosition(8) }}</span>
-          <span class="palace-name">{{ getPalaceByPosition(8)?.palaceName }}</span>
-          <span class="palace-than" *ngIf="isThanPalace(8)">&lt;Thân&gt;</span>
-        </div>
-        <div class="palace-stars">
-          <div class="palace-stars-left">
-            <div *ngFor="let star of getCatStars(8)" 
-                 class="star" 
-                 [ngClass]="getStarClass(star.starName, star.element)">
-              {{ star.starName }}
-            </div>
-          </div>
-          <div class="palace-stars-right">
-            <div *ngFor="let star of getHungStars(8)" 
-                 class="star" 
-                 [ngClass]="getStarClass(star.starName, star.element)">
-              {{ star.starName }}
-            </div>
-          </div>
-        </div>
-        <div class="truong-sinh-section">
-          <div *ngFor="let star of getTruongSinhStars(8)" 
-               class="star" 
-               [ngClass]="getStarClass(star.starName, star.element)">
-            {{ star.starName }}
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- Row 3: 4, Center(occupied), 11 -->
+    <ng-container *ngTemplateOutlet="palaceTemplate; context: {id: 4}"></ng-container>
+    <!-- Center panel spans this row too in CSS -->
+    <ng-container *ngTemplateOutlet="palaceTemplate; context: {id: 11}"></ng-container>
 
-    <div class="palace-cell" [attr.data-palace]="getPalaceByPosition(9)?.palaceName">
-      <div class="palace-content">
-        <div class="palace-header">
-          <span class="palace-branch">{{ getPalaceBranchByPosition(9) }}</span>
-          <span class="palace-name">{{ getPalaceByPosition(9)?.palaceName }}</span>
-          <span class="palace-than" *ngIf="isThanPalace(9)">&lt;Thân&gt;</span>
-        </div>
-        <div class="palace-stars">
-          <div class="palace-stars-left">
-            <div *ngFor="let star of getCatStars(9)" 
-                 class="star" 
-                 [ngClass]="getStarClass(star.starName, star.element)">
-              {{ star.starName }}
-            </div>
-          </div>
-          <div class="palace-stars-right">
-            <div *ngFor="let star of getHungStars(9)" 
-                 class="star" 
-                 [ngClass]="getStarClass(star.starName, star.element)">
-              {{ star.starName }}
-            </div>
-          </div>
-        </div>
-        <div class="truong-sinh-section">
-          <div *ngFor="let star of getTruongSinhStars(9)" 
-               class="star" 
-               [ngClass]="getStarClass(star.starName, star.element)">
-            {{ star.starName }}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Hàng 2: Thìn - Trung tâm - Dậu -->
-    <div class="palace-cell" [attr.data-palace]="getPalaceByPosition(5)?.palaceName">
-      <div class="palace-content">
-        <div class="palace-header">
-          <span class="palace-branch">{{ getPalaceBranchByPosition(5) }}</span>
-          <span class="palace-name">{{ getPalaceByPosition(5)?.palaceName }}</span>
-          <span class="palace-than" *ngIf="isThanPalace(5)">&lt;Thân&gt;</span>
-        </div>
-        <div class="palace-stars">
-          <div class="palace-stars-left">
-            <div *ngFor="let star of getCatStars(5)"
-                 class="star"
-                 [ngClass]="getStarClass(star.starName, star.element)">
-              {{ star.starName }}
-            </div>
-          </div>
-          <div class="palace-stars-right">
-            <div *ngFor="let star of getHungStars(5)"
-                 class="star"
-                 [ngClass]="getStarClass(star.starName, star.element)">
-              {{ star.starName }}
-            </div>
-          </div>
-        </div>
-        <div class="truong-sinh-section">
-          <div *ngFor="let star of getTruongSinhStars(5)" 
-               class="star" 
-               [ngClass]="getStarClass(star.starName, star.element)">
-            {{ star.starName }}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="center-info" colspan="2">
-      <div class="info-section">
-        <h3>Thông Tin Sinh</h3>
-        <p><strong>Họ tên:</strong> {{ chart.fullName || 'Chưa có' }}</p>
-        <p><strong>Năm:</strong> {{ chart.lunarYear }}</p>
-        <p><strong>Tháng:</strong> {{ chart.lunarMonth }}</p>
-        <p><strong>Ngày:</strong> {{ chart.lunarDay }}</p>
-        <p><strong>Giờ:</strong> {{ formatTime(chart.birthTime) }}</p>
-        <p><strong>Giới tính:</strong> {{ chart.isMale ? 'Nam' : 'Nữ' }}</p>
-      </div>
-    </div>
-
-    <div class="palace-cell" [attr.data-palace]="getPalaceByPosition(10)?.palaceName">
-      <div class="palace-content">
-        <div class="palace-header">
-          <span class="palace-branch">{{ getPalaceBranchByPosition(10) }}</span>
-          <span class="palace-name">{{ getPalaceByPosition(10)?.palaceName }}</span>
-          <span class="palace-than" *ngIf="isThanPalace(10)">&lt;Thân&gt;</span>
-        </div>
-        <div class="palace-stars">
-          <div class="palace-stars-left">
-            <div *ngFor="let star of getCatStars(10)"
-                 class="star"
-                 [ngClass]="getStarClass(star.starName, star.element)">
-              {{ star.starName }}
-            </div>
-          </div>
-          <div class="palace-stars-right">
-            <div *ngFor="let star of getHungStars(10)"
-                 class="star"
-                 [ngClass]="getStarClass(star.starName, star.element)">
-              {{ star.starName }}
-            </div>
-          </div>
-        </div>
-        <div class="truong-sinh-section">
-          <div *ngFor="let star of getTruongSinhStars(10)" 
-               class="star" 
-               [ngClass]="getStarClass(star.starName, star.element)">
-            {{ star.starName }}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Hàng 3: Mão - Trung tâm - Tuất -->
-    <div class="palace-cell" [attr.data-palace]="getPalaceByPosition(4)?.palaceName">
-      <div class="palace-content">
-        <div class="palace-header">
-          <span class="palace-branch">{{ getPalaceBranchByPosition(4) }}</span>
-          <span class="palace-name">{{ getPalaceByPosition(4)?.palaceName }}</span>
-          <span class="palace-than" *ngIf="isThanPalace(4)">&lt;Thân&gt;</span>
-        </div>
-        <div class="palace-stars">
-          <div class="palace-stars-left">
-            <div *ngFor="let star of getCatStars(4)"
-                 class="star"
-                 [ngClass]="getStarClass(star.starName, star.element)">
-              {{ star.starName }}
-            </div>
-          </div>
-          <div class="palace-stars-right">
-            <div *ngFor="let star of getHungStars(4)"
-                 class="star"
-                 [ngClass]="getStarClass(star.starName, star.element)">
-              {{ star.starName }}
-            </div>
-          </div>
-        </div>
-        <div class="truong-sinh-section">
-          <div *ngFor="let star of getTruongSinhStars(4)" 
-               class="star" 
-               [ngClass]="getStarClass(star.starName, star.element)">
-            {{ star.starName }}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="center-info" colspan="2">
-      <div class="info-section">
-        <p><strong>Âm Dương:</strong> {{ getAmDuong() }}</p>
-        <p><strong>Mệnh:</strong> {{ getMenh() }}</p>
-        <p><strong>Cục:</strong> {{ getCuc() }}</p>
-      </div>
-    </div>
-
-    <div class="palace-cell" [attr.data-palace]="getPalaceByPosition(11)?.palaceName">
-      <div class="palace-content">
-        <div class="palace-header">
-          <span class="palace-branch">{{ getPalaceBranchByPosition(11) }}</span>
-          <span class="palace-name">{{ getPalaceByPosition(11)?.palaceName }}</span>
-          <span class="palace-than" *ngIf="isThanPalace(11)">&lt;Thân&gt;</span>
-        </div>
-        <div class="palace-stars">
-          <div class="palace-stars-left">
-            <div *ngFor="let star of getCatStars(11)"
-                 class="star"
-                 [ngClass]="getStarClass(star.starName, star.element)">
-              {{ star.starName }}
-            </div>
-          </div>
-          <div class="palace-stars-right">
-            <div *ngFor="let star of getHungStars(11)"
-                 class="star"
-                 [ngClass]="getStarClass(star.starName, star.element)">
-              {{ star.starName }}
-            </div>
-          </div>
-        </div>
-        <div class="truong-sinh-section">
-          <div *ngFor="let star of getTruongSinhStars(11)" 
-               class="star" 
-               [ngClass]="getStarClass(star.starName, star.element)">
-            {{ star.starName }}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Hàng 4: Dần - Sửu - Tý - Hợi -->
-    <div class="palace-cell" [attr.data-palace]="getPalaceByPosition(3)?.palaceName">
-      <div class="palace-content">
-        <div class="palace-header">
-          <span class="palace-branch">{{ getPalaceBranchByPosition(3) }}</span>
-          <span class="palace-name">{{ getPalaceByPosition(3)?.palaceName }}</span>
-          <span class="palace-than" *ngIf="isThanPalace(3)">&lt;Thân&gt;</span>
-        </div>
-        <div class="palace-stars">
-          <div class="palace-stars-left">
-            <div *ngFor="let star of getCatStars(3)"
-                 class="star"
-                 [ngClass]="getStarClass(star.starName, star.element)">
-              {{ star.starName }}
-            </div>
-          </div>
-          <div class="palace-stars-right">
-            <div *ngFor="let star of getHungStars(3)"
-                 class="star"
-                 [ngClass]="getStarClass(star.starName, star.element)">
-              {{ star.starName }}
-            </div>
-          </div>
-        </div>
-        <div class="truong-sinh-section">
-          <div *ngFor="let star of getTruongSinhStars(3)" 
-               class="star" 
-               [ngClass]="getStarClass(star.starName, star.element)">
-            {{ star.starName }}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="palace-cell" [attr.data-palace]="getPalaceByPosition(2)?.palaceName">
-      <div class="palace-content">
-        <div class="palace-header">
-          <span class="palace-branch">{{ getPalaceBranchByPosition(2) }}</span>
-          <span class="palace-name">{{ getPalaceByPosition(2)?.palaceName }}</span>
-          <span class="palace-than" *ngIf="isThanPalace(2)">&lt;Thân&gt;</span>
-        </div>
-        <div class="palace-stars">
-          <div class="palace-stars-left">
-            <div *ngFor="let star of getCatStars(2)"
-                 class="star"
-                 [ngClass]="getStarClass(star.starName, star.element)">
-              {{ star.starName }}
-            </div>
-          </div>
-          <div class="palace-stars-right">
-            <div *ngFor="let star of getHungStars(2)"
-                 class="star"
-                 [ngClass]="getStarClass(star.starName, star.element)">
-              {{ star.starName }}
-            </div>
-          </div>
-        </div>
-        <div class="truong-sinh-section">
-          <div *ngFor="let star of getTruongSinhStars(2)" 
-               class="star" 
-               [ngClass]="getStarClass(star.starName, star.element)">
-            {{ star.starName }}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="palace-cell" [attr.data-palace]="getPalaceByPosition(1)?.palaceName">
-      <div class="palace-content">
-        <div class="palace-header">
-          <span class="palace-branch">{{ getPalaceBranchByPosition(1) }}</span>
-          <span class="palace-name">{{ getPalaceByPosition(1)?.palaceName }}</span>
-          <span class="palace-than" *ngIf="isThanPalace(1)">&lt;Thân&gt;</span>
-        </div>
-        <div class="palace-stars">
-          <div class="palace-stars-left">
-            <div *ngFor="let star of getCatStars(1)"
-                 class="star"
-                 [ngClass]="getStarClass(star.starName, star.element)">
-              {{ star.starName }}
-            </div>
-          </div>
-          <div class="palace-stars-right">
-            <div *ngFor="let star of getHungStars(1)"
-                 class="star"
-                 [ngClass]="getStarClass(star.starName, star.element)">
-              {{ star.starName }}
-            </div>
-          </div>
-        </div>
-        <div class="truong-sinh-section">
-          <div *ngFor="let star of getTruongSinhStars(1)" 
-               class="star" 
-               [ngClass]="getStarClass(star.starName, star.element)">
-            {{ star.starName }}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="palace-cell" [attr.data-palace]="getPalaceByPosition(12)?.palaceName">
-      <div class="palace-content">
-        <div class="palace-header">
-          <span class="palace-branch">{{ getPalaceBranchByPosition(12) }}</span>
-          <span class="palace-name">{{ getPalaceByPosition(12)?.palaceName }}</span>
-          <span class="palace-than" *ngIf="isThanPalace(12)">&lt;Thân&gt;</span>
-        </div>
-        <div class="palace-stars">
-          <div class="palace-stars-left">
-            <div *ngFor="let star of getCatStars(12)"
-                 class="star"
-                 [ngClass]="getStarClass(star.starName, star.element)">
-              {{ star.starName }}
-            </div>
-          </div>
-          <div class="palace-stars-right">
-            <div *ngFor="let star of getHungStars(12)"
-                 class="star"
-                 [ngClass]="getStarClass(star.starName, star.element)">
-              {{ star.starName }}
-            </div>
-          </div>
-        </div>
-        <div class="truong-sinh-section">
-          <div *ngFor="let star of getTruongSinhStars(12)" 
-               class="star" 
-               [ngClass]="getStarClass(star.starName, star.element)">
-            {{ star.starName }}
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- Row 4: 3, 2, 1, 12 -->
+    <ng-container *ngTemplateOutlet="palaceTemplate; context: {id: 3}"></ng-container>
+    <ng-container *ngTemplateOutlet="palaceTemplate; context: {id: 2}"></ng-container>
+    <ng-container *ngTemplateOutlet="palaceTemplate; context: {id: 1}"></ng-container>
+    <ng-container *ngTemplateOutlet="palaceTemplate; context: {id: 12}"></ng-container>
   </div>
 
   <!-- Palace Interpretation Modal -->
@@ -453,10 +138,17 @@
     (interpretationLoaded)="selectedPalace && setCachedInterpretation(selectedPalace.palaceName, $event)">
   </app-palace-interpretation-modal>
 </div>
+
+<!-- Interpretation Container -->
+<div class="interpretation-container" *ngIf="chart">
+  
   <!-- Palace Interpretation Buttons Section -->
-  <div class="palace-interpretation-buttons" *ngIf="chart">
-    <h3>🔮 Luận Giải Chi Tiết Từng Cung</h3>
-    <p class="section-description">Nhấp vào cung bạn muốn xem luận giải chi tiết với phân tích tam phương tứ chính, nhị hợp và các yếu tố ảnh hưởng</p>
+  <div class="palace-interpretation-section">
+    <div class="section-header">
+      <h3>🔮 Luận Giải Chi Tiết Từng Cung</h3>
+      <p class="section-description">Chọn cung trên lá số hoặc nhấn vào nút bên dưới để xem chi tiết</p>
+    </div>
+    
     <div class="palace-buttons-grid">
       <button 
         *ngFor="let palace of chart.palaceStars" 
@@ -464,32 +156,42 @@
         [class.menh]="palace.palaceName === 'Mệnh'"
         [class.than]="palace.palaceId === chart.thanPalace"
         (click)="openPalaceInterpretation(palace.palaceId)">
-        <span class="palace-icon">{{ getPalaceIcon(palace.palaceName) }}</span>
-        <span class="palace-btn-name">{{ palace.palaceName }}</span>
+        <div class="btn-content">
+          <span class="palace-icon">{{ getPalaceIcon(palace.palaceName) }}</span>
+          <span class="palace-btn-name">{{ palace.palaceName }}</span>
+        </div>
         <span class="palace-branch-small">{{ getPalaceBranchByPosition(palace.palaceId) }}</span>
       </button>
     </div>
   </div>
 
   <!-- AI Interpretation Section -->
-  <div class="ai-interpretation-section" *ngIf="chart">
-    <h3>🤖 Luận Giải Tổng Quan AI</h3>
+  <div class="ai-interpretation-section">
+    <div class="section-header">
+      <h3>🤖 Luận Giải Tổng Quan (AI)</h3>
+      <p class="section-description">Phân tích tổng hợp dựa trên toàn bộ lá số</p>
+    </div>
     
     <div class="interpretation-controls">
-      <label for="focusArea">Lĩnh vực:</label>
-      <select id="focusArea" [(ngModel)]="focusArea" (change)="onFocusAreaChange($event)">
-        <option value="general">Tổng quan</option>
-        <option value="career">Sự nghiệp</option>
-        <option value="love">Tình duyên</option>
-        <option value="health">Sức khỏe</option>
-        <option value="wealth">Tài lộc</option>
-      </select>
+      <div class="control-group">
+        <label for="focusArea">Chọn lĩnh vực quan tâm:</label>
+        <div class="select-wrapper">
+          <select id="focusArea" [(ngModel)]="focusArea" (change)="onFocusAreaChange($event)">
+            <option value="general">🌟 Tổng quan cuộc đời</option>
+            <option value="career">💼 Công danh sự nghiệp</option>
+            <option value="wealth">💰 Tài lộc tiền bạc</option>
+            <option value="love">💑 Tình duyên gia đạo</option>
+            <option value="health">⚕️ Sức khỏe bệnh tật</option>
+          </select>
+        </div>
+      </div>
       
       <button 
         class="btn-interpret" 
         (click)="requestAIInterpretation()"
         [disabled]="isLoadingInterpretation">
-        {{ isLoadingInterpretation ? 'Đang phân tích...' : 'Luận giải bằng AI' }}
+        <span *ngIf="!isLoadingInterpretation">✨ Bắt đầu luận giải</span>
+        <span *ngIf="isLoadingInterpretation">⏳ Đang suy luận...</span>
       </button>
     </div>
 
@@ -498,31 +200,29 @@
     </div>
 
     <div *ngIf="isLoadingInterpretation" class="interpretation-loading">
-      <div class="spinner"></div>
-      <p>AI đang phân tích lá số của bạn...</p>
+      <div class="loading-spinner"></div>
+      <p>Hệ thống đang kết nối với các vì sao...</p>
     </div>
 
     <div *ngIf="interpretation && !isLoadingInterpretation" class="interpretation-result">
-      <div class="interpretation-overview">
-        <h4>Tổng Quan</h4>
-        <p [innerHTML]="parseMarkdown(interpretation.overallInterpretation)"></p>
+      <div class="result-card overview-card">
+        <h4><span class="icon">📜</span> Tổng Quan</h4>
+        <div class="markdown-content" [innerHTML]="parseMarkdown(interpretation.overallInterpretation)"></div>
       </div>
 
-      <div *ngIf="interpretation.warnings.length > 0" class="interpretation-warnings">
-        <h4>⚠️ Cảnh Báo</h4>
+      <div *ngIf="interpretation.warnings.length > 0" class="result-card warning-card">
+        <h4><span class="icon">⚠️</span> Lưu Ý Quan Trọng</h4>
         <ul>
           <li *ngFor="let warning of interpretation.warnings" [innerHTML]="parseMarkdown(warning)"></li>
         </ul>
       </div>
 
-      <div *ngIf="interpretation.recommendations.length > 0" class="interpretation-recommendations">
-        <h4>💡 Khuyến Nghị</h4>
+      <div *ngIf="interpretation.recommendations.length > 0" class="result-card recommendation-card">
+        <h4><span class="icon">💡</span> Lời Khuyên</h4>
         <ul>
           <li *ngFor="let rec of interpretation.recommendations" [innerHTML]="parseMarkdown(rec)"></li>
         </ul>
       </div>
-
-      <!-- Đã loại bỏ phần hiển thị palaceInterpretations để tránh trùng lặp -->
-      <!-- Vì overallInterpretation đã chứa toàn bộ luận giải cho 12 cung -->
     </div>
   </div>
+</div>
