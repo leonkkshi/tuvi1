@@ -316,13 +316,13 @@ NGUYÊN TẮC LUẬN ĐOÁN TỬ VI - QUAN TRỌNG:
    - Hung + Hung = Đại hung
    - Hóa Lộc, Hóa Quyền, Hóa Khoa giải hung
    - Hóa Kỵ làm hung thêm
-   - Trường hợp đặc biệt, Tham Lang gặp Hỏa Tinh, Linh Tinh, Địa Không, Địa Kiếp là phú quý, Phá Quân gặp Không Kiếp là cách cục bạo phát
+   - Trường hợp đặc biệt, Tham Lang gặp Hỏa Tinh, Linh Tinh, Địa Không, Địa Kiếp là phú quý, Phá Quân gặp Không Kiếp là cách cục bạo phát, kể cả hội từ tam phương tứ chính.
 
 HÃY LUẬN GIẢI:
 - Chi tiết, cụ thể từng cung
 - ⚠️ BẮT BUỘC: Phải liên hệ tam phương tứ chính rõ ràng cho MỌI cung
 - ⚠️ ĐẶC BIỆT: Với cung Mệnh & Thân nhất định phải xét thêm nhị hợp và cung liền kề
-- Dùng thuật ngữ Tử Vi chính xác
+- Dùng thuật ngữ Tử Vi chính xác, nghiên cứu thêm từ internet nếu cần
 - Giải thích dễ hiểu, thiết thực
 - Đưa ra lời khuyên cụ thể
 
