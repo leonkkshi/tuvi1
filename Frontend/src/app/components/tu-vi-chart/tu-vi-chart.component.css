@@ -3,6 +3,24 @@
     font-family: 'Times New Roman', Times, serif; /* Traditional look */
 }
 
+/* Mobile scroll hint */
+.chart-scroll-hint {
+    display: none;
+    text-align: center;
+    padding: 8px;
+    background: #fff3cd;
+    color: #856404;
+    font-size: 0.85rem;
+    border-radius: 4px;
+    margin: 5px;
+}
+
+@media (max-width: 768px) {
+    .chart-scroll-hint {
+        display: block;
+    }
+}
+
 /* Main Grid Container */
 .chart-container {
     display: grid;
@@ -310,85 +328,295 @@
 }
 
 /* --- Mobile Responsiveness --- */
-@media (max-width: 900px) {
+
+/* Tablet and smaller - keep grid but make it responsive */
+@media (max-width: 1200px) {
     .chart-container {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        border: none;
-        background-color: transparent;
-        box-shadow: none;
+        max-width: 100%;
+        margin: 10px;
+        grid-template-rows: repeat(4, minmax(140px, auto));
     }
     
     .palace-cell {
-        min-height: auto;
-        border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        border: 1px solid #ccc;
-        margin-bottom: 0;
+        padding: 4px;
+        padding-bottom: 26px;
     }
     
-    .center-info-panel {
-        order: -100; /* Always top first */
-        grid-column: auto;
-        grid-row: auto;
-        margin-bottom: 10px;
-        border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    .palace-name {
+        font-size: 0.9rem;
     }
-
-    .minor-stars-container {
-        flex-direction: row; /* Keep row even on mobile */
+    
+    .palace-branch-label, .daivan-number {
+        font-size: 1rem;
     }
-
-    /* Reorder Palaces to logical sequence (1-12 or Tý-Hợi) */
-    .p1 { order: 1; }
-    .p2 { order: 2; }
-    .p3 { order: 3; }
-    .p4 { order: 4; }
-    .p5 { order: 5; }
-    .p6 { order: 6; }
-    .p7 { order: 7; }
-    .p8 { order: 8; }
-    .p9 { order: 9; }
-    .p10 { order: 10; }
-    .p11 { order: 11; }
-    .p12 { order: 12; }
-
-    /* Adjust font sizes for mobile readability */
-    .palace-header {
-        height: auto;
-        padding-bottom: 5px;
-        border-bottom: 1px solid #eee;
-        margin-bottom: 10px;
-    }
-
-    .major-stars .star-main {
+    
+    .star-main {
         font-size: 1.1rem;
     }
     
-    .chart-summary {
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
+    .star-item {
+        font-size: 0.8rem;
     }
-
+    
+    .center-header h3 {
+        font-size: 1.5rem;
+    }
+    
     .personal-info-grid {
-        grid-template-columns: 1fr; /* Stack labels and values */
-        text-align: center;
+        padding: 0 10px;
+        gap: 6px 10px;
+    }
+}
+
+/* Small tablet - further adjustments */
+@media (max-width: 900px) {
+    .chart-container {
+        grid-template-rows: repeat(4, minmax(120px, auto));
+        margin: 5px;
     }
     
-    .personal-info-grid strong {
-        text-align: center;
-        display: block;
-        margin-top: 5px;
+    .palace-cell {
+        padding: 3px;
+        padding-bottom: 24px;
     }
     
-    .info-row {
-        display: block;
-        margin-bottom: 5px;
+    .palace-name {
+        font-size: 0.8rem;
+        padding: 1px 4px;
+    }
+    
+    .palace-branch-label, .daivan-number {
+        font-size: 0.9rem;
+    }
+    
+    .star-main {
+        font-size: 1rem;
+        letter-spacing: 0.3px;
+    }
+    
+    .star-item {
+        font-size: 0.75rem;
+        margin-bottom: 1px;
+    }
+    
+    .brightness {
+        font-size: 0.7rem;
+    }
+    
+    .center-info-panel {
+        padding: 10px;
+    }
+    
+    .center-header h3 {
+        font-size: 1.3rem;
+        margin-bottom: 10px;
+    }
+    
+    .personal-info-grid {
+        gap: 4px 8px;
+        font-size: 0.9rem;
+    }
+    
+    .chart-summary {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+    
+    .palace-footer {
+        height: 22px;
+    }
+    
+    .tieu-han, .nguyet-han {
+        font-size: 0.7rem;
+    }
+    
+    .star-truongsinh {
+        font-size: 0.7rem;
+        padding: 0 3px;
+    }
+    
+    .barrier-label {
+        font-size: 0.7rem;
+        padding: 1px 4px;
+    }
+}
+
+/* Mobile portrait - Scale down the entire grid to fit */
+@media (max-width: 768px) {
+    .tu-vi-chart {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        /* Add smooth scrolling */
+        scroll-behavior: smooth;
+    }
+    
+    /* Wrapper to enable pinch-zoom on some browsers */
+    .chart-container {
+        grid-template-rows: repeat(4, minmax(100px, auto));
+        min-width: 600px; /* Minimum width to maintain readability */
+        margin: 5px auto;
+        /* Ensure chart doesn't collapse */
+        width: max-content;
+        touch-action: pan-x pinch-zoom;
+    }
+    
+    .palace-cell {
+        padding: 2px;
+        padding-bottom: 20px;
+    }
+    
+    .palace-header {
+        margin-bottom: 4px;
+        height: auto;
+        min-height: 18px;
+    }
+    
+    .palace-name {
+        font-size: 0.7rem;
+        padding: 1px 3px;
+    }
+    
+    .palace-than {
+        font-size: 0.65rem;
+    }
+    
+    .palace-branch-label, .daivan-number {
+        font-size: 0.8rem;
+    }
+    
+    .major-stars {
+        margin-bottom: 4px;
+        min-height: 16px;
+    }
+    
+    .star-main {
+        font-size: 0.9rem;
+        letter-spacing: 0.2px;
+        margin: 1px 0;
+    }
+    
+    .star-item {
+        font-size: 0.7rem;
+        margin-bottom: 1px;
+    }
+    
+    .brightness {
+        font-size: 0.65rem;
+    }
+    
+    .center-info-panel {
+        padding: 8px;
+    }
+    
+    .center-header h3 {
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+    }
+    
+    .personal-info-grid {
+        gap: 3px 6px;
+        font-size: 0.8rem;
+        padding: 0 5px;
+    }
+    
+    .chart-summary {
+        padding: 8px;
+        font-size: 0.8rem;
+        gap: 5px;
+    }
+    
+    .palace-footer {
+        height: 18px;
+        padding: 0 2px;
+    }
+    
+    .tieu-han, .nguyet-han {
+        font-size: 0.65rem;
+    }
+    
+    .star-truongsinh {
+        font-size: 0.65rem;
+        padding: 0 2px;
+    }
+    
+    .barrier-label {
+        font-size: 0.65rem;
+        padding: 1px 3px;
+    }
+    
+    .footer-center {
+        min-width: 40px;
+    }
+}
+
+/* Very small phones - ultra compact */
+@media (max-width: 480px) {
+    .chart-container {
+        grid-template-rows: repeat(4, minmax(85px, auto));
+        min-width: 500px;
+    }
+    
+    .palace-cell {
+        padding: 1px;
+        padding-bottom: 18px;
+    }
+    
+    .palace-name {
+        font-size: 0.65rem;
+        padding: 0 2px;
+    }
+    
+    .palace-than {
+        font-size: 0.6rem;
+    }
+    
+    .palace-branch-label, .daivan-number {
+        font-size: 0.75rem;
+    }
+    
+    .star-main {
+        font-size: 0.85rem;
+    }
+    
+    .star-item {
+        font-size: 0.65rem;
+    }
+    
+    .brightness {
+        font-size: 0.6rem;
+    }
+    
+    .center-header h3 {
+        font-size: 1rem;
+        margin-bottom: 6px;
+    }
+    
+    .personal-info-grid {
+        font-size: 0.75rem;
+        gap: 2px 4px;
+    }
+    
+    .chart-summary {
+        font-size: 0.75rem;
+        padding: 6px;
+    }
+    
+    .palace-footer {
+        height: 16px;
+    }
+    
+    .tieu-han, .nguyet-han {
+        font-size: 0.6rem;
+    }
+    
+    .star-truongsinh {
+        font-size: 0.6rem;
+        padding: 0 2px;
+    }
+    
+    .barrier-label {
+        font-size: 0.6rem;
+        padding: 0 2px;
     }
 }
 
@@ -655,4 +883,103 @@
     .select-wrapper select {
         width: 100%;
     }
+    
+    .palace-buttons-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .palace-interpret-btn {
+        padding: 10px 5px;
+    }
+    
+    .palace-icon {
+        font-size: 1.5rem;
+        margin-bottom: 3px;
+    }
+    
+    .palace-btn-name {
+        font-size: 0.95rem;
+    }
+    
+    .palace-branch-small {
+        font-size: 0.7rem;
+    }
+    
+    .section-header h3 {
+        font-size: 1.5rem;
+    }
+    
+    .ai-interpretation-section {
+        padding: 15px;
+    }
+    
+    .result-card {
+        padding: 15px;
+    }
+    
+    .result-card h4 {
+        font-size: 1.1rem;
+    }
+    
+    .interpretation-container {
+        padding: 0 10px;
+        margin: 20px auto;
+    }
+}
+
+/* Extra small phones */
+@media (max-width: 400px) {
+    .palace-buttons-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .section-header h3 {
+        font-size: 1.3rem;
+    }
+    
+    .interpretation-controls {
+        padding: 15px;
+    }
+    
+    .control-group label {
+        font-size: 0.9rem;
+    }
+    
+    .select-wrapper select {
+        min-width: auto;
+        font-size: 0.9rem;
+        padding: 8px 12px;
+    }
+    
+    .btn-interpret {
+        padding: 8px 20px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Star Element Colors */
+.star-element-kim {
+    color: silver;
+}
+
+.star-element-moc {
+    color: green;
+}
+
+.star-element-thuy {
+    color: black;
+}
+
+.star-element-hoa {
+    color: red;
+}
+
+.star-element-tho {
+    color: yellow;
+}
+
+/* Bold stars for specific types */
+.star-bold {
+    font-weight: bold;
 }

@@ -23,6 +23,7 @@ namespace Backend.Models
         public string LunarYear { get; set; } = string.Empty;
         public string LunarMonth { get; set; } = string.Empty;
         public string LunarDay { get; set; } = string.Empty;
+        public string NapAm { get; set; } = string.Empty; // Nạp Âm của năm sinh
         public int NguHanhCuc { get; set; } // 2=Thủy Nhị, 3=Mộc Tam, 4=Kim Tứ, 5=Thổ Ngũ, 6=Hỏa Lục
         public string AmDuong { get; set; } = string.Empty; // Dương Nam, Âm Nam, Dương Nữ, Âm Nữ
         public int ThanPalace { get; set; } // Cung Thân (1-12)
@@ -34,6 +35,7 @@ namespace Backend.Models
         // Triệt và Tuần - kẹp giữa 2 cung (không phải sao)
         public string TrietBetween { get; set; } = string.Empty; // VD: "Thân-Dậu" (2 cung)
         public string TuanPositions { get; set; } = string.Empty; // VD: "Thân,Dậu" (2 cung)
+        public int? ViewYear { get; set; } // Năm xem hạn
     }
 
     // Sao trong cung

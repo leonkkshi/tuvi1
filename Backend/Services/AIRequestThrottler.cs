@@ -35,8 +35,8 @@ namespace Backend.Services
             var requestId = Guid.NewGuid().ToString();
             Interlocked.Increment(ref _totalRequests);
 
-            // Timeout nếu chờ quá 30 giây
-            var waitTimeout = TimeSpan.FromSeconds(30);
+            // Timeout nếu chờ quá 60 giây
+            var waitTimeout = TimeSpan.FromSeconds(60);
             var waitSuccess = await _semaphore.WaitAsync(waitTimeout, cancellationToken);
 
             if (!waitSuccess)
@@ -65,7 +65,7 @@ namespace Backend.Services
                 
                 // Trigger garbage collection nếu memory cao
                 var memoryMB = GC.GetTotalMemory(false) / 1024 / 1024;
-                if (memoryMB > 500) // Nếu > 500MB
+                if (memoryMB > 1500) // Nếu > 1.5GB
                 {
                     _logger.LogWarning("High memory usage: {MemoryMB}MB. Triggering GC", memoryMB);
                     GC.Collect(2, GCCollectionMode.Optimized, false);

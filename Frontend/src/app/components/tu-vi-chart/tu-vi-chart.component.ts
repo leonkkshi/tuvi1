@@ -1,10 +1,11 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TuViChart, PalaceStar } from '../../models/tu-vi.models';
 import { TuViService, PalaceInterpretationResult } from '../../services/tu-vi.service';
 import { InterpretationResponse } from '../../models/interpretation.models';
 import { PalaceInterpretationModalComponent } from '../palace-interpretation-modal/palace-interpretation-modal.component';
+// import html2canvas from 'html2canvas'; // Lazy load để giảm bundle size
 
 @Component({
   selector: 'app-tu-vi-chart',
@@ -14,6 +15,7 @@ import { PalaceInterpretationModalComponent } from '../palace-interpretation-mod
 })
 export class TuViChartComponent implements OnChanges {
   @Input() chart: TuViChart | null = null;
+  @ViewChild('chartContainer') chartContainer!: ElementRef;
 
   // AI Interpretation properties
   interpretation: InterpretationResponse | null = null;
@@ -31,6 +33,9 @@ export class TuViChartComponent implements OnChanges {
   // Barriers
   tuanPairs: Set<string> = new Set();
   trietPairs: Set<string> = new Set();
+
+  // Download state
+  isDownloading = false;
 
   constructor(private tuViService: TuViService) {}
 
@@ -198,7 +203,7 @@ export class TuViChartComponent implements OnChanges {
   getTrietDisplay(): string {
     if (!this.chart?.trietBetween) return '';
     
-    const branches = ['Tý', 'Sửu', 'Dần', 'Mão', 'Thìn', 'Tị', 'Ngọ', 'Mùi', 'Thân', 'Dậu', 'Tuất', 'Hợi'];
+    const branches = ['Tý', 'Sửu', 'Dần', 'Mão', 'Thìn', 'Tỵ', 'Ngọ', 'Mùi', 'Thân', 'Dậu', 'Tuất', 'Hợi'];
     const parts = this.chart.trietBetween.split('-');
     
     // Kiểm tra xem tất cả phần đều là chi hợp lệ
@@ -215,7 +220,7 @@ export class TuViChartComponent implements OnChanges {
   getTuanDisplay(): string {
     if (!this.chart?.tuanPositions) return '';
     
-    const branches = ['Tý', 'Sửu', 'Dần', 'Mão', 'Thìn', 'Tị', 'Ngọ', 'Mùi', 'Thân', 'Dậu', 'Tuất', 'Hợi'];
+    const branches = ['Tý', 'Sửu', 'Dần', 'Mão', 'Thìn', 'Tỵ', 'Ngọ', 'Mùi', 'Thân', 'Dậu', 'Tuất', 'Hợi'];
     const parts = this.chart.tuanPositions.split(',');
     
     // Kiểm tra xem tất cả phần đều là chi hợp lệ
@@ -236,61 +241,67 @@ export class TuViChartComponent implements OnChanges {
     return this.branchNames[palaceId - 1] || '';
   }
 
-  getStarClass(starName: string, element: string = ''): string {
+  getStarClass(starName: string, element: string = '', type: string = ''): string {
+    let classes = [];
+
     // Ưu tiên tô màu theo ngũ hành trước
     if (element) {
       switch (element) {
-        case 'Kim': return 'star-element-kim';
-        case 'Mộc': return 'star-element-moc';
-        case 'Thủy': return 'star-element-thuy';
-        case 'Hỏa': return 'star-element-hoa';
-        case 'Thổ': return 'star-element-tho';
+        case 'Kim': classes.push('star-element-kim'); break;
+        case 'Mộc': classes.push('star-element-moc'); break;
+        case 'Thủy': classes.push('star-element-thuy'); break;
+        case 'Hỏa': classes.push('star-element-hoa'); break;
+        case 'Thổ': classes.push('star-element-tho'); break;
       }
     }
 
-    // Nếu không có ngũ hành thì dùng màu mặc định theo loại
-    // Chính tinh - màu tím
-    const mainStars = ['Tử Vi', 'Thiên Cơ', 'Thái Dương', 'Vũ Khúc', 'Thiên Đồng', 'Liêm Trinh', 
-                       'Thiên Phủ', 'Thái Âm', 'Tham Lang', 'Cự Môn', 'Thiên Tướng', 'Thiên Lương', 'Thất Sát', 'Phá Quân'];
-    
-    // Tứ Hóa - màu đỏ
-    const tuHoa = ['Hóa Lộc', 'Hóa Quyền', 'Hóa Khoa', 'Hóa Kỵ'];
-    
-    // Phụ tinh văn - màu xanh lá
-    const vanTinh = ['Văn Xương', 'Văn Khúc', 'Tả Phù', 'Hữu Bật', 'Thiên Khôi', 'Thiên Việt'];
-    
-    // Hung tinh - màu đỏ đậm
-    const hungTinh = ['Hỏa Tinh', 'Linh Tinh', 'Địa Không', 'Địa Kiếp', 'Thiên La', 'Địa Võng', 'Đà La'];
-    
-    // Trường Sinh - màu cam/vàng
-    const truongSinh = ['Trường Sinh', 'Mộc Dục', 'Quan Đới', 'Lâm Quan', 'Đế Vượng', 'Suy', 
-                         'Bệnh', 'Tử', 'Mộ', 'Tuyệt', 'Thai', 'Dưỡng'];
-    
-    // Thái Tuế - màu xanh dương
-    const thaiTue = ['Thái Tuế', 'Thiếu Dương', 'Tang Môn', 'Thiếu Âm', 'Quan Phù', 'Tử Phù', 
-                     'Tuế Phá', 'Long Đức', 'Bạch Hổ', 'Phúc Đức', 'Điếu Khách', 'Trực Phù',
-                     'Thiên Không', 'Long Trì', 'Nguyệt Đức', 'Thiên Hư', 'Thiên Đức',
-                     'Thiên Khốc', 'Hoa Cái', 'Đào Hoa', 'Kiếp Sát'];
+    // Thêm font-weight cho các type đặc biệt và sao có chữ Hóa
+    if (type === 'Lục sát' || type === 'Cát tinh' || type === 'Trung tinh' || starName.includes('Hóa')) {
+      classes.push('star-bold');
+    }
 
-    if (mainStars.includes(starName)) return 'star-main';
-    if (tuHoa.includes(starName)) return 'star-tuhoa';
-    if (vanTinh.includes(starName)) return 'star-van';
-    if (hungTinh.includes(starName)) return 'star-hung';
-    if (truongSinh.includes(starName)) return 'star-truongsinh';
-    if (thaiTue.includes(starName)) return 'star-thaitue';
-    
-    return 'star-secondary';
+    // Nếu không có ngũ hành thì dùng màu mặc định theo loại
+    if (classes.length === 0) {
+      // Chính tinh - màu tím
+      const mainStars = ['Tử Vi', 'Thiên Cơ', 'Thái Dương', 'Vũ Khúc', 'Thiên Đồng', 'Liêm Trinh', 
+                         'Thiên Phủ', 'Thái Âm', 'Tham Lang', 'Cự Môn', 'Thiên Tướng', 'Thiên Lương', 'Thất Sát', 'Phá Quân'];
+      
+      // Tứ Hóa - màu đỏ
+      const tuHoa = ['Hóa Lộc', 'Hóa Quyền', 'Hóa Khoa', 'Hóa Kỵ'];
+      
+      // Phụ tinh văn - màu xanh lá
+      const vanTinh = ['Văn Xương', 'Văn Khúc', 'Tả Phù', 'Hữu Bật', 'Thiên Khôi', 'Thiên Việt'];
+      
+      // Hung tinh - màu đỏ đậm
+      const hungTinh = ['Hỏa Tinh', 'Linh Tinh', 'Địa Không', 'Địa Kiếp', 'Thiên La', 'Địa Võng', 'Đà La',
+                         'Lưu Lộc Tồn', 'Lưu Thiên Mã', 'Lưu Kình Dương', 'Lưu Đà La'];
+      
+      // Trường Sinh - màu cam/vàng
+      const truongSinh = ['Trường Sinh', 'Mộc Dục', 'Quan Đới', 'Lâm Quan', 'Đế Vượng', 'Suy', 
+                           'Bệnh', 'Tử', 'Mộ', 'Tuyệt', 'Thai', 'Dưỡng'];
+      
+      // Thái Tuế - màu xanh dương
+      const thaiTue = ['Thái Tuế', 'Thiếu Dương', 'Tang Môn', 'Thiếu Âm', 'Quan Phù', 'Tử Phù', 
+                       'Tuế Phá', 'Long Đức', 'Bạch Hổ', 'Phúc Đức', 'Điếu Khách', 'Trực Phù',
+                       'Thiên Không', 'Long Trì', 'Nguyệt Đức', 'Thiên Hư', 'Thiên Đức',
+                       'Thiên Khốc', 'Hoa Cái', 'Đào Hoa', 'Kiếp Sát',
+                       'Lưu Thái Tuế', 'Lưu Thiên Khốc', 'Lưu Thiên Hư', 'Lưu Tang Môn', 'Lưu Bạch Hổ'];
+
+      if (mainStars.includes(starName)) classes.push('star-main');
+      else if (tuHoa.includes(starName)) classes.push('star-tuhoa');
+      else if (vanTinh.includes(starName)) classes.push('star-van');
+      else if (hungTinh.includes(starName)) classes.push('star-hung');
+      else if (truongSinh.includes(starName)) classes.push('star-truongsinh');
+      else if (thaiTue.includes(starName)) classes.push('star-thaitue');
+    }
+
+    return classes.join(' ');
   }
 
   formatTime(timeString: string): string {
     if (!timeString) return '';
     const time = timeString.split(':');
     return `${time[0]}:${time[1]}`;
-  }
-
-  getAmDuong(): string {
-    if (!this.chart) return '';
-    return this.chart.amDuong || '';
   }
 
   getMenh(): string {
@@ -342,7 +353,20 @@ export class TuViChartComponent implements OnChanges {
     return cucNames[this.chart.nguHanhCuc] || 'Chưa xác định';
   }
 
-// Lọc chính tinh (14 sao chính)
+  getAmDuong(): string {
+    if (!this.chart) return '';
+    return this.chart.amDuong || '';
+  }
+
+  getMenhYear(): string {
+    return this.chart?.napAm || '';
+  }
+
+  getNapAm(): string {
+    return this.chart?.napAm || '';
+  }
+
+  // Lọc chính tinh (14 sao chính)
   getChinhTinh(palaceId: number) {
     const palace = this.getPalaceByPosition(palaceId);
     if (!palace) return [];
@@ -539,6 +563,71 @@ export class TuViChartComponent implements OnChanges {
       'Huynh Đệ': '👫'
     };
     return icons[palaceName] || '⭐';
+  }
+
+  // Download lá số dưới dạng hình ảnh
+  async downloadChart() {
+    if (!this.chart || this.isDownloading) return;
+    
+    try {
+      this.isDownloading = true;
+      
+      // Lazy load html2canvas để giảm bundle size
+      const html2canvas = (await import('html2canvas')).default;
+      
+      // Tìm element chứa lá số (bao gồm cả header và chart)
+      const element = document.querySelector('.tu-vi-chart') as HTMLElement;
+      if (!element) {
+        alert('Không tìm thấy lá số để tải xuống');
+        return;
+      }
+
+      // Ẩn scroll hint và các nút không cần thiết trước khi chụp
+      const scrollHint = element.querySelector('.chart-scroll-hint') as HTMLElement;
+      const downloadBtn = element.querySelector('.download-btn') as HTMLElement;
+      
+      if (scrollHint) scrollHint.style.display = 'none';
+      if (downloadBtn) downloadBtn.style.display = 'none';
+
+      // Chụp ảnh
+      const canvas = await html2canvas(element, {
+        scale: 2, // Độ phân giải cao hơn
+        useCORS: true,
+        backgroundColor: '#fffef8',
+        logging: false,
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight
+      } as any);
+
+      // Hiện lại các element đã ẩn
+      if (scrollHint) scrollHint.style.display = '';
+      if (downloadBtn) downloadBtn.style.display = '';
+
+      // Convert canvas thành blob và tải xuống
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          
+          // Tạo tên file từ thông tin lá số
+          const name = this.chart?.fullName || 'LasoTuVi';
+          const date = new Date().toLocaleDateString('vi-VN').replace(/\//g, '-');
+          link.download = `${name}_${date}.png`;
+          
+          link.href = url;
+          link.click();
+          
+          // Cleanup
+          URL.revokeObjectURL(url);
+        }
+      }, 'image/png');
+      
+    } catch (error) {
+      console.error('Lỗi khi tải xuống lá số:', error);
+      alert('Có lỗi xảy ra khi tải xuống lá số. Vui lòng thử lại.');
+    } finally {
+      this.isDownloading = false;
+    }
   }
 }
 

@@ -16,12 +16,25 @@ public class TuViService : ITuViService
     private readonly TruongSinhStarPlacementService _truongSinhStarService = new();
     private readonly ThaiTueStarPlacementService _thaiTueStarService = new();
     private readonly TuHoaStarPlacementService _tuHoaStarService = new();
+    private readonly LuuNienVanTinhStarPlacementService _luuNienVanTinhStarService = new();
+    private readonly ThienQuanStarPlacementService _thienQuanStarService = new();
+    private readonly LuuThaiTueStarPlacementService _luuThaiTueStarService = new();
+    private readonly LuuLocTonStarPlacementService _luuLocTonStarService = new();
+    private readonly LuuThienMaStarPlacementService _luuThienMaStarService = new();
+    private readonly LuuKinhDuongStarPlacementService _luuKinhDuongStarService = new();
+    private readonly LuuDaLaStarPlacementService _luuDaLaStarService = new();
+    private readonly LuuThienKhocStarPlacementService _luuThienKhocStarService = new();
+    private readonly LuuThienHuStarPlacementService _luuThienHuStarService = new();
+    private readonly LuuTangMonStarPlacementService _luuTangMonStarService = new();
+    private readonly LuuBachHoStarPlacementService _luuBachHoStarService = new();
+    private readonly LuuTuHoaStarPlacementService _luuTuHoaStarService = new();
 
     // Utility services
     private readonly LunarCalendarService _lunarCalendarService = new();
     private readonly PalaceCalculationService _palaceCalculationService = new();
     private readonly BranchStemService _branchStemService = new();
     private readonly CatalogService _catalogService = new();
+    private readonly NapAmService _napAmService = new();
 
     public TuViService()
     {
@@ -96,15 +109,39 @@ public class TuViService : ITuViService
             TatAchPalace = tatAchPalace,
             AmDuong = amDuong,
             NguHanhCuc = nguHanhCuc,
+            ViewYear = request.ViewYear ?? DateTime.Now.Year,
         };
 
         var mainStars = _mainStarService.PlaceStars(ctx);
         ctx.MainStarPositions = mainStars;
 
         var secondaryStars = _secondaryStarService.PlaceStars(ctx);
+        
+        // Merge main + secondary stars để Tứ Hóa có thể gắn vào cả văn tinh
+        var allStars = new Dictionary<int, List<int>>();
+        for (int i = 1; i <= 12; i++)
+        {
+            allStars[i] = new List<int>();
+            allStars[i].AddRange(mainStars[i]);
+            allStars[i].AddRange(secondaryStars[i]);
+        }
+        ctx.MainStarPositions = allStars;
+        
         var truongSinhStars = _truongSinhStarService.PlaceStars(ctx);
         var thaiTueStars = _thaiTueStarService.PlaceStars(ctx);
         var tuHoaStars = _tuHoaStarService.PlaceStars(ctx);
+        var luuNienVanTinhStars = _luuNienVanTinhStarService.PlaceStars(ctx);
+        var thienQuanStars = _thienQuanStarService.PlaceStars(ctx);
+        var luuThaiTueStars = _luuThaiTueStarService.PlaceStars(ctx);
+        var luuLocTonStars = _luuLocTonStarService.PlaceStars(ctx);
+        var luuThienMaStars = _luuThienMaStarService.PlaceStars(ctx);
+        var luuKinhDuongStars = _luuKinhDuongStarService.PlaceStars(ctx);
+        var luuDaLaStars = _luuDaLaStarService.PlaceStars(ctx);
+        var luuThienKhocStars = _luuThienKhocStarService.PlaceStars(ctx);
+        var luuThienHuStars = _luuThienHuStarService.PlaceStars(ctx);
+        var luuTangMonStars = _luuTangMonStarService.PlaceStars(ctx);
+        var luuBachHoStars = _luuBachHoStarService.PlaceStars(ctx);
+        var luuTuHoaStars = _luuTuHoaStarService.PlaceStars(ctx);
 
         // Tính Triệt và Tuần
         var trietBetween = CalculateTriet(lunarYear);
@@ -123,6 +160,18 @@ public class TuViService : ITuViService
             AddUnique(starIds, thaiTueStars[pos]);
             AddUnique(starIds, tuHoaStars[pos]);
             AddUnique(starIds, truongSinhStars[pos]);
+            AddUnique(starIds, luuNienVanTinhStars[pos]);
+            AddUnique(starIds, thienQuanStars[pos]);
+            AddUnique(starIds, luuThaiTueStars[pos]);
+            AddUnique(starIds, luuLocTonStars[pos]);
+            AddUnique(starIds, luuThienMaStars[pos]);
+            AddUnique(starIds, luuKinhDuongStars[pos]);
+            AddUnique(starIds, luuDaLaStars[pos]);
+            AddUnique(starIds, luuThienKhocStars[pos]);
+            AddUnique(starIds, luuThienHuStars[pos]);
+            AddUnique(starIds, luuTangMonStars[pos]);
+            AddUnique(starIds, luuBachHoStars[pos]);
+            AddUnique(starIds, luuTuHoaStars[pos]);
 
             var starsInPalace = starIds
                 .Select(id => ToStarInPalace(id, pos))
@@ -160,6 +209,7 @@ public class TuViService : ITuViService
             LunarYear = _branchStemService.BuildCanChiYear(lunarYear),
             LunarMonth = lunarMonth.ToString(),
             LunarDay = lunarDay.ToString(),
+            NapAm = _napAmService.GetNapAmFromYear(lunarYear),
             NguHanhCuc = nguHanhCuc,
             AmDuong = amDuong,
             ThanPalace = thanPalace,
@@ -168,7 +218,8 @@ public class TuViService : ITuViService
             TieuHan = tieuHan,
             NguyetHan = nguyetHan,
             TrietBetween = trietBetween, 
-            TuanPositions = tuanPositions
+            TuanPositions = tuanPositions,
+            ViewYear = viewYear
         };
     }
 

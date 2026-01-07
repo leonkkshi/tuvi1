@@ -11,7 +11,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - AI__Provider=Gemini
       - Gemini__ApiKey=${GEMINI_API_KEY}
-      - AI__MaxConcurrentRequests=3
+      - AI__MaxConcurrentRequests=50
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/api/tuvi/health"]
       interval: 30s

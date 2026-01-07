@@ -31,6 +31,9 @@ public class StarPlacementContext
     public string AmDuong { get; set; } = "";
     public int NguHanhCuc { get; set; }
     
+    // Năm xem hạn
+    public int ViewYear { get; set; }
+    
     // Vị trí các sao chính (dùng cho Tứ Hóa)
     public Dictionary<int, List<int>>? MainStarPositions { get; set; }
 }

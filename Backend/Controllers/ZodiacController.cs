@@ -11,15 +11,18 @@ namespace Backend.Controllers
         private readonly ITuViService _tuViService;
         private readonly IAIInterpretationService _aiInterpretationService;
         private readonly IAIRequestThrottler _throttler;
+        private readonly IAsyncAIRequestQueue _asyncQueue;
 
         public TuViController(
             ITuViService tuViService, 
             IAIInterpretationService aiInterpretationService,
-            IAIRequestThrottler throttler)
+            IAIRequestThrottler throttler,
+            IAsyncAIRequestQueue asyncQueue)
         {
             _tuViService = tuViService;
             _aiInterpretationService = aiInterpretationService;
             _throttler = throttler;
+            _asyncQueue = asyncQueue;
         }
 
         [HttpGet("health")]
@@ -51,6 +54,165 @@ namespace Backend.Controllers
                     threads = process.Threads.Count
                 }
             });
+        }
+
+        [HttpPost("ai-interpret-async")]
+        [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("general")]
+        public ActionResult<object> AIInterpretChartAsync([FromBody] InterpretationRequest request)
+        {
+            try
+            {
+                var requestId = _asyncQueue.EnqueueRequest(request);
+                return Ok(new
+                {
+                    requestId,
+                    status = "queued",
+                    message = "Yêu cầu đã được đưa vào hàng đợi xử lý",
+                    statusEndpoint = $"/api/tuvi/ai-status/{requestId}",
+                    resultEndpoint = $"/api/tuvi/ai-result/{requestId}"
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Lỗi khi xếp hàng yêu cầu", details = ex.Message });
+            }
+        }
+
+        [HttpPost("ai-interpret-palace-async")]
+        [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("general")]
+        public ActionResult<object> AIInterpretPalaceAsync([FromBody] PalaceInterpretationRequest request)
+        {
+            try
+            {
+                if (request.Chart == null || string.IsNullOrWhiteSpace(request.PalaceName))
+                {
+                    return BadRequest(new { error = "Thông tin lá số hoặc tên cung không hợp lệ" });
+                }
+
+                var requestId = _asyncQueue.EnqueuePalaceRequest(request.Chart, request.PalaceName);
+                return Ok(new
+                {
+                    requestId,
+                    palaceName = request.PalaceName,
+                    status = "queued",
+                    message = "Yêu cầu đã được đưa vào hàng đợi xử lý",
+                    statusEndpoint = $"/api/tuvi/ai-status/{requestId}",
+                    resultEndpoint = $"/api/tuvi/ai-palace-result/{requestId}"
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Lỗi khi xếp hàng yêu cầu", details = ex.Message });
+            }
+        }
+
+        [HttpGet("ai-status/{requestId}")]
+        public ActionResult<AIRequestStatus> GetAIRequestStatus(string requestId)
+        {
+            try
+            {
+                var status = _asyncQueue.GetRequestStatus(requestId);
+                return Ok(status);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Lỗi khi lấy trạng thái", details = ex.Message });
+            }
+        }
+
+        [HttpGet("ai-result/{requestId}")]
+        public ActionResult<object> GetAIResult(string requestId)
+        {
+            try
+            {
+                var status = _asyncQueue.GetRequestStatus(requestId);
+                
+                if (status.Status == "not_found")
+                {
+                    return NotFound(new { error = "Request ID không tồn tại hoặc đã hết hạn" });
+                }
+                
+                if (status.Status == "failed")
+                {
+                    return StatusCode(500, new { error = "Xử lý thất bại", details = status.Error });
+                }
+                
+                if (status.Status != "completed")
+                {
+                    return Ok(new
+                    {
+                        status = status.Status,
+                        message = "Yêu cầu đang được xử lý",
+                        queuedAt = status.QueuedAt,
+                        startedAt = status.StartedAt
+                    });
+                }
+
+                var result = _asyncQueue.GetResult(requestId);
+                if (result is null)
+                {
+                    return NotFound(new { error = "Không tìm thấy kết quả" });
+                }
+
+                return Ok(new
+                {
+                    status = "completed",
+                    result,
+                    completedAt = status.CompletedAt
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Lỗi khi lấy kết quả", details = ex.Message });
+            }
+        }
+
+        [HttpGet("ai-palace-result/{requestId}")]
+        public ActionResult<object> GetAIPalaceResult(string requestId)
+        {
+            try
+            {
+                var status = _asyncQueue.GetRequestStatus(requestId);
+                
+                if (status.Status == "not_found")
+                {
+                    return NotFound(new { error = "Request ID không tồn tại hoặc đã hết hạn" });
+                }
+                
+                if (status.Status == "failed")
+                {
+                    return StatusCode(500, new { error = "Xử lý thất bại", details = status.Error });
+                }
+                
+                if (status.Status != "completed")
+                {
+                    return Ok(new
+                    {
+                        status = status.Status,
+                        palaceName = status.PalaceName,
+                        message = "Yêu cầu đang được xử lý",
+                        queuedAt = status.QueuedAt,
+                        startedAt = status.StartedAt
+                    });
+                }
+
+                var result = _asyncQueue.GetPalaceResult(requestId);
+                if (result is null)
+                {
+                    return NotFound(new { error = "Không tìm thấy kết quả" });
+                }
+
+                return Ok(new
+                {
+                    status = "completed",
+                    result,
+                    completedAt = status.CompletedAt
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Lỗi khi lấy kết quả", details = ex.Message });
+            }
         }
 
         [HttpGet("palaces")]

@@ -1,6 +1,14 @@
 <div class="tu-vi-chart" *ngIf="chart">
   <div class="chart-header-mobile">
     <h2>LÁ SỐ TỬ VI</h2>
+    <button class="download-btn" (click)="downloadChart()" [disabled]="isDownloading">
+      <span *ngIf="!isDownloading">📥 Tải xuống</span>
+      <span *ngIf="isDownloading">⏳ Đang xử lý...</span>
+    </button>
+  </div>
+  
+  <div class="chart-scroll-hint">
+    ☜ Vuốt ngang để xem toàn bộ lá số ☞
   </div>
   
   <div class="chart-info">
@@ -38,7 +46,7 @@
              <div class="major-stars">
                <div *ngFor="let star of getChinhTinh(id)" 
                     class="star-item star-main" 
-                    [ngClass]="getStarClass(star.starName, star.element)">
+                    [ngClass]="getStarClass(star.starName, star.element, star.type)">
                  {{ star.starName }} <span class="brightness">{{ getBrightnessText(star.brightness) }}</span>
                </div>
              </div>
@@ -48,14 +56,14 @@
                <div class="stars-col left">
                  <div *ngFor="let star of getPhuTinhCat(id)" 
                       class="star-item star-good"
-                      [ngClass]="getStarClass(star.starName, star.element)">
+                      [ngClass]="getStarClass(star.starName, star.element, star.type)">
                    {{ star.starName }}
                  </div>
                </div>
                <div class="stars-col right">
                  <div *ngFor="let star of getPhuTinhHung(id)" 
                       class="star-item star-bad"
-                      [ngClass]="getStarClass(star.starName, star.element)">
+                      [ngClass]="getStarClass(star.starName, star.element, star.type)">
                    {{ star.starName }}
                  </div>
                </div>
@@ -94,7 +102,7 @@
     <div class="center-info-panel">
         <div class="center-content">
             <div class="center-header">
-                <h3>THIÊN BÀN</h3>
+                <h3>Lá Số Tử Vi</h3>
             </div>
             
             <div class="personal-info-grid">
@@ -104,6 +112,7 @@
                  <div class="info-row">
                      <strong>Năm:</strong> {{ chart.lunarYear }}
                  </div>
+               
                  <div class="info-row">
                      <strong>Tháng:</strong> {{ chart.lunarMonth }}
                  </div>
@@ -113,11 +122,14 @@
                  <div class="info-row">
                      <strong>Giờ:</strong> {{ formatTime(chart.birthTime) }}
                  </div>
+                   <div class="info-row" *ngIf="chart.viewYear">
+                     <strong>Năm xem hạn:</strong> {{ chart.viewYear }}
+                 </div>
             </div>
 
             <div class="chart-summary">
                  <div class="info-row"><strong>Âm Dương:</strong> {{ getAmDuong() }}</div>
-                 <div class="info-row"><strong>Mệnh:</strong> {{ getMenh() }}</div>
+                 <div class="info-row"><strong>Mệnh:</strong> {{ getMenhYear() }}</div>
                  <div class="info-row"><strong>Cục:</strong> {{ getCuc() }}</div>
             </div>
         </div>

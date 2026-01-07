@@ -42,6 +42,7 @@ export interface TuViChart {
   lunarYear: string;
   lunarMonth: string;
   lunarDay: string;
+  napAm: string; // Nạp Âm của năm sinh
   nguHanhCuc: number; // 2=Thủy Nhị, 3=Mộc Tam, 4=Kim Tứ, 5=Thổ Ngũ, 6=Hỏa Lục
   amDuong: string; // Dương Nam, Âm Nam, Dương Nữ, Âm Nữ
   thanPalace: number; // Cung Thân (1-12)
@@ -51,6 +52,7 @@ export interface TuViChart {
   daiVan: { [key: number]: number }; // Key = Palace Position (1-12), Value = Tuổi bắt đầu Đại Vận
   tieuHan: { [key: number]: string }; // Key = Palace Position (1-12), Value = Chi năm tiểu hạn
   nguyetHan: { [key: number]: number }; // Key = Palace Position (1-12), Value = Tháng âm lịch
+  viewYear?: number; // Năm xem hạn
 }
 
 export interface ChartRequest {

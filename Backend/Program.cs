@@ -17,30 +17,30 @@ builder.Services.AddMemoryCache();
 // Configure Kestrel limits
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.Limits.MaxConcurrentConnections = 100;
-    options.Limits.MaxConcurrentUpgradedConnections = 100;
+    options.Limits.MaxConcurrentConnections = 5000;
+    options.Limits.MaxConcurrentUpgradedConnections = 1000;
     options.Limits.MaxRequestBodySize = 10 * 1024 * 1024; // 10MB
 });
 
 // Add Rate Limiting để bảo vệ AI endpoints
 builder.Services.AddRateLimiter(options =>
 {
-    // Policy cho AI endpoints: tối đa 5 requests/phút mỗi IP
+    // Policy cho AI endpoints: tối đa 20 requests/phút mỗi IP
     options.AddFixedWindowLimiter("ai-limit", opt =>
     {
-        opt.PermitLimit = 5;
+        opt.PermitLimit = 20;
         opt.Window = TimeSpan.FromMinutes(1);
         opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        opt.QueueLimit = 2; // Chỉ queue thêm 2 requests, từ chối còn lại
+        opt.QueueLimit = 10; // Queue thêm 10 requests
     });
     
-    // Policy chung: 50 requests/phút
+    // Policy chung: 100 requests/phút
     options.AddFixedWindowLimiter("general", opt =>
     {
-        opt.PermitLimit = 50;
+        opt.PermitLimit = 100;
         opt.Window = TimeSpan.FromMinutes(1);
         opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        opt.QueueLimit = 5;
+        opt.QueueLimit = 20;
     });
     
     options.RejectionStatusCode = 429; // Too Many Requests
@@ -58,6 +58,9 @@ builder.Services.AddHttpClient().ConfigureHttpClientDefaults(http =>
 
 // Register AI Request Throttler để giới hạn concurrent AI calls
 builder.Services.AddSingleton<IAIRequestThrottler, AIRequestThrottler>();
+
+// Register Async AI Request Queue để xử lý background jobs
+builder.Services.AddSingleton<IAsyncAIRequestQueue, AsyncAIRequestQueue>();
 
 var aiProvider = builder.Configuration["AI:Provider"] ?? "OpenAI";
 if (aiProvider.Equals("Gemini", StringComparison.OrdinalIgnoreCase))
