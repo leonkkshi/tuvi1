@@ -14,6 +14,9 @@
     <!-- Template for Palace Cell -->
     <ng-template #palaceTemplate let-id="id">
       <div class="palace-cell" [ngClass]="'p' + id" [attr.data-palace]="getPalaceByPosition(id)?.palaceName">
+        <div *ngIf="getBarrierLabel(id)" class="barrier-label" [ngClass]="getBarrierClass(id)">
+             <span>{{ getBarrierLabel(id) }}</span>
+        </div>
         <div class="palace-content">
           <!-- Header: Branch - Name - DaiVan -->
           <div class="palace-header">
@@ -59,12 +62,18 @@
              </div>
           </div>
 
-          <!-- Bottom: Life Stage -->
+          <!-- Bottom: Tieu Han - Truong Sinh - Nguyet Han -->
           <div class="palace-footer">
+            <div class="footer-left">
+               <span class="tieu-han" *ngIf="getTieuHan(id)">năm {{ getTieuHan(id) }}</span>
+            </div>
             <div class="footer-center">
                <div *ngFor="let star of getTruongSinhStars(id)" class="star-truongsinh">
                  {{ star.starName }}
                </div>
+            </div>
+            <div class="footer-right">
+               <span class="nguyet-han" *ngIf="getNguyetHan(id)">tháng {{ getNguyetHan(id) }}</span>
             </div>
           </div>
         </div>

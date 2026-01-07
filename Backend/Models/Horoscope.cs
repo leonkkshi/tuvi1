@@ -28,7 +28,9 @@ namespace Backend.Models
         public int ThanPalace { get; set; } // Cung Thân (1-12)
         public List<PalaceStar> PalaceStars { get; set; } = new();
         public Dictionary<int, int> DaiVan { get; set; } = new(); // Key = Palace Position (1-12), Value = Tuổi bắt đầu Đại Vận
-        
+        public Dictionary<int, string> TieuHan { get; set; } = new(); // Key = Palace Position (1-12), Value = Chi năm tiểu hạn (Tý, Sửu...)
+        public Dictionary<int, int> NguyetHan { get; set; } = new(); // Key = Palace Position (1-12), Value = Tháng âm lịch (1-12)
+
         // Triệt và Tuần - kẹp giữa 2 cung (không phải sao)
         public string TrietBetween { get; set; } = string.Empty; // VD: "Thân-Dậu" (2 cung)
         public string TuanPositions { get; set; } = string.Empty; // VD: "Thân,Dậu" (2 cung)

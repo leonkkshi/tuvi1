@@ -49,6 +49,8 @@ export interface TuViChart {
   trietBetween: string; // VD: "Thân-Dậu" (2 cung)
   tuanPositions: string; // VD: "Thân,Dậu" (2 cung)
   daiVan: { [key: number]: number }; // Key = Palace Position (1-12), Value = Tuổi bắt đầu Đại Vận
+  tieuHan: { [key: number]: string }; // Key = Palace Position (1-12), Value = Chi năm tiểu hạn
+  nguyetHan: { [key: number]: number }; // Key = Palace Position (1-12), Value = Tháng âm lịch
 }
 
 export interface ChartRequest {
@@ -60,4 +62,5 @@ export interface ChartRequest {
   minute: number;
   isMale: boolean;
   isLunar: boolean;
+  viewYear?: number; // Năm xem hạn
 }

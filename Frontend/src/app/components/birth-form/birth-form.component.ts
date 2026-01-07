@@ -192,7 +192,8 @@ export class BirthFormComponent {
         minute: Number(this.birthInfo.minute),
         isMale: this.birthInfo.isMale,
         isLunar: true, // Luôn gửi true vì đã chuyển đổi ở frontend
-        fullName: this.fullName
+        fullName: this.fullName,
+        viewYear: Number(this.viewYear)
       };
       console.log('Submitting request:', request); // Debug
       this.chartGenerated.emit(request);

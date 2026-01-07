@@ -144,7 +144,7 @@ public class CatalogService
             MakeStar(90, "Quả Tú", "Phụ tinh", "", "Hung", 40),
             MakeStar(91, "Hồng Loan", "Phụ tinh", "", "Cát", 50),
             MakeStar(92, "Thiên Hỉ", "Phụ tinh", "", "Cát", 55),
-            MakeStar(93, "Kình Dương", "Phụ tinh", "", "Cát", 50),
+            MakeStar(93, "Kình Dương", "Phụ tinh", "", "Hung", 50),
             MakeStar(94, "Đà La", "Phụ tinh", "", "Hung", 45),
             MakeStar(95, "Thiên Y", "Phụ tinh", "", "Cát", 52),
             MakeStar(96, "Đường Phù", "Phụ tinh", "", "Cát", 48),

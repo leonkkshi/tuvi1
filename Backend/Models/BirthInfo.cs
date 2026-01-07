@@ -17,5 +17,6 @@ namespace Backend.Models
         public int Minute { get; set; }
         public bool IsMale { get; set; }
         public bool IsLunar { get; set; } = true; // Mặc định là âm lịch
+        public int? ViewYear { get; set; } // Năm xem hạn (Dương lịch), mặc định là năm hiện tại
     }
 }

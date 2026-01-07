@@ -143,6 +143,13 @@ public class TuViService : ITuViService
         // Tính Đại Vận
         var daiVan = CalculateDaiVan(menhPalace, nguHanhCuc, amDuong);
 
+        // Tính Tiểu Hạn
+        var tieuHan = CalculateTieuHan(lunarYear, request.IsMale);
+
+        // Tính Nguyệt Hạn (cho năm xem hạn, mặc định là năm hiện tại)
+        int viewYear = request.ViewYear ?? DateTime.Now.Year;
+        var nguyetHan = CalculateNguyetHan(tieuHan, viewYear, lunarMonth, hourBranch);
+
         return new TuViChart
         {
             Id = Guid.NewGuid(),
@@ -158,7 +165,9 @@ public class TuViService : ITuViService
             ThanPalace = thanPalace,
             PalaceStars = palaceStars,
             DaiVan = daiVan,
-            TrietBetween = trietBetween,
+            TieuHan = tieuHan,
+            NguyetHan = nguyetHan,
+            TrietBetween = trietBetween, 
             TuanPositions = tuanPositions
         };
     }
@@ -322,5 +331,106 @@ public class TuViService : ITuViService
         }
         
         return daiVan;
+    }
+
+    // Tính Tiểu Hạn
+    private Dictionary<int, string> CalculateTieuHan(int lunarYear, bool isMale)
+    {
+        var tieuHan = new Dictionary<int, string>();
+        string[] branchNames = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tị", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
+
+        // 1. Xác định Chi năm sinh
+        int birthBranch = (lunarYear - 3) % 12;
+        if (birthBranch <= 0) birthBranch += 12;
+
+        // 2. Xác định cung khởi Tiểu Hạn
+        // Dần (3), Ngọ (7), Tuất (11) -> Khởi tại Thìn (5)
+        // Thân (9), Tý (1), Thìn (5) -> Khởi tại Tuất (11)
+        // Tị (6), Dậu (10), Sửu (2) -> Khởi tại Mùi (8)
+        // Hợi (12), Mão (4), Mùi (8) -> Khởi tại Sửu (2)
+        
+        int startPalacePos = 0;
+        if (birthBranch == 3 || birthBranch == 7 || birthBranch == 11) startPalacePos = 5;
+        else if (birthBranch == 9 || birthBranch == 1 || birthBranch == 5) startPalacePos = 11;
+        else if (birthBranch == 6 || birthBranch == 10 || birthBranch == 2) startPalacePos = 8;
+        else if (birthBranch == 12 || birthBranch == 4 || birthBranch == 8) startPalacePos = 2;
+
+        // 3. An Tiểu Hạn
+        // Nam thuận, Nữ nghịch
+        bool thuanChieu = isMale;
+
+        // Bắt đầu từ năm sinh (birthBranch), an vào cung khởi (startPalacePos)
+        // Viết tiếp theo chiều thuận của địa chi (năm sau = năm trước + 1)
+        // Nhưng vị trí cung thì theo chiều Nam/Nữ
+        
+        int currentBranch = birthBranch;
+        int currentPalace = startPalacePos;
+
+        for (int i = 0; i < 12; i++)
+        {
+            // Ghi nhận
+            tieuHan[currentPalace] = branchNames[currentBranch - 1];
+
+            // Tăng năm (luôn tăng)
+            currentBranch++;
+            if (currentBranch > 12) currentBranch = 1;
+
+            // Di chuyển cung tương ứng
+            if (thuanChieu)
+            {
+                currentPalace++;
+                if (currentPalace > 12) currentPalace = 1;
+            }
+            else
+            {
+                currentPalace--;
+                if (currentPalace < 1) currentPalace = 12;
+            }
+        }
+
+        return tieuHan;
+    }
+
+    // Tính Nguyệt Hạn
+    // Luật: Từ cung Tiểu Vận (của năm xem hạn), nghịch tháng (đến tháng sinh), thuận giờ (đến giờ sinh) -> Tháng 1
+    // Sau đó thuận hành mỗi cung 1 tháng
+    private Dictionary<int, int> CalculateNguyetHan(Dictionary<int, string> tieuHan, int viewYear, int birthMonth, int birthHourBranch)
+    {
+        var nguyetHan = new Dictionary<int, int>();
+        string[] branchNames = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tị", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
+
+        // 1. Tìm Chi của năm xem hạn
+        int viewYearBranch = (viewYear - 3) % 12;
+        if (viewYearBranch <= 0) viewYearBranch += 12;
+        string viewBranchName = branchNames[viewYearBranch - 1];
+
+        // 2. Tìm cung Tiểu Vận (Tiểu Hạn của năm đó)
+        // tieuHan map: PalaceId -> BranchName
+        int tieuVanPalace = tieuHan.FirstOrDefault(x => x.Value == viewBranchName).Key;
+        
+        // Nếu không tìm thấy (lỗi logic nào đó), return empty
+        if (tieuVanPalace == 0) return nguyetHan;
+
+        // 3. Tính vị trí tháng 1
+        // Từ Tiểu Vận, nghịch tháng (bắt đầu là tháng 1, lùi về birthMonth)
+        // => count backward (birthMonth - 1) steps
+        int posAfterMonth = tieuVanPalace - (birthMonth - 1);
+        while (posAfterMonth <= 0) posAfterMonth += 12;
+
+        // Từ đó, thuận giờ (bắt đầu là giờ Tý, tiến tới birthHourBranch)
+        // => count forward (birthHourBranch - 1) steps
+        int month1Pos = posAfterMonth + (birthHourBranch - 1);
+        while (month1Pos > 12) month1Pos -= 12;
+
+        // 4. An Nguyệt Hạn (Thuận hành)
+        for (int m = 1; m <= 12; m++)
+        {
+            int currentPos = month1Pos + (m - 1);
+            while (currentPos > 12) currentPos -= 12;
+            
+            nguyetHan[currentPos] = m;
+        }
+
+        return nguyetHan;
     }
 }

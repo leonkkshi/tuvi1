@@ -28,19 +28,159 @@ export class TuViChartComponent implements OnChanges {
   // Cache cho palace interpretations - lưu theo palaceName
   palaceInterpretationsCache: Map<string, PalaceInterpretationResult> = new Map();
 
+  // Barriers
+  tuanPairs: Set<string> = new Set();
+  trietPairs: Set<string> = new Set();
+
   constructor(private tuViService: TuViService) {}
 
   // Theo dõi thay đổi của chart để clear cache khi lập lá số mới
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['chart'] && !changes['chart'].firstChange) {
+    if (changes['chart']) {
       // Clear cache khi chart thay đổi (lập lá số mới)
       this.palaceInterpretationsCache.clear();
       this.interpretation = null;
+      this.updateBarriers();
     }
   }
 
   // Mapping địa chi theo vị trí
   private branchNames = ['Tý', 'Sửu', 'Dần', 'Mão', 'Thìn', 'Tỵ', 'Ngọ', 'Mùi', 'Thân', 'Dậu', 'Tuất', 'Hợi'];
+
+  private updateBarriers() {
+    this.tuanPairs.clear();
+    this.trietPairs.clear();
+    
+    if (!this.chart) return;
+
+    // Parse Triet: "Thân-Dậu" -> 9-10
+    if (this.chart.trietBetween) {
+      const parts = this.chart.trietBetween.split('-');
+      if (parts.length === 2) {
+        const id1 = this.getPalaceIdByName(parts[0].trim());
+        const id2 = this.getPalaceIdByName(parts[1].trim());
+        if (id1 > 0 && id2 > 0) {
+           this.trietPairs.add(`${id1}-${id2}`);
+           this.trietPairs.add(`${id2}-${id1}`); // Add reverse just in case, though we primarily check forward
+        }
+      }
+    }
+
+    // Parse Tuan: "Thân,Dậu" -> 9-10
+    if (this.chart.tuanPositions) {
+       // Usually format is "A,B".
+       const parts = this.chart.tuanPositions.split(',');
+       if (parts.length === 2) {
+         const id1 = this.getPalaceIdByName(parts[0].trim());
+         const id2 = this.getPalaceIdByName(parts[1].trim());
+         if (id1 > 0 && id2 > 0) {
+             this.tuanPairs.add(`${id1}-${id2}`);
+             this.tuanPairs.add(`${id2}-${id1}`);
+         }
+       }
+    }
+  }
+
+  private getPalaceIdByName(name: string): number {
+    const idx = this.branchNames.indexOf(name);
+    return idx >= 0 ? idx + 1 : 0;
+  }
+
+  getBarrierLabel(id: number): string {
+    // Check for barrier with "previous" neighbor (logically or visually earlier in DOM)
+    // We attach labels to the "later" element to ensure it renders on top.
+    
+    // Top Row: 7, 8, 9 (Left barrier with 6, 7, 8)
+    if (id === 7 && this.checkPair(6, 7)) return this.getLabelForPair(6, 7);
+    if (id === 8 && this.checkPair(7, 8)) return this.getLabelForPair(7, 8);
+    if (id === 9 && this.checkPair(8, 9)) return this.getLabelForPair(8, 9);
+
+    // Right Column: 10, 11, 12 (Top barrier with 9, 10, 11)
+    if (id === 10 && this.checkPair(9, 10)) return this.getLabelForPair(9, 10);
+    if (id === 11 && this.checkPair(10, 11)) return this.getLabelForPair(10, 11);
+    if (id === 12) {
+       // 12 has Top barrier with 11
+       if (this.checkPair(11, 12)) return this.getLabelForPair(11, 12);
+       // 12 also needs to handle barrier with 1?
+       // 12 is at R4C4. 1 is R4C3. 12 is to the right of 1.
+       // 12 is later in DOM than 1. So 12 should handle 1-12 boundary (Left barrier).
+       if (this.checkPair(12, 1)) return this.getLabelForPair(12, 1);
+    } 
+
+    // Bottom Row: 1, 2 (Left barrier with 2, 3) -> Wait
+    // Order: 3, 2, 1, 12.
+    // 1 is later than 2. Boundary 1-2. 1 is right of 2. 1 handles Left barrier.
+    if (id === 1 && this.checkPair(1, 2)) return this.getLabelForPair(1, 2);
+    // 2 is later than 3. Boundary 2-3. 2 is right of 3. 2 handles Left barrier.
+    if (id === 2 && this.checkPair(2, 3)) return this.getLabelForPair(2, 3);
+
+    // Left Column: 3, 4, 5 (Top barrier with 4, 5, 6) -> Wait
+    // 3 (R4) vs 4 (R3). 3 is later in DOM. 
+    // 3 is Below 4.
+    // So 3 handles barrier with 4. Barrier is Top of 3.
+    if (id === 3 && this.checkPair(3, 4)) return this.getLabelForPair(3, 4);
+    
+    // 4 vs 5. 4 (R3) vs 5 (R2). 4 is later. 4 Below 5.
+    // 4 handles barrier with 5. Top of 4.
+    if (id === 4 && this.checkPair(4, 5)) return this.getLabelForPair(4, 5);
+
+    // 5 vs 6. 5 (R2) vs 6 (R1). 5 is later. 5 Below 6.
+    // 5 handles barrier with 6. Top of 5.
+    if (id === 5 && this.checkPair(5, 6)) return this.getLabelForPair(5, 6);
+
+    return '';
+  }
+
+  private checkPair(id1: number, id2: number): boolean {
+    const key = `${id1}-${id2}`;
+    return this.tuanPairs.has(key) || this.trietPairs.has(key) || this.tuanPairs.has(`${id2}-${id1}`) || this.trietPairs.has(`${id2}-${id1}`);
+  }
+
+  private getLabelForPair(id1: number, id2: number): string {
+    const key = `${id1}-${id2}`;
+    const revKey = `${id2}-${id1}`;
+    
+    const hasTuan = this.tuanPairs.has(key) || this.tuanPairs.has(revKey);
+    const hasTriet = this.trietPairs.has(key) || this.trietPairs.has(revKey);
+
+    if (hasTuan && hasTriet) return 'Tuần - Triệt';
+    if (hasTuan) return 'Tuần';
+    if (hasTriet) return 'Triệt';
+    return '';
+  }
+
+  getBarrierClass(id: number): string {
+    // Return CSS class based on the barrier position relative to the cell
+    // AND relative to the center of the chart (Inner Edge Anchoring)
+    
+    // Left Barriers
+    // Top Row (6-7, 7-8, 8-9)
+    if (id === 7 || id === 8 || id === 9) return 'barrier-ver-bottom'; // Left barrier, anchored Bottom
+    
+    if (id === 12) {
+      // 12 can be Top (11-12) or Left (12-1)
+      // Prioritize? Can a cell have both?
+      // Usually Tuần/Triệt are adjacent. 
+      // If 11-12 has barrier, and 12-1 has barrier -> That means 11,12,1 are all blocked?
+      // Possible if Tuần at 11-12 and Triệt at 12-1.
+      // But getBarrierLabel returns only one string.
+      // My logic above returns first match.
+      // 11-12 checked first -> Top.
+      if (this.checkPair(11, 12)) return 'barrier-hor-left';
+      if (this.checkPair(12, 1)) return 'barrier-ver-top';
+    }
+
+    if (id === 1 || id === 2) return 'barrier-ver-top'; // For 1-2, 2-3 (Left barrier, anchored Top)
+
+    // Top Barriers
+    // Right Column (9-10, 10-11)
+    if (id === 10 || id === 11) return 'barrier-hor-left'; // Top barrier, anchored Left
+
+    // Left Column (3-4, 4-5, 5-6)
+    if (id === 3 || id === 4 || id === 5) return 'barrier-hor-right'; // Top barrier, anchored Right
+
+    return '';
+  }
 
   // Kiểm tra xem Triệt và Tuần có cùng 2 cung không
   areSamePositions(): boolean {
@@ -362,6 +502,16 @@ export class TuViChartComponent implements OnChanges {
   getDaiVan(palaceId: number): number | string {
     if (!this.chart || !this.chart.daiVan) return '';
     return this.chart.daiVan[palaceId] || '';
+  }
+
+  getTieuHan(palaceId: number): string {
+    if (!this.chart || !this.chart.tieuHan) return '';
+    return this.chart.tieuHan[palaceId] || '';
+  }
+
+  getNguyetHan(palaceId: number): number | string {
+    if (!this.chart || !this.chart.nguyetHan) return '';
+    return this.chart.nguyetHan[palaceId] || '';
   }
 
   getBrightnessText(brightness: number): string {
