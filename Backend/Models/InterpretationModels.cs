@@ -24,4 +24,14 @@ namespace Backend.Models
         public string Interpretation { get; set; } = string.Empty;
         public List<string> InfluencingStars { get; set; } = new();
     }
+
+    // Queue statistics
+    public class QueueStats
+    {
+        public int TotalQueued { get; set; }
+        public int TotalProcessing { get; set; }
+        public int ChartQueueSize { get; set; }
+        public int PalaceQueueSize { get; set; }
+        public int TotalQueueSize { get; set; }
+    }
 }

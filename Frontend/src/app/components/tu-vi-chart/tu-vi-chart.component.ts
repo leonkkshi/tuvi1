@@ -460,7 +460,33 @@ export class TuViChartComponent implements OnChanges {
       },
       error: (error) => {
         console.error('Error getting AI interpretation:', error);
-        this.interpretationError = 'Không thể luận giải lá số. Vui lòng kiểm tra cấu hình OpenAI API Key.';
+        
+        // Xử lý các loại lỗi cụ thể
+        if (error.status === 503) {
+          // Hệ thống quá tải
+          const errorData = error.error;
+          this.interpretationError = errorData?.message || '😔 Hệ thống đang quá tải. Vui lòng thử lại sau vài phút.';
+          
+          if (errorData?.retryAfter) {
+            this.interpretationError += ` (Thử lại sau ${errorData.retryAfter}s)`;
+          }
+          
+          if (errorData?.queueStats) {
+            const stats = errorData.queueStats;
+            this.interpretationError += `\n\n📋 Trạng thái hàng đợi: ${stats.totalQueueSize} yêu cầu đang chờ xử lý.`;
+          }
+        } else if (error.status === 429) {
+          // Rate limit
+          this.interpretationError = '⚠️ Bạn đã gửi quá nhiều yêu cầu. Vui lòng chờ 1 phút rồi thử lại.';
+        } else if (error.status === 0) {
+          // Network error
+          this.interpretationError = '❌ Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.';
+        } else {
+          // Generic error
+          const errorMsg = error.error?.message || error.error?.error || error.message;
+          this.interpretationError = errorMsg || 'Không thể luận giải lá số. Vui lòng kiểm tra cấu hình API.';
+        }
+        
         this.isLoadingInterpretation = false;
       }
     });

@@ -96,7 +96,24 @@ export class PalaceInterpretationModalComponent implements OnChanges {
       error: (err) => {
         console.error('[Modal] API error:', err);
         if (this.palace && this.palace.palaceName === palaceName) {
-          this.error = 'Không thể tải luận giải cho cung này. Vui lòng thử lại.';
+          // Xử lý các loại lỗi cụ thể
+          if (err.status === 503) {
+            // Hệ thống quá tải
+            const errorData = err.error;
+            this.error = errorData?.message || '😔 Hệ thống đang quá tải. Vui lòng thử lại sau vài phút.';
+            
+            if (errorData?.retryAfter) {
+              this.error += ` (Thử lại sau ${errorData.retryAfter}s)`;
+            }
+          } else if (err.status === 429) {
+            this.error = '⚠️ Bạn đã gửi quá nhiều yêu cầu. Vui lòng chờ 1 phút.';
+          } else if (err.status === 0) {
+            this.error = '❌ Không thể kết nối đến server.';
+          } else {
+            const errorMsg = err.error?.message || err.error?.error;
+            this.error = errorMsg || 'Không thể tải luận giải cho cung này. Vui lòng thử lại.';
+          }
+          
           this.isLoading = false;
         }
       }

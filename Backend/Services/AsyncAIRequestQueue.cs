@@ -14,6 +14,7 @@ namespace Backend.Services
         AIRequestStatus GetRequestStatus(string requestId);
         InterpretationResponse? GetResult(string requestId);
         PalaceInterpretationResult? GetPalaceResult(string requestId);
+        QueueStats GetQueueStats();
     }
 
     public class AsyncAIRequestQueue : IAsyncAIRequestQueue, IDisposable
@@ -52,6 +53,14 @@ namespace Backend.Services
 
         public string EnqueueRequest(InterpretationRequest request)
         {
+            // Kiểm tra queue size limit
+            var totalQueueSize = _chartQueue.Count + _palaceQueue.Count;
+            if (totalQueueSize >= 200) // Max queue size from config
+            {
+                _logger.LogWarning("Queue is full. Current size: {QueueSize}", totalQueueSize);
+                throw new InvalidOperationException("Hàng đợi đã đầy. Vui lòng thử lại sau.");
+            }
+
             var requestId = Guid.NewGuid().ToString();
             _requestStatuses[requestId] = new AIRequestStatus
             {
@@ -70,6 +79,14 @@ namespace Backend.Services
 
         public string EnqueuePalaceRequest(TuViChart chart, string palaceName)
         {
+            // Kiểm tra queue size limit
+            var totalQueueSize = _chartQueue.Count + _palaceQueue.Count;
+            if (totalQueueSize >= 200) // Max queue size from config
+            {
+                _logger.LogWarning("Queue is full. Current size: {QueueSize}", totalQueueSize);
+                throw new InvalidOperationException("Hàng đợi đã đầy. Vui lòng thử lại sau.");
+            }
+
             var requestId = Guid.NewGuid().ToString();
             _requestStatuses[requestId] = new AIRequestStatus
             {
@@ -112,6 +129,21 @@ namespace Backend.Services
         {
             _palaceResults.TryGetValue(requestId, out var result);
             return result;
+        }
+
+        public QueueStats GetQueueStats()
+        {
+            var queuedCount = _requestStatuses.Count(s => s.Value.Status == "queued");
+            var processingCount = _requestStatuses.Count(s => s.Value.Status == "processing");
+            
+            return new QueueStats
+            {
+                TotalQueued = queuedCount,
+                TotalProcessing = processingCount,
+                ChartQueueSize = _chartQueue.Count,
+                PalaceQueueSize = _palaceQueue.Count,
+                TotalQueueSize = _chartQueue.Count + _palaceQueue.Count
+            };
         }
 
         private async Task ProcessQueueAsync(CancellationToken cancellationToken)

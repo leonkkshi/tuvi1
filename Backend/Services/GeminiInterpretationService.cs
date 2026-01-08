@@ -49,8 +49,8 @@ namespace Backend.Services
                 return await ExecuteInterpretationAsync(request);
             });
 
-            // Cache kết quả trong 1 giờ
-            _cache.Set(cacheKey, result, TimeSpan.FromHours(1));
+            // Cache kết quả trong 6 giờ (tăng để giảm tải AI)
+            _cache.Set(cacheKey, result, TimeSpan.FromHours(6));
             _logger.LogInformation("Cached new chart interpretation result");
 
             return result;
@@ -74,8 +74,8 @@ namespace Backend.Services
                 return await ExecuteSinglePalaceInterpretationAsync(chart, palaceName);
             });
 
-            // Cache kết quả trong 1 giờ
-            _cache.Set(cacheKey, result, TimeSpan.FromHours(1));
+            // Cache kết quả trong 6 giờ (tăng để giảm tải AI)
+            _cache.Set(cacheKey, result, TimeSpan.FromHours(6));
             _logger.LogInformation("Cached new palace interpretation result for: {PalaceName}", palaceName);
 
             return result;

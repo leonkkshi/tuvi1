@@ -33,6 +33,7 @@ namespace Backend.Controllers
         {
             var stats = _throttler.GetStats();
             var process = System.Diagnostics.Process.GetCurrentProcess();
+            var queueStatus = _asyncQueue.GetRequestStatus("__health__"); // Dummy call to check queue
             
             return Ok(new
             {
@@ -49,7 +50,10 @@ namespace Backend.Controllers
                     activeRequests = stats.ActiveRequests,
                     availableSlots = stats.AvailableSlots,
                     totalRequests = stats.TotalRequests,
-                    rejectedRequests = stats.RejectedRequests
+                    rejectedRequests = stats.RejectedRequests,
+                    utilizationPercent = stats.AvailableSlots > 0 ? 
+                        Math.Round((double)stats.ActiveRequests / (stats.ActiveRequests + stats.AvailableSlots) * 100, 1) : 100,
+                    isOverloaded = stats.AvailableSlots == 0
                 },
                 cpu = new
                 {
@@ -81,7 +85,18 @@ namespace Backend.Controllers
                 return StatusCode(503, new { 
                     error = "Hệ thống đang quá tải", 
                     message = "Quá nhiều yêu cầu đồng thời. Vui lòng thử lại sau vài phút.",
-                    retryAfter = 60
+                    retryAfter = 60,
+                    queueStats = _asyncQueue.GetQueueStats()
+                });
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("hàng đợi"))
+            {
+                _logger.LogWarning("Queue is full: {Message}", ex.Message);
+                return StatusCode(503, new { 
+                    error = "Hàng đợi đã đầy", 
+                    message = "Hệ thống đang xử lý quá nhiều yêu cầu. Vui lòng thử lại sau 2-3 phút.",
+                    retryAfter = 120,
+                    queueStats = _asyncQueue.GetQueueStats()
                 });
             }
             catch (Exception ex)
@@ -112,8 +127,29 @@ namespace Backend.Controllers
                     resultEndpoint = $"/api/tuvi/ai-palace-result/{requestId}"
                 });
             }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("quá tải") || ex.Message.Contains("queue"))
+            {
+                _logger.LogWarning("Palace request rejected: {Message}", ex.Message);
+                return StatusCode(503, new { 
+                    error = "Hệ thống đang quá tải", 
+                    message = "Quá nhiều yêu cầu đồng thời. Vui lòng thử lại sau vài phút.",
+                    retryAfter = 60,
+                    queueStats = _asyncQueue.GetQueueStats()
+                });
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("hàng đợi"))
+            {
+                _logger.LogWarning("Queue is full for palace request: {Message}", ex.Message);
+                return StatusCode(503, new { 
+                    error = "Hàng đợi đã đầy", 
+                    message = "Hệ thống đang xử lý quá nhiều yêu cầu. Vui lòng thử lại sau 2-3 phút.",
+                    retryAfter = 120,
+                    queueStats = _asyncQueue.GetQueueStats()
+                });
+            }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error queuing palace request");
                 return StatusCode(500, new { error = "Lỗi khi xếp hàng yêu cầu", details = ex.Message });
             }
         }
