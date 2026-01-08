@@ -291,6 +291,7 @@ NGUYÊN TẮC LUẬN ĐOÁN TỬ VI - QUAN TRỌNG:
    - Tam hợp phải: Cung cách 8 vị trí
    ⚠️ CỰC KỲ QUAN TRỌNG: Các sao ở tam phương tứ chính CHIẾU vào bản cung, ảnh hưởng trực tiếp
    ⚠️ TUYỆT ĐỐI KHÔNG được luận riêng bản cung mà bỏ qua tam phương tứ chính!
+   ⚠️ Khi nào xem hạn mới luận các sao lưu
    ⚠️ Phải phân tích đầy đủ 4 cung (bản cung + 3 cung tam phương) mới có luận đoán chính xác
 
 2. NHỊ HỢP (ĐẶC BIỆT quan trọng cho cung Mệnh & Thân):
