@@ -154,7 +154,7 @@ public class CatalogService
             MakeStar(99, "Thiên Phúc", "Phụ tinh", "Thổ", "Cát", 55),
             MakeStar(100, "Đẩu Quân", "Phụ tinh", "Hỏa", "Hung", 48),
             MakeStar(101, "Tam Thai", "Phụ tinh", "Thủy", "Cát", 50),
-            MakeStar(102, "Bát Tọa", "Phụ tinh", "Mộc", "Hung", 48),
+            MakeStar(102, "Bát Tọa", "Phụ tinh", "Mộc", "Cát", 48),
             MakeStar(103, "Thiên Quý", "Phụ tinh", "Thổ", "Cát", 52),
             MakeStar(104, "Ân Quang", "Phụ tinh", "Mộc", "Cát", 55),
             MakeStar(105, "Thiên Tài", "Phụ tinh", "Thổ", "Cát", 60),
@@ -179,7 +179,13 @@ public class CatalogService
             MakeStar(120, "Lưu Hóa Lộc", "Lưu Tứ Hóa", "Mộc", "Cát", 95),
             MakeStar(121, "Lưu Hóa Quyền", "Lưu Tứ Hóa", "Mộc", "Cát", 90),
             MakeStar(122, "Lưu Hóa Khoa", "Lưu Tứ Hóa", "Mộc", "Cát", 85),
-            MakeStar(123, "Lưu Hóa Kỵ", "Lưu Tứ Hóa", "Thủy", "Hung", 50)
+            MakeStar(123, "Lưu Hóa Kỵ", "Lưu Tứ Hóa", "Thủy", "Hung", 50),
+
+            // Thiên Trù (124)
+            MakeStar(124, "Thiên Trù", "Cát tinh", "Thổ", "Cát", 75),
+
+            // Phượng Các (125)
+            MakeStar(125, "Phượng Các", "Cát tinh", "Thổ", "Cát", 80)
         };
 
         return stars;

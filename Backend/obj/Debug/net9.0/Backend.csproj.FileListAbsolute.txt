@@ -83,3 +83,4 @@ C:\tuvi\Backend\bin\Debug\net9.0\node_modules\vietnamese-lunar-calendar\build\te
 C:\tuvi\Backend\bin\Debug\net9.0\node_modules\vietnamese-lunar-calendar\build\test.js
 C:\tuvi\Backend\bin\Debug\net9.0\node_modules\vietnamese-lunar-calendar\package.json
 C:\tuvi\Backend\bin\Debug\net9.0\node_modules\vietnamese-lunar-calendar\README.md
+C:\tuvi\Backend\bin\Debug\net9.0\Frontend\dist\frontend\prerendered-routes.json

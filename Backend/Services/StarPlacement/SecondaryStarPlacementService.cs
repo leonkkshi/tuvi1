@@ -114,7 +114,7 @@ public class SecondaryStarPlacementService : IStarPlacementService
         positions[locTonPos].Add(19);
 
         // Thiên Khôi (20): Theo Can năm sinh
-        // Giáp=Sửu, Ất=Tý, Bính=Hợi, Đinh=Hợi, Mậu=Sửu, Kỷ=Tý, Canh=Ngọ, Tân=Ngọ, Nhâm=Mão, Quý=Mão
+        // Giáp=Sửu, Ất=Tý, Bính=Hợi, Đinh=Hợi, Mậu=Sửu, Kỷ=Tý, Canh=Dần, Tân=Ngọ, Nhâm=Mão, Quý=Mão
         int thienKhoiPos = yearCan switch
         {
             1 => 2,    // Giáp -> Sửu
@@ -123,7 +123,7 @@ public class SecondaryStarPlacementService : IStarPlacementService
             4 => 12,   // Đinh -> Hợi
             5 => 2,    // Mậu -> Sửu
             6 => 1,    // Kỷ -> Tý
-            7 => 7,    // Canh -> Ngọ
+            7 => 3,    // Canh -> Dần
             8 => 7,    // Tân -> Ngọ
             9 => 4,    // Nhâm -> Mão
             10 => 4,   // Quý -> Mão
@@ -132,7 +132,7 @@ public class SecondaryStarPlacementService : IStarPlacementService
         positions[thienKhoiPos].Add(20);
 
         // Thiên Việt (21): Theo Can năm sinh
-        // Giáp=Mùi, Ất=Thân, Bính=Dậu, Đinh=Dậu, Mậu=Mùi, Kỷ=Thân, Canh=Dần, Tân=Dần, Nhâm=Tỵ, Quý=Tỵ
+        // Giáp=Mùi, Ất=Thân, Bính=Dậu, Đinh=Dậu, Mậu=Mùi, Kỷ=Thân, Canh=Ngọ, Tân=Dần, Nhâm=Tỵ, Quý=Tỵ
         int thienVietPos = yearCan switch
         {
             1 => 8,    // Giáp -> Mùi
@@ -141,13 +141,36 @@ public class SecondaryStarPlacementService : IStarPlacementService
             4 => 10,   // Đinh -> Dậu
             5 => 8,    // Mậu -> Mùi
             6 => 9,    // Kỷ -> Thân
-            7 => 3,    // Canh -> Dần
+            7 => 7,    // Canh -> Ngọ
             8 => 3,    // Tân -> Dần
             9 => 6,    // Nhâm -> Tỵ
             10 => 6,   // Quý -> Tỵ
             _ => 8
         };
         positions[thienVietPos].Add(21);
+
+        // Thiên Trù (124): Theo Can năm sinh
+        // Giáp, Đinh -> Tỵ (6), Ất, Mậu, Tân -> Ngọ (7), Bính -> Tý (1), Kỷ -> Thân (9), Canh -> Dần (3), Nhâm -> Dậu (10), Quý -> Tuất (11)
+        int thienTruPos = yearCan switch
+        {
+            1 => 6,    // Giáp -> Tỵ
+            2 => 7,    // Ất -> Ngọ
+            3 => 1,    // Bính -> Tý
+            4 => 6,    // Đinh -> Tỵ
+            5 => 7,    // Mậu -> Ngọ
+            6 => 9,    // Kỷ -> Thân
+            7 => 3,    // Canh -> Dần
+            8 => 7,    // Tân -> Ngọ
+            9 => 10,   // Nhâm -> Dậu
+            10 => 11,  // Quý -> Tuất
+            _ => 6
+        };
+        positions[thienTruPos].Add(124);
+
+        // Phượng Các (125): Theo Chi năm sinh - Từ Tuất (11) cho Tý (1), chạy ngược
+        int phuongCacPos = 11 - (yearBranch - 1);
+        if (phuongCacPos <= 0) phuongCacPos += 12;
+        positions[phuongCacPos].Add(125);
 
         // Lưu Hà (88): Theo Can năm
         int luuHaPos = yearCan switch

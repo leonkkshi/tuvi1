@@ -26,7 +26,7 @@ public class TuHoaStarPlacementService : IStarPlacementService
             {8,5,2,10},  // Đinh
             {9,8,18,2},  // Mậu
             {4,9,12,16}, // Kỷ
-            {3,4,5,8},   // Canh
+            {3,4,8,5}, // Canh - Thái Âm hóa Khoa, Thiên Đồng hóa Kỵ
             {10,3,16,15},// Tân
             {12,1,17,4}, // Nhâm
             {14,10,8,9}  // Quý
