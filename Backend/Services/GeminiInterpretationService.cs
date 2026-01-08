@@ -3,6 +3,7 @@ using Backend.Services.Helpers;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Backend.Services
 {
@@ -13,36 +14,71 @@ namespace Backend.Services
         private readonly string _model;
         private readonly ILogger<GeminiInterpretationService> _logger;
         private readonly IAIRequestThrottler _throttler;
+        private readonly IMemoryCache _cache;
 
         public GeminiInterpretationService(
             IHttpClientFactory httpClientFactory, 
             IConfiguration configuration,
             ILogger<GeminiInterpretationService> logger,
-            IAIRequestThrottler throttler)
+            IAIRequestThrottler throttler,
+            IMemoryCache cache)
         {
             _httpClient = httpClientFactory.CreateClient();
             _apiKey = configuration["Gemini:ApiKey"] ?? throw new InvalidOperationException("Gemini API key không được cấu hình");
             _model = configuration["Gemini:Model"] ?? "gemini-pro";
             _logger = logger;
             _throttler = throttler;
+            _cache = cache;
         }
 
         public async Task<InterpretationResponse> InterpretChartAsync(InterpretationRequest request)
         {
+            // Tạo cache key từ request
+            var cacheKey = $"gemini_chart_{request.Chart.GetHashCode()}_vi";
+            
+            // Kiểm tra cache trước
+            if (_cache.TryGetValue(cacheKey, out InterpretationResponse cachedResponse))
+            {
+                _logger.LogInformation("Cache hit for chart interpretation");
+                return cachedResponse;
+            }
+
             // Sử dụng throttler để giới hạn concurrent requests
-            return await _throttler.ExecuteAsync(async () =>
+            var result = await _throttler.ExecuteAsync(async () =>
             {
                 return await ExecuteInterpretationAsync(request);
             });
+
+            // Cache kết quả trong 1 giờ
+            _cache.Set(cacheKey, result, TimeSpan.FromHours(1));
+            _logger.LogInformation("Cached new chart interpretation result");
+
+            return result;
         }
 
         public async Task<string> InterpretSinglePalaceAsync(TuViChart chart, string palaceName)
         {
+            // Tạo cache key từ chart và palace
+            var cacheKey = $"gemini_palace_{chart.GetHashCode()}_{palaceName}";
+            
+            // Kiểm tra cache trước
+            if (_cache.TryGetValue(cacheKey, out string cachedResult))
+            {
+                _logger.LogInformation("Cache hit for palace interpretation: {PalaceName}", palaceName);
+                return cachedResult;
+            }
+
             // Sử dụng throttler để giới hạn concurrent requests
-            return await _throttler.ExecuteAsync(async () =>
+            var result = await _throttler.ExecuteAsync(async () =>
             {
                 return await ExecuteSinglePalaceInterpretationAsync(chart, palaceName);
             });
+
+            // Cache kết quả trong 1 giờ
+            _cache.Set(cacheKey, result, TimeSpan.FromHours(1));
+            _logger.LogInformation("Cached new palace interpretation result for: {PalaceName}", palaceName);
+
+            return result;
         }
 
         private async Task<InterpretationResponse> ExecuteInterpretationAsync(InterpretationRequest request)

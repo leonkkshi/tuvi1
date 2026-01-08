@@ -17,8 +17,8 @@ builder.Services.AddMemoryCache();
 // Configure Kestrel limits
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.Limits.MaxConcurrentConnections = 5000;
-    options.Limits.MaxConcurrentUpgradedConnections = 1000;
+    options.Limits.MaxConcurrentConnections = 10000; // Tăng từ 5000 lên 10000
+    options.Limits.MaxConcurrentUpgradedConnections = 2000; // Tăng từ 1000 lên 2000
     options.Limits.MaxRequestBodySize = 10 * 1024 * 1024; // 10MB
 });
 
@@ -34,13 +34,23 @@ builder.Services.AddRateLimiter(options =>
         opt.QueueLimit = 10; // Queue thêm 10 requests
     });
     
-    // Policy chung: 100 requests/phút
+    // Sliding window limiter cho AI để tránh spike
+    options.AddSlidingWindowLimiter("ai-sliding", opt =>
+    {
+        opt.PermitLimit = 100; // Tăng từ 50 lên 100 requests/phút
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.SegmentsPerWindow = 4; // 15 giây mỗi segment
+        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        opt.QueueLimit = 50; // Tăng queue
+    });
+    
+    // Policy chung: 200 requests/phút (tăng từ 100)
     options.AddFixedWindowLimiter("general", opt =>
     {
-        opt.PermitLimit = 100;
+        opt.PermitLimit = 200;
         opt.Window = TimeSpan.FromMinutes(1);
         opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        opt.QueueLimit = 20;
+        opt.QueueLimit = 50; // Tăng queue
     });
     
     options.RejectionStatusCode = 429; // Too Many Requests

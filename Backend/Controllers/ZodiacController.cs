@@ -12,17 +12,20 @@ namespace Backend.Controllers
         private readonly IAIInterpretationService _aiInterpretationService;
         private readonly IAIRequestThrottler _throttler;
         private readonly IAsyncAIRequestQueue _asyncQueue;
+        private readonly ILogger<TuViController> _logger;
 
         public TuViController(
             ITuViService tuViService, 
             IAIInterpretationService aiInterpretationService,
             IAIRequestThrottler throttler,
-            IAsyncAIRequestQueue asyncQueue)
+            IAsyncAIRequestQueue asyncQueue,
+            ILogger<TuViController> logger)
         {
             _tuViService = tuViService;
             _aiInterpretationService = aiInterpretationService;
             _throttler = throttler;
             _asyncQueue = asyncQueue;
+            _logger = logger;
         }
 
         [HttpGet("health")]
@@ -57,7 +60,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost("ai-interpret-async")]
-        [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("general")]
+        [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("ai-sliding")]
         public ActionResult<object> AIInterpretChartAsync([FromBody] InterpretationRequest request)
         {
             try
@@ -72,6 +75,15 @@ namespace Backend.Controllers
                     resultEndpoint = $"/api/tuvi/ai-result/{requestId}"
                 });
             }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("quá tải"))
+            {
+                _logger.LogWarning("AI request rejected due to throttling: {Message}", ex.Message);
+                return StatusCode(503, new { 
+                    error = "Hệ thống đang quá tải", 
+                    message = "Quá nhiều yêu cầu đồng thời. Vui lòng thử lại sau vài phút.",
+                    retryAfter = 60
+                });
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, new { error = "Lỗi khi xếp hàng yêu cầu", details = ex.Message });
@@ -79,7 +91,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost("ai-interpret-palace-async")]
-        [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("general")]
+        [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("ai-sliding")]
         public ActionResult<object> AIInterpretPalaceAsync([FromBody] PalaceInterpretationRequest request)
         {
             try

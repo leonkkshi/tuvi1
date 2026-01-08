@@ -2,6 +2,7 @@ using Backend.Models;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Backend.Services
 {
@@ -12,29 +13,48 @@ namespace Backend.Services
         private readonly string _model;
         private readonly ILogger<OpenAIInterpretationService> _logger;
         private readonly IAIRequestThrottler _throttler;
+        private readonly IMemoryCache _cache;
 
         public OpenAIInterpretationService(
             IHttpClientFactory httpClientFactory, 
             IConfiguration configuration,
             ILogger<OpenAIInterpretationService> logger,
-            IAIRequestThrottler throttler)
+            IAIRequestThrottler throttler,
+            IMemoryCache cache)
         {
             _httpClient = httpClientFactory.CreateClient();
             _apiKey = configuration["OpenAI:ApiKey"] ?? throw new InvalidOperationException("OpenAI API key không được cấu hình");
             _model = configuration["OpenAI:Model"] ?? "gpt-4";
             _logger = logger;
             _throttler = throttler;
+            _cache = cache;
             
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
         }
 
         public async Task<InterpretationResponse> InterpretChartAsync(InterpretationRequest request)
         {
+            // Tạo cache key từ request
+            var cacheKey = $"openai_chart_{request.Chart.GetHashCode()}_vi";
+            
+            // Kiểm tra cache trước
+            if (_cache.TryGetValue(cacheKey, out InterpretationResponse cachedResponse))
+            {
+                _logger.LogInformation("Cache hit for OpenAI chart interpretation");
+                return cachedResponse;
+            }
+
             // Sử dụng throttler để giới hạn concurrent requests
-            return await _throttler.ExecuteAsync(async () =>
+            var result = await _throttler.ExecuteAsync(async () =>
             {
                 return await ExecuteInterpretationAsync(request);
             });
+
+            // Cache kết quả trong 1 giờ
+            _cache.Set(cacheKey, result, TimeSpan.FromHours(1));
+            _logger.LogInformation("Cached new OpenAI chart interpretation result");
+
+            return result;
         }
 
         public async Task<string> InterpretSinglePalaceAsync(TuViChart chart, string palaceName)
