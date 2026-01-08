@@ -17,7 +17,7 @@ public class LuuNienVanTinhStarPlacementService : IStarPlacementService
         // Vị trí sao Lưu Niên Văn Tinh theo Can năm
         int palacePos = yearCan switch
         {
-            1 => 6,   // Giáp: Tị
+            1 => 6,   // Giáp: Tỵ
             2 => 7,   // Ất: Ngọ
             3 => 9,   // Bính: Thân
             4 => 10,  // Đinh: Dậu

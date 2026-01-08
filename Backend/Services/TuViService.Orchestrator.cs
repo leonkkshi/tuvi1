@@ -281,14 +281,14 @@ public class TuViService : ITuViService
         int yearCan = (lunarYear - 3) % 10;
         if (yearCan <= 0) yearCan += 10;
 
-        string[] branchNames = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tị", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
+        string[] branchNames = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tỵ", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
 
         // Triệt dựa vào Thiên Can năm sinh
         return yearCan switch
         {
             1 or 6 => "Thân-Dậu",      // Giáp hoặc Kỷ
             2 or 7 => "Ngọ-Mùi",       // Ất hoặc Canh
-            3 or 8 => "Thìn-Tị",       // Bính hoặc Tân
+            3 or 8 => "Thìn-Tỵ",       // Bính hoặc Tân
             4 or 9 => "Dần-Mão",       // Đinh hoặc Nhâm
             5 or 10 => "Tý-Sửu",       // Mậu hoặc Quý
             _ => ""
@@ -304,7 +304,7 @@ public class TuViService : ITuViService
         int yearBranch = (lunarYear - 3) % 12;
         if (yearBranch <= 0) yearBranch += 12;
 
-        string[] branchNames = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tị", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
+        string[] branchNames = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tỵ", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
 
         // Từ cung địa chi năm sinh, đặt là Can Giáp
         // Chạy ngược chiều kim đồng hồ qua các Can: Giáp(1) → Ất(2) → Bính(3) → ...
@@ -388,7 +388,7 @@ public class TuViService : ITuViService
     private Dictionary<int, string> CalculateTieuHan(int lunarYear, bool isMale)
     {
         var tieuHan = new Dictionary<int, string>();
-        string[] branchNames = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tị", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
+        string[] branchNames = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tỵ", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
 
         // 1. Xác định Chi năm sinh
         int birthBranch = (lunarYear - 3) % 12;
@@ -397,7 +397,7 @@ public class TuViService : ITuViService
         // 2. Xác định cung khởi Tiểu Hạn
         // Dần (3), Ngọ (7), Tuất (11) -> Khởi tại Thìn (5)
         // Thân (9), Tý (1), Thìn (5) -> Khởi tại Tuất (11)
-        // Tị (6), Dậu (10), Sửu (2) -> Khởi tại Mùi (8)
+        // Tỵ (6), Dậu (10), Sửu (2) -> Khởi tại Mùi (8)
         // Hợi (12), Mão (4), Mùi (8) -> Khởi tại Sửu (2)
         
         int startPalacePos = 0;
@@ -448,7 +448,7 @@ public class TuViService : ITuViService
     private Dictionary<int, int> CalculateNguyetHan(Dictionary<int, string> tieuHan, int viewYear, int birthMonth, int birthHourBranch)
     {
         var nguyetHan = new Dictionary<int, int>();
-        string[] branchNames = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tị", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
+        string[] branchNames = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tỵ", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
 
         // 1. Tìm Chi của năm xem hạn
         int viewYearBranch = (viewYear - 3) % 12;

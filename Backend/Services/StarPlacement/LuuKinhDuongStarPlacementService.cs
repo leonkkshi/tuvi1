@@ -23,9 +23,9 @@ public class LuuKinhDuongStarPlacementService : IStarPlacementService
         {
             1 => 3,    // Giáp -> Dần
             2 => 4,    // Ất -> Mão
-            3 => 6,    // Bính -> Tị
+            3 => 6,    // Bính -> Tỵ
             4 => 7,    // Đinh -> Ngọ
-            5 => 6,    // Mậu -> Tị
+            5 => 6,    // Mậu -> Tỵ
             6 => 7,    // Kỷ -> Ngọ
             7 => 9,    // Canh -> Thân
             8 => 10,   // Tân -> Dậu

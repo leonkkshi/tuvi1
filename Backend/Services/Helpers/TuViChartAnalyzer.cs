@@ -70,8 +70,8 @@ namespace Backend.Services.Helpers
                 { 11, 4 },  // Tuất - Mão hợp Hỏa
                 { 5, 10 },  // Thìn - Dậu hợp Kim
                 { 10, 5 },  // Dậu - Thìn hợp Kim
-                { 6, 9 },   // Tị - Thân hợp Thủy
-                { 9, 6 },   // Thân - Tị hợp Thủy
+                { 6, 9 },   // Tỵ - Thân hợp Thủy
+                { 9, 6 },   // Thân - Tỵ hợp Thủy
                 { 7, 8 },   // Ngọ - Mùi hợp Thái Dương/Thái Âm
                 { 8, 7 }    // Mùi - Ngọ hợp Thái Dương/Thái Âm
             };
@@ -155,7 +155,7 @@ namespace Backend.Services.Helpers
         /// </summary>
         public static string GetBranchName(int palaceId)
         {
-            var branches = new[] { "Tý", "Sửu", "Dần", "Mão", "Thìn", "Tị", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi" };
+            var branches = new[] { "Tý", "Sửu", "Dần", "Mão", "Thìn", "Tỵ", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi" };
             return branches[palaceId - 1];
         }
 

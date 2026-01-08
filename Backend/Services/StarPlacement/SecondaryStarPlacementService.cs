@@ -96,14 +96,14 @@ public class SecondaryStarPlacementService : IStarPlacementService
         positions[phongCaoPos].Add(39);
 
         // Lộc Tồn (19): Theo Can năm sinh
-        // Giáp-Kỷ=Dần, Ất-Canh=Mão, Bính-Tân=Tỵ, Đinh-Nhâm=Ngọ, Mậu=Tị, Quý=Tý
+        // Giáp-Kỷ=Dần, Ất-Canh=Mão, Bính-Tân=Tỵ, Đinh-Nhâm=Ngọ, Mậu=Tỵ, Quý=Tý
         int locTonPos = yearCan switch
         {
             1 => 3,    // Giáp -> Dần
             2 => 4,    // Ất -> Mão
             3 => 6,    // Bính -> Tỵ
             4 => 7,    // Đinh -> Ngọ
-            5 => 6,    // Mậu -> Tị
+            5 => 6,    // Mậu -> Tỵ
             6 => 7,    // Kỷ -> Ngọ
             7 => 9,    // Canh -> Thân
             8 => 10,   // Tân -> Dậu
@@ -132,7 +132,7 @@ public class SecondaryStarPlacementService : IStarPlacementService
         positions[thienKhoiPos].Add(20);
 
         // Thiên Việt (21): Theo Can năm sinh
-        // Giáp=Mùi, Ất=Thân, Bính=Dậu, Đinh=Dậu, Mậu=Mùi, Kỷ=Thân, Canh=Dần, Tân=Dần, Nhâm=Tị, Quý=Tị
+        // Giáp=Mùi, Ất=Thân, Bính=Dậu, Đinh=Dậu, Mậu=Mùi, Kỷ=Thân, Canh=Dần, Tân=Dần, Nhâm=Tỵ, Quý=Tỵ
         int thienVietPos = yearCan switch
         {
             1 => 8,    // Giáp -> Mùi
@@ -143,8 +143,8 @@ public class SecondaryStarPlacementService : IStarPlacementService
             6 => 9,    // Kỷ -> Thân
             7 => 3,    // Canh -> Dần
             8 => 3,    // Tân -> Dần
-            9 => 6,    // Nhâm -> Tị
-            10 => 6,   // Quý -> Tị
+            9 => 6,    // Nhâm -> Tỵ
+            10 => 6,   // Quý -> Tỵ
             _ => 8
         };
         positions[thienVietPos].Add(21);
@@ -191,12 +191,12 @@ public class SecondaryStarPlacementService : IStarPlacementService
         }
         else if (yearBranch == 3 || yearBranch == 4 || yearBranch == 5)
         {
-            // Dần – Mão – Thìn: Cô Thần=Tị, Quả Tú=Sửu
+            // Dần – Mão – Thìn: Cô Thần=Tỵ, Quả Tú=Sửu
             coThanPos = 6; quaTuPos = 2;
         }
         else if (yearBranch == 6 || yearBranch == 7 || yearBranch == 8)
         {
-            // Tị – Ngọ – Mùi: Cô Thần=Thân, Quả Tú=Thìn
+            // Tỵ – Ngọ – Mùi: Cô Thần=Thân, Quả Tú=Thìn
             coThanPos = 9; quaTuPos = 5;
         }
         else if (yearBranch == 9 || yearBranch == 10 || yearBranch == 11)
@@ -240,7 +240,7 @@ public class SecondaryStarPlacementService : IStarPlacementService
             hoaKhoi = 3; // Dần
             linhKhoi = 11; // Tuất
         }
-        // Tuổi Tị, Dậu, Sửu (yearBranch = 6, 10, 2)
+        // Tuổi Tỵ, Dậu, Sửu (yearBranch = 6, 10, 2)
         else if (yearBranch == 6 || yearBranch == 10 || yearBranch == 2)
         {
             hoaKhoi = 4; // Mão
@@ -344,11 +344,11 @@ public class SecondaryStarPlacementService : IStarPlacementService
         int phaThoaiPos = 0;
         if (yearBranch == 3 || yearBranch == 9 || yearBranch == 6 || yearBranch == 12)
         {
-            phaThoaiPos = 10; // Dần, Thân, Tị, Hợi -> Dậu
+            phaThoaiPos = 10; // Dần, Thân, Tỵ, Hợi -> Dậu
         }
         else if (yearBranch == 1 || yearBranch == 7 || yearBranch == 4 || yearBranch == 10)
         {
-            phaThoaiPos = 6;  // Tý, Ngọ, Mão, Dậu -> Tị
+            phaThoaiPos = 6;  // Tý, Ngọ, Mão, Dậu -> Tỵ
         }
         else
         {
@@ -366,9 +366,9 @@ public class SecondaryStarPlacementService : IStarPlacementService
             5 => 4,    // Mậu -> Mão
             6 => 3,    // Kỷ -> Dần
             7 => 7,    // Canh -> Ngọ
-            8 => 6,    // Tân -> Tị
+            8 => 6,    // Tân -> Tỵ
             9 => 7,    // Nhâm -> Ngọ
-            10 => 6,   // Quý -> Tị
+            10 => 6,   // Quý -> Tỵ
             _ => 1
         };
         positions[thienPhucPos].Add(99);

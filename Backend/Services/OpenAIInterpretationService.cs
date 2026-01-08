@@ -373,7 +373,7 @@ Phong cách: Chuyên nghiệp nhưng gần gũi, tận tâm như thầy hướng
 
         private string GetBranchName(int palaceId)
         {
-            var branches = new[] { "Tý", "Sửu", "Dần", "Mão", "Thìn", "Tị", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi" };
+            var branches = new[] { "Tý", "Sửu", "Dần", "Mão", "Thìn", "Tỵ", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi" };
             return branches[palaceId - 1];
         }
 

@@ -18,14 +18,14 @@ public class LuuLocTonStarPlacementService : IStarPlacementService
         int yearCan = _branchStemService.GetYearCan(context.ViewYear);
 
         // Lưu Lộc Tồn an giống Lộc Tồn nhưng theo Can năm xem hạn
-        // Giáp-Kỷ=Dần, Ất-Canh=Mão, Bính-Tân=Tỵ, Đinh-Nhâm=Ngọ, Mậu=Tị, Quý=Tý
+        // Giáp-Kỷ=Dần, Ất-Canh=Mão, Bính-Tân=Tỵ, Đinh-Nhâm=Ngọ, Mậu=Tỵ, Quý=Tý
         int luuLocTonPos = yearCan switch
         {
             1 => 3,    // Giáp -> Dần
             2 => 4,    // Ất -> Mão
             3 => 6,    // Bính -> Tỵ
             4 => 7,    // Đinh -> Ngọ
-            5 => 6,    // Mậu -> Tị
+            5 => 6,    // Mậu -> Tỵ
             6 => 7,    // Kỷ -> Ngọ
             7 => 9,    // Canh -> Thân
             8 => 10,   // Tân -> Dậu

@@ -19,7 +19,7 @@ public class ThienQuanStarPlacementService : IStarPlacementService
         {
             1 => 8,    // Giáp: Mùi
             2 => 5,   // Ất: Thìn
-            3 => 6,   // Bính: Tị
+            3 => 6,   // Bính: Tỵ
             4 => 3,    // Đinh: Dần
             5 => 4,    // Mậu: Mão
             6 => 10,   // Kỷ: Dậu

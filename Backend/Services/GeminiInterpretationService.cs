@@ -331,7 +331,7 @@ NGUYÊN TẮC LUẬN ĐOÁN TỬ VI - QUAN TRỌNG:
    ⚠️ Phải phân tích đầy đủ 4 cung (bản cung + 3 cung tam phương) mới có luận đoán chính xác
 
 2. NHỊ HỢP (ĐẶC BIỆT quan trọng cho cung Mệnh & Thân):
-   - Cặp đôi địa chi hợp khí theo ngũ hành (Tý-Sửu, Dần-Hợi, Mão-Tuất, Thìn-Dậu, Tị-Thân, Ngọ-Mùi)
+   - Cặp đôi địa chi hợp khí theo ngũ hành (Tý-Sửu, Dần-Hợi, Mão-Tuất, Thìn-Dậu, Tỵ-Thân, Ngọ-Mùi)
    - Ảnh hưởng đến bản chất sâu xa, vận khí tổng thể
    - Đối với Mệnh và Thân: PHẢI xét nhị hợp để hiểu đầy đủ cục diện
    - Đối với các cung khác: Không cần thiết phải xét nhị hợp
