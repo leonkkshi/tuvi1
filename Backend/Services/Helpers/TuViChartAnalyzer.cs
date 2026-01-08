@@ -165,6 +165,14 @@ namespace Backend.Services.Helpers
         /// </summary>
         public static string BuildPalaceAnalysis(PalaceStar palace, TuViChart chart, bool includeNhiHop = false)
         {
+            return BuildPalaceAnalysis(palace, chart, includeNhiHop, includeNhiHop);
+        }
+
+        /// <summary>
+        /// Xây dựng thông tin đầy đủ về một cung với điều khiển riêng cho nhị hợp và giáp cung
+        /// </summary>
+        public static string BuildPalaceAnalysis(PalaceStar palace, TuViChart chart, bool includeNhiHop, bool includeGiapCung)
+        {
             var sb = new System.Text.StringBuilder();
             
             sb.AppendLine($"【{palace.PalaceName}】 (Vị trí: {GetBranchName(palace.PalaceId)})");
@@ -200,13 +208,17 @@ namespace Backend.Services.Helpers
             sb.AppendLine($"    - Tam hợp trái ({tamPhuong.TamHopTrai.Name} - {tamPhuong.TamHopTrai.Branch}): {FormatStarList(tamPhuong.TamHopTrai.Stars)}");
             sb.AppendLine($"    - Tam hợp phải ({tamPhuong.TamHopPhai.Name} - {tamPhuong.TamHopPhai.Branch}): {FormatStarList(tamPhuong.TamHopPhai.Stars)}");
 
-            // Nhị hợp và cung liền kề (chỉ cho Mệnh và Thân)
+            // Nhị hợp (chỉ cho Mệnh và Thân)
             if (includeNhiHop)
             {
                 var nhiHop = GetNhiHop(palace.PalaceId, chart);
                 sb.AppendLine($"\n  Nhị hợp (cặp đôi hợp khí):");
                 sb.AppendLine($"    - Cung hợp ({nhiHop.CungHop.Name} - {nhiHop.CungHop.Branch}): {FormatStarList(nhiHop.CungHop.Stars)}");
-                
+            }
+
+            // Cung liền kề (giáp cung)
+            if (includeGiapCung)
+            {
                 var lienKe = GetCungLienKe(palace.PalaceId, chart);
                 sb.AppendLine($"\n  Cung liền kề (2 bên):");
                 sb.AppendLine($"    - Cung trước ({lienKe.CungTruoc.Name} - {lienKe.CungTruoc.Branch}): {FormatStarList(lienKe.CungTruoc.Stars)}");

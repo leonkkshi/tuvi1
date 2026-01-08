@@ -250,9 +250,9 @@ namespace Backend.Services
             sb.AppendLine($"{palaceInfo.Icon} {palaceInfo.Meaning}");
             sb.AppendLine();
 
-            // Chỉ Mệnh và Thân cần xét nhị hợp
+            // Nhị hợp chỉ cho Mệnh và Thân, nhưng giáp cung cho TẤT CẢ các cung khi luận riêng
             bool isMenhOrThan = palace.PalaceName == "Mệnh" || palace.PalaceId == chart.ThanPalace;
-            sb.AppendLine(TuViChartAnalyzer.BuildPalaceAnalysis(palace, chart, includeNhiHop: isMenhOrThan));
+            sb.AppendLine(TuViChartAnalyzer.BuildPalaceAnalysis(palace, chart, includeNhiHop: isMenhOrThan, includeGiapCung: true));
             
             sb.AppendLine();
             sb.AppendLine("=== YÊU CẦU LUẬN GIẢI ===");

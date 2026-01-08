@@ -207,7 +207,7 @@ Phong cách: Chuyên nghiệp nhưng gần gũi, tận tâm như thầy hướng
                 {
                     var nhiHop = GetNhiHop(palace.PalaceId, chart);
                     sb.AppendLine($"\n  Nhị hợp (cặp đôi hợp khí):");
-                    sb.AppendLine($"    - Cung hợp ({nhiHop.CungTruoc.Name}): {FormatStarList(nhiHop.CungTruoc.Stars)}");
+                    sb.AppendLine($"    - Cung hợp ({nhiHop.CungHop.Name}): {FormatStarList(nhiHop.CungHop.Stars)}");
                     
                     var lienKe = GetCungLienKe(palace.PalaceId, chart);
                     sb.AppendLine($"\n  Cung liền kề (2 bên):");
@@ -321,8 +321,7 @@ Phong cách: Chuyên nghiệp nhưng gần gũi, tận tâm như thầy hướng
 
             return new NhiHop
             {
-                CungTruoc = new CungInfo { Name = nhiHopCung?.PalaceName ?? "", Stars = nhiHopCung?.Stars ?? new List<StarInPalace>() },
-                CungSau = new CungInfo { Name = "", Stars = new List<StarInPalace>() } // Chỉ có 1 cung nhị hợp
+                CungHop = new CungInfo { Name = nhiHopCung?.PalaceName ?? "", Stars = nhiHopCung?.Stars ?? new List<StarInPalace>() }
             };
         }
 
@@ -368,8 +367,7 @@ Phong cách: Chuyên nghiệp nhưng gần gũi, tận tâm như thầy hướng
 
         private class NhiHop
         {
-            public CungInfo CungTruoc { get; set; } = new();
-            public CungInfo CungSau { get; set; } = new();
+            public CungInfo CungHop { get; set; } = new();
         }
 
         private class CungLienKe
