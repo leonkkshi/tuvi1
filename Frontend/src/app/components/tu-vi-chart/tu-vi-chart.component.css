@@ -780,6 +780,24 @@
     box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
+.provider-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.provider-badge {
+    font-weight: 600;
+    color: #2e7d32;
+    font-size: 1rem;
+}
+
+.provider-desc {
+    color: #666;
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
 .api-key-help {
     margin-top: 6px;
 }

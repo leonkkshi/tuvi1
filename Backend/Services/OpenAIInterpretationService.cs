@@ -30,42 +30,12 @@ namespace Backend.Services
 
         public async Task<InterpretationResponse> InterpretChartAsync(InterpretationRequest request, string apiKey, string provider)
         {
-            if (provider != "OpenAI")
-            {
-                throw new ArgumentException("This service only supports OpenAI provider");
-            }
-
-            // Tạo cache key từ request
-            var cacheKey = $"openai_chart_{request.Chart.GetHashCode()}_vi";
-            
-            // Kiểm tra cache trước
-            if (_cache.TryGetValue(cacheKey, out InterpretationResponse cachedResponse))
-            {
-                _logger.LogInformation("Cache hit for OpenAI chart interpretation");
-                return cachedResponse;
-            }
-
-            // Sử dụng throttler để giới hạn concurrent requests
-            var result = await _throttler.ExecuteAsync(async () =>
-            {
-                return await ExecuteInterpretationAsync(request, apiKey);
-            });
-
-            // Cache kết quả trong 6 giờ (tăng để giảm tải AI)
-            _cache.Set(cacheKey, result, TimeSpan.FromHours(6));
-            _logger.LogInformation("Cached new OpenAI chart interpretation result");
-
-            return result;
+            throw new NotImplementedException("OpenAI service is no longer supported. Please use Gemini.");
         }
 
         public async Task<string> InterpretSinglePalaceAsync(TuViChart chart, string palaceName, string apiKey, string provider)
         {
-            if (provider != "OpenAI")
-            {
-                throw new ArgumentException("This service only supports OpenAI provider");
-            }
-
-            throw new NotImplementedException("Single palace interpretation is not implemented for OpenAI service. Please use Gemini.");
+            throw new NotImplementedException("OpenAI service is no longer supported. Please use Gemini.");
         }
 
         private async Task<InterpretationResponse> ExecuteInterpretationAsync(InterpretationRequest request, string apiKey)

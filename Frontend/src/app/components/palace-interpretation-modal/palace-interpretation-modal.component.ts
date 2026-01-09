@@ -16,7 +16,7 @@ export class PalaceInterpretationModalComponent implements OnChanges {
   @Input() isOpen: boolean = false;
   @Input() cachedInterpretation: PalaceInterpretationResult | null = null;
   @Input() apiKey: string = '';
-  @Input() provider: 'Gemini' | 'OpenAI' = 'Gemini';
+  @Input() provider: 'Gemini' = 'Gemini';
   @Output() close = new EventEmitter<void>();
   @Output() interpretationLoaded = new EventEmitter<PalaceInterpretationResult>();
 

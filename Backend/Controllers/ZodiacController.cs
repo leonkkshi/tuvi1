@@ -74,10 +74,9 @@ namespace Backend.Controllers
                     return BadRequest(new { error = "API key không được để trống" });
                 }
 
-                if (string.IsNullOrWhiteSpace(request.Provider) || 
-                    (request.Provider != "Gemini" && request.Provider != "OpenAI"))
+                if (string.IsNullOrWhiteSpace(request.Provider) || request.Provider != "Gemini")
                 {
-                    return BadRequest(new { error = "Provider phải là 'Gemini' hoặc 'OpenAI'" });
+                    return BadRequest(new { error = "Chỉ hỗ trợ Gemini provider" });
                 }
 
                 var requestId = _asyncQueue.EnqueueRequest(request);
@@ -132,10 +131,9 @@ namespace Backend.Controllers
                     return BadRequest(new { error = "API key không được để trống" });
                 }
 
-                if (string.IsNullOrWhiteSpace(request.Provider) || 
-                    (request.Provider != "Gemini" && request.Provider != "OpenAI"))
+                if (string.IsNullOrWhiteSpace(request.Provider) || request.Provider != "Gemini")
                 {
-                    return BadRequest(new { error = "Provider phải là 'Gemini' hoặc 'OpenAI'" });
+                    return BadRequest(new { error = "Chỉ hỗ trợ Gemini provider" });
                 }
 
                 var requestId = _asyncQueue.EnqueuePalaceRequest(request.Chart, request.PalaceName, request.ApiKey, request.Provider);

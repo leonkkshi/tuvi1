@@ -23,7 +23,7 @@ export class TuViChartComponent implements OnChanges {
   interpretationError = '';
   focusArea = 'general';
   apiKey = '';
-  provider: 'Gemini' | 'OpenAI' = 'Gemini';
+  provider: 'Gemini' = 'Gemini';
 
   // Palace interpretation modal
   selectedPalace: PalaceStar | null = null;

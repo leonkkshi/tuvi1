@@ -4,7 +4,7 @@ export interface InterpretationRequest {
   chart: TuViChart;
   focusArea: string; // 'general' | 'career' | 'love' | 'health' | 'wealth'
   apiKey: string;
-  provider: 'Gemini' | 'OpenAI';
+  provider: 'Gemini';
 }
 
 export interface InterpretationResponse {

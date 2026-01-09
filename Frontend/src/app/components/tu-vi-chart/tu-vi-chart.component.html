@@ -197,12 +197,10 @@
     
     <div class="interpretation-controls">
       <div class="control-group">
-        <label for="provider">Chọn AI Provider:</label>
-        <div class="select-wrapper">
-          <select id="provider" [(ngModel)]="provider">
-            <option value="Gemini">🤖 Google Gemini</option>
-            <option value="OpenAI">🧠 OpenAI GPT</option>
-          </select>
+        <label for="provider">AI Provider:</label>
+        <div class="provider-info">
+          <span class="provider-badge">🤖 Google Gemini 2.5 Flash</span>
+          <span class="provider-desc">Model AI tiên tiến nhất</span>
         </div>
       </div>
 
@@ -219,8 +217,7 @@
         <div class="api-key-help">
           <small class="help-text">
             🔑 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" class="help-link">Lấy API key Gemini</a> 
-            hoặc <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" class="help-link">OpenAI</a> 
-            (miễn phí)
+            (miễn phí với hạn mức sử dụng)
           </small>
         </div>
       </div>
