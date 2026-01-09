@@ -55,7 +55,7 @@ namespace Backend.Services
         {
             // Kiểm tra queue size limit
             var totalQueueSize = _chartQueue.Count + _palaceQueue.Count;
-            if (totalQueueSize >= 200) // Max queue size from config
+            if (totalQueueSize >= 500) // Max queue size from config
             {
                 _logger.LogWarning("Queue is full. Current size: {QueueSize}", totalQueueSize);
                 throw new InvalidOperationException("Hàng đợi đã đầy. Vui lòng thử lại sau.");
@@ -81,7 +81,7 @@ namespace Backend.Services
         {
             // Kiểm tra queue size limit
             var totalQueueSize = _chartQueue.Count + _palaceQueue.Count;
-            if (totalQueueSize >= 200) // Max queue size from config
+            if (totalQueueSize >= 500) // Max queue size from config
             {
                 _logger.LogWarning("Queue is full. Current size: {QueueSize}", totalQueueSize);
                 throw new InvalidOperationException("Hàng đợi đã đầy. Vui lòng thử lại sau.");

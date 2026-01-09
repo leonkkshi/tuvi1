@@ -21,8 +21,8 @@ namespace Backend.Services
 
         public AIRequestThrottler(IConfiguration configuration, ILogger<AIRequestThrottler> logger)
         {
-            // Giới hạn số lượng concurrent AI requests (default: 3)
-            var maxConcurrent = configuration.GetValue<int>("AI:MaxConcurrentRequests", 3);
+            // Giới hạn số lượng concurrent AI requests (default: 15)
+            var maxConcurrent = configuration.GetValue<int>("AI:MaxConcurrentRequests", 15);
             _semaphore = new SemaphoreSlim(maxConcurrent, maxConcurrent);
             _logger = logger;
             _activeRequests = new ConcurrentDictionary<string, DateTime>();
@@ -35,8 +35,8 @@ namespace Backend.Services
             var requestId = Guid.NewGuid().ToString();
             Interlocked.Increment(ref _totalRequests);
 
-            // Timeout nếu chờ quá 120 giây (tăng lên cho AI xử lý)
-            var waitTimeout = TimeSpan.FromSeconds(120);
+            // Timeout nếu chờ quá 300 giây (tăng lên cho AI xử lý)
+            var waitTimeout = TimeSpan.FromSeconds(300);
             var waitSuccess = await _semaphore.WaitAsync(waitTimeout, cancellationToken);
 
             if (!waitSuccess)

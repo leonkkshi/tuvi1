@@ -25,10 +25,10 @@ builder.WebHost.ConfigureKestrel(options =>
 // Add Rate Limiting để bảo vệ AI endpoints
 builder.Services.AddRateLimiter(options =>
 {
-    // Policy cho AI endpoints: tối đa 20 requests/phút mỗi IP
+    // Policy cho AI endpoints: tối đa 50 requests/phút mỗi IP
     options.AddFixedWindowLimiter("ai-limit", opt =>
     {
-        opt.PermitLimit = 20;
+        opt.PermitLimit = 50;
         opt.Window = TimeSpan.FromMinutes(1);
         opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
         opt.QueueLimit = 10; // Queue thêm 10 requests
@@ -37,17 +37,17 @@ builder.Services.AddRateLimiter(options =>
     // Sliding window limiter cho AI để tránh spike
     options.AddSlidingWindowLimiter("ai-sliding", opt =>
     {
-        opt.PermitLimit = 100; // Tăng từ 50 lên 100 requests/phút
+        opt.PermitLimit = 200; // Tăng từ 100 lên 200 requests/phút
         opt.Window = TimeSpan.FromMinutes(1);
         opt.SegmentsPerWindow = 4; // 15 giây mỗi segment
         opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
         opt.QueueLimit = 50; // Tăng queue
     });
     
-    // Policy chung: 200 requests/phút (tăng từ 100)
+    // Policy chung: 500 requests/phút (tăng từ 200)
     options.AddFixedWindowLimiter("general", opt =>
     {
-        opt.PermitLimit = 200;
+        opt.PermitLimit = 500;
         opt.Window = TimeSpan.FromMinutes(1);
         opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
         opt.QueueLimit = 50; // Tăng queue
@@ -62,7 +62,7 @@ builder.Services.AddHttpClient().ConfigureHttpClientDefaults(http =>
     // Timeout để tránh requests bị treo lâu chiếm memory
     http.ConfigureHttpClient(client =>
     {
-        client.Timeout = TimeSpan.FromSeconds(120); // 2 phút timeout
+        client.Timeout = TimeSpan.FromSeconds(300); // 5 phút timeout
     });
 });
 

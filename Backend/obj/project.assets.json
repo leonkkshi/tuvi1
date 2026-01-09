@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\tuvi\\Backend\\Backend.csproj",
+      "projectUniqueName": "C:\\tuvi1\\Backend\\Backend.csproj",
       "projectName": "Backend",
-      "projectPath": "C:\\tuvi\\Backend\\Backend.csproj",
+      "projectPath": "C:\\tuvi1\\Backend\\Backend.csproj",
       "packagesPath": "C:\\Users\\tungu\\.nuget\\packages\\",
-      "outputPath": "C:\\tuvi\\Backend\\obj\\",
+      "outputPath": "C:\\tuvi1\\Backend\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
