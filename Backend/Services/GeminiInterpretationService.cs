@@ -353,6 +353,7 @@ NGUYÊN TẮC LUẬN ĐOÁN TỬ VI - QUAN TRỌNG:
    - Sao chính tinh: Xương cốt cung, quyết định bản chất
    - Sao phụ tinh: Tăng giảm cát hung, biến hóa ý nghĩa
    - Sao Hóa (Lộc, Quyền, Khoa, Kỵ): Rất quan trọng, thay đổi cục diện
+   - Chú ý cả vòng thái tuế
    - Độ sáng sao: Sao sáng (Miếu, Vượng) mạnh, sao tối (Hãm, Bình) yếu
 
 5. QUY TẮC TỔNG HỢP:
