@@ -213,7 +213,7 @@ Phong cách: Chuyên nghiệp nhưng gần gũi, tận tâm như thầy hướng
 
             sb.AppendLine();
             sb.AppendLine("=== YÊU CẦU LUẬN GIẢI CHI TIẾT ===");
-            sb.AppendLine($"Lĩnh vực tập trung: {GetFocusAreaName(request.FocusArea)}");
+   
             sb.AppendLine();
             sb.AppendLine("QUAN TRỌNG - Phương pháp luận giải theo Tử Vi Đẩu Số chính thống:");
             sb.AppendLine();

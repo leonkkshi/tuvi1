@@ -21,7 +21,6 @@ export class TuViChartComponent implements OnChanges {
   interpretation: InterpretationResponse | null = null;
   isLoadingInterpretation = false;
   interpretationError = '';
-  focusArea = 'general';
   apiKey = '';
   provider: 'Gemini' = 'Gemini';
 
@@ -454,7 +453,6 @@ export class TuViChartComponent implements OnChanges {
 
     this.tuViService.interpretChart({
       chart: this.chart,
-      focusArea: this.focusArea,
       apiKey: this.apiKey.trim(),
       provider: this.provider
     }).subscribe({
@@ -494,10 +492,6 @@ export class TuViChartComponent implements OnChanges {
         this.isLoadingInterpretation = false;
       }
     });
-  }
-
-  onFocusAreaChange(event: any): void {
-    this.focusArea = event.target.value;
   }
 
   // Parse markdown text thành HTML

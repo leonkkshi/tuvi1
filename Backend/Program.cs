@@ -62,7 +62,7 @@ builder.Services.AddHttpClient().ConfigureHttpClientDefaults(http =>
     // Timeout để tránh requests bị treo lâu chiếm memory
     http.ConfigureHttpClient(client =>
     {
-        client.Timeout = TimeSpan.FromSeconds(300); // 5 phút timeout
+        client.Timeout = TimeSpan.FromSeconds(600); // 10 phút timeout
     });
 });
 

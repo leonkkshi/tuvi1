@@ -507,18 +507,6 @@ Phong cách: Chuyên nghiệp nhưng gần gũi, tận tâm như thầy hướng
             };
         }
 
-        private string GetFocusAreaName(string focusArea)
-        {
-            return focusArea.ToLower() switch
-            {
-                "career" => "Sự nghiệp",
-                "love" => "Tình duyên",
-                "health" => "Sức khỏe",
-                "wealth" => "Tài lộc",
-                _ => "Tổng quan"
-            };
-        }
-
         private InterpretationResponse ParseAIResponse(string aiResponse, TuViChart chart)
         {
             var response = new InterpretationResponse

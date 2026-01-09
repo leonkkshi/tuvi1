@@ -35,8 +35,8 @@ namespace Backend.Services
             var requestId = Guid.NewGuid().ToString();
             Interlocked.Increment(ref _totalRequests);
 
-            // Timeout nếu chờ quá 300 giây (tăng lên cho AI xử lý)
-            var waitTimeout = TimeSpan.FromSeconds(300);
+            // Timeout nếu chờ quá 600 giây (tăng lên cho AI xử lý)
+            var waitTimeout = TimeSpan.FromSeconds(600);
             var waitSuccess = await _semaphore.WaitAsync(waitTimeout, cancellationToken);
 
             if (!waitSuccess)
