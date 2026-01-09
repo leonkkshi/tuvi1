@@ -761,6 +761,53 @@
     cursor: pointer;
 }
 
+.input-wrapper {
+    display: flex;
+}
+
+.api-key-input {
+    padding: 10px 15px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    min-width: 200px;
+    background-color: #fff;
+}
+
+.api-key-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.api-key-help {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.help-link {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.help-link:hover {
+    text-decoration: underline;
+}
+
+.help-text {
+    color: #666;
+    font-size: 0.8rem;
+}
+
+.help-separator {
+    color: #ccc;
+    margin: 0 4px;
+}
+
 .btn-interpret {
     padding: 10px 25px;
     background: linear-gradient(135deg, #b30000 0%, #800000 100%);

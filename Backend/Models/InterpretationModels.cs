@@ -5,6 +5,8 @@ namespace Backend.Models
     {
         public TuViChart Chart { get; set; } = null!;
         public string FocusArea { get; set; } = "general"; // general, career, love, health, wealth
+        public string ApiKey { get; set; } = string.Empty;
+        public string Provider { get; set; } = "Gemini"; // Gemini or OpenAI
     }
 
     // Response từ AI

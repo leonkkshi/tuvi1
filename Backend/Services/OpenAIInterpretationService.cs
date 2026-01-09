@@ -9,7 +9,6 @@ namespace Backend.Services
     public class OpenAIInterpretationService : IAIInterpretationService
     {
         private readonly HttpClient _httpClient;
-        private readonly string _apiKey;
         private readonly string _model;
         private readonly ILogger<OpenAIInterpretationService> _logger;
         private readonly IAIRequestThrottler _throttler;
@@ -23,17 +22,19 @@ namespace Backend.Services
             IMemoryCache cache)
         {
             _httpClient = httpClientFactory.CreateClient();
-            _apiKey = configuration["OpenAI:ApiKey"] ?? throw new InvalidOperationException("OpenAI API key không được cấu hình");
             _model = configuration["OpenAI:Model"] ?? "gpt-4";
             _logger = logger;
             _throttler = throttler;
             _cache = cache;
-            
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
         }
 
-        public async Task<InterpretationResponse> InterpretChartAsync(InterpretationRequest request)
+        public async Task<InterpretationResponse> InterpretChartAsync(InterpretationRequest request, string apiKey, string provider)
         {
+            if (provider != "OpenAI")
+            {
+                throw new ArgumentException("This service only supports OpenAI provider");
+            }
+
             // Tạo cache key từ request
             var cacheKey = $"openai_chart_{request.Chart.GetHashCode()}_vi";
             
@@ -47,7 +48,7 @@ namespace Backend.Services
             // Sử dụng throttler để giới hạn concurrent requests
             var result = await _throttler.ExecuteAsync(async () =>
             {
-                return await ExecuteInterpretationAsync(request);
+                return await ExecuteInterpretationAsync(request, apiKey);
             });
 
             // Cache kết quả trong 6 giờ (tăng để giảm tải AI)
@@ -57,16 +58,17 @@ namespace Backend.Services
             return result;
         }
 
-        public async Task<string> InterpretSinglePalaceAsync(TuViChart chart, string palaceName)
+        public async Task<string> InterpretSinglePalaceAsync(TuViChart chart, string palaceName, string apiKey, string provider)
         {
-            // Sử dụng throttler để giới hạn concurrent requests
-            return await _throttler.ExecuteAsync(async () =>
+            if (provider != "OpenAI")
             {
-                return await Task.FromResult($"Luận giải cung {palaceName} chưa được implement cho OpenAI service. Vui lòng sử dụng Gemini service.");
-            });
+                throw new ArgumentException("This service only supports OpenAI provider");
+            }
+
+            throw new NotImplementedException("Single palace interpretation is not implemented for OpenAI service. Please use Gemini.");
         }
 
-        private async Task<InterpretationResponse> ExecuteInterpretationAsync(InterpretationRequest request)
+        private async Task<InterpretationResponse> ExecuteInterpretationAsync(InterpretationRequest request, string apiKey)
         {
             try
             {
@@ -137,6 +139,9 @@ Phong cách: Chuyên nghiệp nhưng gần gũi, tận tâm như thầy hướng
 
                 var json = JsonSerializer.Serialize(chatRequest);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                // Set authorization header with provided API key
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
 
                 var response = await _httpClient.PostAsync("https://api.openai.com/v1/chat/completions", content);
                 response.EnsureSuccessStatusCode();

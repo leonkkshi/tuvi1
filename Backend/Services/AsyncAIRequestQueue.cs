@@ -10,7 +10,7 @@ namespace Backend.Services
     public interface IAsyncAIRequestQueue
     {
         string EnqueueRequest(InterpretationRequest request);
-        string EnqueuePalaceRequest(TuViChart chart, string palaceName);
+        string EnqueuePalaceRequest(TuViChart chart, string palaceName, string apiKey, string provider);
         AIRequestStatus GetRequestStatus(string requestId);
         InterpretationResponse? GetResult(string requestId);
         PalaceInterpretationResult? GetPalaceResult(string requestId);
@@ -23,7 +23,7 @@ namespace Backend.Services
         private readonly ConcurrentDictionary<string, InterpretationResponse> _chartResults;
         private readonly ConcurrentDictionary<string, PalaceInterpretationResult> _palaceResults;
         private readonly ConcurrentQueue<(string requestId, InterpretationRequest request)> _chartQueue;
-        private readonly ConcurrentQueue<(string requestId, TuViChart chart, string palaceName)> _palaceQueue;
+        private readonly ConcurrentQueue<(string requestId, TuViChart chart, string palaceName, string apiKey, string provider)> _palaceQueue;
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly ILogger<AsyncAIRequestQueue> _logger;
         private readonly IAIRequestThrottler _throttler;
@@ -42,7 +42,7 @@ namespace Backend.Services
             _chartResults = new ConcurrentDictionary<string, InterpretationResponse>();
             _palaceResults = new ConcurrentDictionary<string, PalaceInterpretationResult>();
             _chartQueue = new ConcurrentQueue<(string, InterpretationRequest)>();
-            _palaceQueue = new ConcurrentQueue<(string, TuViChart, string)>();
+            _palaceQueue = new ConcurrentQueue<(string requestId, TuViChart chart, string palaceName, string apiKey, string provider)>();
             _cancellationTokenSource = new CancellationTokenSource();
 
             // Start background processing
@@ -77,7 +77,7 @@ namespace Backend.Services
             return requestId;
         }
 
-        public string EnqueuePalaceRequest(TuViChart chart, string palaceName)
+        public string EnqueuePalaceRequest(TuViChart chart, string palaceName, string apiKey, string provider)
         {
             // Kiểm tra queue size limit
             var totalQueueSize = _chartQueue.Count + _palaceQueue.Count;
@@ -97,7 +97,7 @@ namespace Backend.Services
                 PalaceName = palaceName
             };
             
-            _palaceQueue.Enqueue((requestId, chart, palaceName));
+            _palaceQueue.Enqueue((requestId, chart, palaceName, apiKey, provider));
             _logger.LogInformation("Palace request {RequestId} for {PalaceName} queued. Queue size: {QueueSize}", 
                 requestId, palaceName, _chartQueue.Count + _palaceQueue.Count);
             
@@ -162,7 +162,7 @@ namespace Backend.Services
                     // Process palace requests
                     else if (_palaceQueue.TryDequeue(out var palaceItem))
                     {
-                        await ProcessPalaceRequestAsync(palaceItem.requestId, palaceItem.chart, palaceItem.palaceName);
+                        await ProcessPalaceRequestAsync(palaceItem.requestId, palaceItem.chart, palaceItem.palaceName, palaceItem.apiKey, palaceItem.provider);
                     }
                     else
                     {
@@ -208,7 +208,7 @@ namespace Backend.Services
                 // Execute AI request with throttling
                 var result = await _throttler.ExecuteAsync(async () =>
                 {
-                    return await aiService.InterpretChartAsync(request);
+                    return await aiService.InterpretChartAsync(request, request.ApiKey, request.Provider);
                 });
 
                 // Store result
@@ -237,7 +237,7 @@ namespace Backend.Services
             }
         }
 
-        private async Task ProcessPalaceRequestAsync(string requestId, TuViChart chart, string palaceName)
+        private async Task ProcessPalaceRequestAsync(string requestId, TuViChart chart, string palaceName, string apiKey, string provider)
         {
             try
             {
@@ -257,7 +257,7 @@ namespace Backend.Services
                 // Execute AI request with throttling
                 var interpretation = await _throttler.ExecuteAsync(async () =>
                 {
-                    return await aiService.InterpretSinglePalaceAsync(chart, palaceName);
+                    return await aiService.InterpretSinglePalaceAsync(chart, palaceName, apiKey, provider);
                 });
 
                 // Store result

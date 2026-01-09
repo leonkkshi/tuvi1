@@ -29,10 +29,12 @@ export class TuViService {
     return this.http.post<InterpretationResponse>(`${this.apiUrl}/ai-interpret`, request);
   }
 
-  interpretPalace(chart: TuViChart, palaceName: string): Observable<PalaceInterpretationResult> {
+  interpretPalace(chart: TuViChart, palaceName: string, apiKey: string, provider: 'Gemini' | 'OpenAI'): Observable<PalaceInterpretationResult> {
     return this.http.post<PalaceInterpretationResult>(`${this.apiUrl}/ai-interpret-palace`, {
       Chart: chart,
-      PalaceName: palaceName
+      PalaceName: palaceName,
+      ApiKey: apiKey,
+      Provider: provider
     });
   }
 }

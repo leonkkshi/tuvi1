@@ -69,6 +69,17 @@ namespace Backend.Controllers
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(request.ApiKey))
+                {
+                    return BadRequest(new { error = "API key không được để trống" });
+                }
+
+                if (string.IsNullOrWhiteSpace(request.Provider) || 
+                    (request.Provider != "Gemini" && request.Provider != "OpenAI"))
+                {
+                    return BadRequest(new { error = "Provider phải là 'Gemini' hoặc 'OpenAI'" });
+                }
+
                 var requestId = _asyncQueue.EnqueueRequest(request);
                 return Ok(new
                 {
@@ -116,7 +127,18 @@ namespace Backend.Controllers
                     return BadRequest(new { error = "Thông tin lá số hoặc tên cung không hợp lệ" });
                 }
 
-                var requestId = _asyncQueue.EnqueuePalaceRequest(request.Chart, request.PalaceName);
+                if (string.IsNullOrWhiteSpace(request.ApiKey))
+                {
+                    return BadRequest(new { error = "API key không được để trống" });
+                }
+
+                if (string.IsNullOrWhiteSpace(request.Provider) || 
+                    (request.Provider != "Gemini" && request.Provider != "OpenAI"))
+                {
+                    return BadRequest(new { error = "Provider phải là 'Gemini' hoặc 'OpenAI'" });
+                }
+
+                var requestId = _asyncQueue.EnqueuePalaceRequest(request.Chart, request.PalaceName, request.ApiKey, request.Provider);
                 return Ok(new
                 {
                     requestId,
@@ -297,7 +319,7 @@ namespace Backend.Controllers
             {
                 var startTime = DateTime.UtcNow;
                 
-                var interpretation = await _aiInterpretationService.InterpretChartAsync(request);
+                var interpretation = await _aiInterpretationService.InterpretChartAsync(request, request.ApiKey, request.Provider);
                 
                 var duration = (DateTime.UtcNow - startTime).TotalMilliseconds;
                 // Log performance để monitor
@@ -330,7 +352,9 @@ namespace Backend.Controllers
                 // Đối với Mệnh và Thân thì có thêm nhị hợp
                 var interpretation = await _aiInterpretationService.InterpretSinglePalaceAsync(
                     request.Chart, 
-                    request.PalaceName);
+                    request.PalaceName,
+                    request.ApiKey,
+                    request.Provider);
                 
                 var result = new PalaceInterpretationResult
                 {
@@ -397,6 +421,8 @@ namespace Backend.Controllers
     {
         public TuViChart Chart { get; set; } = null!;
         public string PalaceName { get; set; } = string.Empty;
+        public string ApiKey { get; set; } = string.Empty;
+        public string Provider { get; set; } = "Gemini"; // Gemini or OpenAI
     }
 
     public class PalaceInterpretationResult

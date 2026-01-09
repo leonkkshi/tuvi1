@@ -22,6 +22,8 @@ export class TuViChartComponent implements OnChanges {
   isLoadingInterpretation = false;
   interpretationError = '';
   focusArea = 'general';
+  apiKey = '';
+  provider: 'Gemini' | 'OpenAI' = 'Gemini';
 
   // Palace interpretation modal
   selectedPalace: PalaceStar | null = null;
@@ -452,7 +454,9 @@ export class TuViChartComponent implements OnChanges {
 
     this.tuViService.interpretChart({
       chart: this.chart,
-      focusArea: this.focusArea
+      focusArea: this.focusArea,
+      apiKey: this.apiKey.trim(),
+      provider: this.provider
     }).subscribe({
       next: (response) => {
         this.interpretation = response;

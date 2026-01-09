@@ -10,7 +10,6 @@ namespace Backend.Services
     public class GeminiInterpretationService : IAIInterpretationService
     {
         private readonly HttpClient _httpClient;
-        private readonly string _apiKey;
         private readonly string _model;
         private readonly ILogger<GeminiInterpretationService> _logger;
         private readonly IAIRequestThrottler _throttler;
@@ -24,15 +23,19 @@ namespace Backend.Services
             IMemoryCache cache)
         {
             _httpClient = httpClientFactory.CreateClient();
-            _apiKey = configuration["Gemini:ApiKey"] ?? throw new InvalidOperationException("Gemini API key không được cấu hình");
-            _model = configuration["Gemini:Model"] ?? "gemini-pro";
+            _model = configuration["Gemini:Model"] ?? "gemini-2.5-flash";
             _logger = logger;
             _throttler = throttler;
             _cache = cache;
         }
 
-        public async Task<InterpretationResponse> InterpretChartAsync(InterpretationRequest request)
+        public async Task<InterpretationResponse> InterpretChartAsync(InterpretationRequest request, string apiKey, string provider)
         {
+            if (provider != "Gemini")
+            {
+                throw new ArgumentException("This service only supports Gemini provider");
+            }
+
             // Tạo cache key từ request
             var cacheKey = $"gemini_chart_{request.Chart.GetHashCode()}_vi";
             
@@ -46,7 +49,7 @@ namespace Backend.Services
             // Sử dụng throttler để giới hạn concurrent requests
             var result = await _throttler.ExecuteAsync(async () =>
             {
-                return await ExecuteInterpretationAsync(request);
+                return await ExecuteInterpretationAsync(request, apiKey);
             });
 
             // Cache kết quả trong 6 giờ (tăng để giảm tải AI)
@@ -56,8 +59,13 @@ namespace Backend.Services
             return result;
         }
 
-        public async Task<string> InterpretSinglePalaceAsync(TuViChart chart, string palaceName)
+        public async Task<string> InterpretSinglePalaceAsync(TuViChart chart, string palaceName, string apiKey, string provider)
         {
+            if (provider != "Gemini")
+            {
+                throw new ArgumentException("This service only supports Gemini provider");
+            }
+
             // Tạo cache key từ chart và palace
             var cacheKey = $"gemini_palace_{chart.GetHashCode()}_{palaceName}";
             
@@ -71,7 +79,7 @@ namespace Backend.Services
             // Sử dụng throttler để giới hạn concurrent requests
             var result = await _throttler.ExecuteAsync(async () =>
             {
-                return await ExecuteSinglePalaceInterpretationAsync(chart, palaceName);
+                return await ExecuteSinglePalaceInterpretationAsync(chart, palaceName, apiKey);
             });
 
             // Cache kết quả trong 6 giờ (tăng để giảm tải AI)
@@ -81,7 +89,7 @@ namespace Backend.Services
             return result;
         }
 
-        private async Task<InterpretationResponse> ExecuteInterpretationAsync(InterpretationRequest request)
+        private async Task<InterpretationResponse> ExecuteInterpretationAsync(InterpretationRequest request, string apiKey)
         {
             try
             {
@@ -124,7 +132,7 @@ namespace Backend.Services
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
                 // API từ AI Studio cần dùng v1beta
-                var url = $"https://generativelanguage.googleapis.com/v1beta/models/{_model}:generateContent?key={_apiKey}";
+                var url = $"https://generativelanguage.googleapis.com/v1beta/models/{_model}:generateContent?key={apiKey}";
                 
                 _logger.LogInformation("Calling Gemini API with model: {Model}", _model);
                 
@@ -165,7 +173,7 @@ namespace Backend.Services
             }
         }
 
-        private async Task<string> ExecuteSinglePalaceInterpretationAsync(TuViChart chart, string palaceName)
+        private async Task<string> ExecuteSinglePalaceInterpretationAsync(TuViChart chart, string palaceName, string apiKey)
         {
             try
             {
@@ -220,7 +228,7 @@ namespace Backend.Services
                 var json = JsonSerializer.Serialize(geminiRequest);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var url = $"https://generativelanguage.googleapis.com/v1beta/models/{_model}:generateContent?key={_apiKey}";
+                var url = $"https://generativelanguage.googleapis.com/v1beta/models/{_model}:generateContent?key={apiKey}";
                 
                 _logger.LogInformation("Calling Gemini API for single palace: {PalaceName}", palaceName);
                 

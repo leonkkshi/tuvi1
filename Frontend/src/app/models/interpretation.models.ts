@@ -3,6 +3,8 @@ import { TuViChart } from './tu-vi.models';
 export interface InterpretationRequest {
   chart: TuViChart;
   focusArea: string; // 'general' | 'career' | 'love' | 'health' | 'wealth'
+  apiKey: string;
+  provider: 'Gemini' | 'OpenAI';
 }
 
 export interface InterpretationResponse {

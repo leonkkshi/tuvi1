@@ -21,8 +21,8 @@ namespace Backend.Services
 
         public AIRequestThrottler(IConfiguration configuration, ILogger<AIRequestThrottler> logger)
         {
-            // Giới hạn số lượng concurrent AI requests (default: 15)
-            var maxConcurrent = configuration.GetValue<int>("AI:MaxConcurrentRequests", 15);
+            // Giới hạn số lượng concurrent AI requests (default: 200)
+            var maxConcurrent = configuration.GetValue<int>("AI:MaxConcurrentRequests", 200);
             _semaphore = new SemaphoreSlim(maxConcurrent, maxConcurrent);
             _logger = logger;
             _activeRequests = new ConcurrentDictionary<string, DateTime>();

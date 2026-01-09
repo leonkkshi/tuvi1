@@ -15,6 +15,8 @@ export class PalaceInterpretationModalComponent implements OnChanges {
   @Input() palace: PalaceStar | null = null;
   @Input() isOpen: boolean = false;
   @Input() cachedInterpretation: PalaceInterpretationResult | null = null;
+  @Input() apiKey: string = '';
+  @Input() provider: 'Gemini' | 'OpenAI' = 'Gemini';
   @Output() close = new EventEmitter<void>();
   @Output() interpretationLoaded = new EventEmitter<PalaceInterpretationResult>();
 
@@ -79,7 +81,7 @@ export class PalaceInterpretationModalComponent implements OnChanges {
 
     console.log(`[Modal] Starting API call for: ${palaceName}`);
 
-    this.tuViService.interpretPalace(this.chart, palaceName).subscribe({
+    this.tuViService.interpretPalace(this.chart, palaceName, this.apiKey, this.provider).subscribe({
       next: (result) => {
         console.log(`[Modal] API response for ${palaceName}:`, result);
         // Chỉ cập nhật nếu vẫn đang xem cùng cung

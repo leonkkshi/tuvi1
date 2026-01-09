@@ -155,6 +155,8 @@
     [palace]="selectedPalace"
     [isOpen]="isModalOpen"
     [cachedInterpretation]="selectedPalace ? getCachedInterpretation(selectedPalace.palaceName) : null"
+    [apiKey]="apiKey"
+    [provider]="provider"
     (close)="closeModal()"
     (interpretationLoaded)="selectedPalace && setCachedInterpretation(selectedPalace.palaceName, $event)">
   </app-palace-interpretation-modal>
@@ -195,6 +197,38 @@
     
     <div class="interpretation-controls">
       <div class="control-group">
+        <label for="provider">Chọn AI Provider:</label>
+        <div class="select-wrapper">
+          <select id="provider" [(ngModel)]="provider">
+            <option value="Gemini">🤖 Google Gemini</option>
+            <option value="OpenAI">🧠 OpenAI GPT</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label for="apiKey">API Key của bạn:</label>
+        <div class="input-wrapper">
+          <input 
+            type="password" 
+            id="apiKey" 
+            [(ngModel)]="apiKey" 
+            placeholder="Nhập API key của bạn..."
+            class="api-key-input">
+        </div>
+        <div class="api-key-help">
+          <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" class="help-link">
+            🔑 Cách lấy API key Gemini
+          </a>
+          <span class="help-text">| Miễn phí với hạn mức sử dụng</span>
+          <span class="help-separator">•</span>
+          <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" class="help-link">
+            🔑 Cách lấy API key OpenAI
+          </a>
+        </div>
+      </div>
+
+      <div class="control-group">
         <label for="focusArea">Chọn lĩnh vực quan tâm:</label>
         <div class="select-wrapper">
           <select id="focusArea" [(ngModel)]="focusArea" (change)="onFocusAreaChange($event)">
@@ -210,7 +244,7 @@
       <button 
         class="btn-interpret" 
         (click)="requestAIInterpretation()"
-        [disabled]="isLoadingInterpretation">
+        [disabled]="isLoadingInterpretation || !apiKey.trim()">
         <span *ngIf="!isLoadingInterpretation">✨ Bắt đầu luận giải</span>
         <span *ngIf="isLoadingInterpretation">⏳ Đang suy luận...</span>
       </button>
