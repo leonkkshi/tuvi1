@@ -27,11 +27,17 @@ export class BirthFormComponent {
 
   fullName: string = 'Tử Vi';
   viewYear: number = 2026;
-  selectedHourBranch: string = 'Mùi'; // Giờ 14:30
+  displayHourBranchName: string = '';  // Hiển thị địa chi từ giờ nhập vào
   errors: { [key: string]: string } = {};
   
   // Tab selection
   calendarType: 'lunar' | 'solar' = 'lunar';
+  
+  // Track trạng thái giờ Tý để xử lý âm lịch
+  private lastHourWasNight: boolean = false;  // True = giờ Tý (23h-1h)
+  private lastLunarDay: number = 17;  // Lưu lại ngày âm lịch gốc
+  private lastLunarMonth: number = 8;
+  private lastLunarYear: number = 2005;
   
   // Solar date inputs (for conversion)
   solarDate = {
@@ -42,22 +48,6 @@ export class BirthFormComponent {
   
   solarDays: number[] = [];
   lunarConversionText: string = '';
-
-  // Danh sách giờ địa chi
-  hourBranches = [
-    { name: 'Tý', startHour: 23, endHour: 1, displayTime: '23:00 - 01:00' },
-    { name: 'Sửu', startHour: 1, endHour: 3, displayTime: '01:00 - 03:00' },
-    { name: 'Dần', startHour: 3, endHour: 5, displayTime: '03:00 - 05:00' },
-    { name: 'Mão', startHour: 5, endHour: 7, displayTime: '05:00 - 07:00' },
-    { name: 'Thìn', startHour: 7, endHour: 9, displayTime: '07:00 - 09:00' },
-    { name: 'Tỵ', startHour: 9, endHour: 11, displayTime: '09:00 - 11:00' },
-    { name: 'Ngọ', startHour: 11, endHour: 13, displayTime: '11:00 - 13:00' },
-    { name: 'Mùi', startHour: 13, endHour: 15, displayTime: '13:00 - 15:00' },
-    { name: 'Thân', startHour: 15, endHour: 17, displayTime: '15:00 - 17:00' },
-    { name: 'Dậu', startHour: 17, endHour: 19, displayTime: '17:00 - 19:00' },
-    { name: 'Tuất', startHour: 19, endHour: 21, displayTime: '19:00 - 21:00' },
-    { name: 'Hợi', startHour: 21, endHour: 23, displayTime: '21:00 - 23:00' }
-  ];
 
   // Danh sách năm gần đây
   years: number[] = [];
@@ -75,13 +65,16 @@ export class BirthFormComponent {
     }
     this.updateDaysInMonth();
     this.updateSolarDaysInMonth();
-    // Đặt giờ phút mặc định từ địa chi đã chọn
-    this.onHourBranchChange();
+    // Update display địa chi từ giờ mặc định
+    this.updateDisplayHourBranch();
   }
 
   switchCalendarType(type: 'lunar' | 'solar') {
     this.calendarType = type;
     this.birthInfo.isLunar = (type === 'lunar');
+    
+    // Reset tracking state khi chuyển tab
+    this.lastHourWasNight = false;
     
     if (type === 'solar') {
       // Sync solarDate với birthInfo
@@ -89,19 +82,31 @@ export class BirthFormComponent {
       this.solarDate.month = this.birthInfo.month;
       this.solarDate.day = this.birthInfo.day;
       this.updateSolarDaysInMonth();
+    } else if (type === 'lunar') {
+      // Cập nhật tracking state khi quay về âm lịch
+      this.lastLunarDay = this.birthInfo.day;
+      this.lastLunarMonth = this.birthInfo.month;
+      this.lastLunarYear = this.birthInfo.year;
     }
   }
 
   onSolarDateChange() {
     this.updateSolarDaysInMonth();
-    
+    this.updateSolarToLunarConversion();
+  }
+
+  /**
+   * Thực hiện chuyển đổi từ dương lịch sang âm lịch, có xét đến giờ Tý
+   */
+  private updateSolarToLunarConversion() {
     // Đảm bảo các giá trị là number (vì select trả về string)
     const day = Number(this.solarDate.day);
     const month = Number(this.solarDate.month);
     const year = Number(this.solarDate.year);
     
-    // Chuyển đổi dương lịch sang âm lịch ngay ở frontend
-    const lunarResult = this.lunarConverter.convertSolarToLunar(day, month, year);
+    // Chuyển đổi dương lịch sang âm lịch với xét đến giờ sinh
+    // FIX: Khi sinh giờ Tý (23h-1h), ngày âm lịch phải cộng thêm 1
+    const lunarResult = this.lunarConverter.convertSolarToLunarWithHour(day, month, year, this.birthInfo.hour);
     
     // CẬP NHẬT birthInfo với ngày ÂM LỊCH đã chuyển đổi
     // Vì backend trên production không có Node.js để chuyển đổi
@@ -122,17 +127,107 @@ export class BirthFormComponent {
     }
   }
 
-  onHourBranchChange() {
-    const branch = this.hourBranches.find(b => b.name === this.selectedHourBranch);
-    if (branch) {
-      // Lấy giờ giữa khoảng
-      this.birthInfo.hour = branch.startHour === 23 ? 0 : branch.startHour + 1;
-      this.birthInfo.minute = 0;
+  /**
+   * Xử lý khi giờ/phút thay đổi
+   */
+  onTimeChange() {
+    // Validate giờ phút
+    this.birthInfo.hour = Math.max(0, Math.min(23, this.birthInfo.hour || 0));
+    this.birthInfo.minute = Math.max(0, Math.min(59, this.birthInfo.minute || 0));
+    
+    // Update display địa chi
+    this.updateDisplayHourBranch();
+    
+    // Xử lý giờ Tý (23h-1h)
+    const isNightHour = this.birthInfo.hour >= 23 || this.birthInfo.hour < 1;
+    
+    if (this.calendarType === 'solar') {
+      // Dương lịch: cập nhật conversion sang âm lịch
+      this.updateSolarToLunarConversion();
+    } else if (this.calendarType === 'lunar') {
+      // Âm lịch: xử lý giờ Tý
+      this.handleLunarHourChange(isNightHour);
+    }
+  }
+
+  /**
+   * Xử lý thay đổi giờ cho âm lịch
+   * Khi giờ Tý (23h-1h), ngày âm lịch phải cộng thêm 1
+   */
+  private handleLunarHourChange(isNightHour: boolean) {
+    // Nếu trạng thái giờ Tý không thay đổi, không cần xử lý
+    if (isNightHour === this.lastHourWasNight) {
+      return;
+    }
+
+    // Trạng thái giờ Tý đã thay đổi
+    if (isNightHour) {
+      // Chuyển từ giờ khác sang giờ Tý -> cộng 1 ngày
+      // Lưu ngày gốc trước khi cộng
+      this.lastLunarDay = this.birthInfo.day;
+      this.lastLunarMonth = this.birthInfo.month;
+      this.lastLunarYear = this.birthInfo.year;
+
+      // Cộng 1 ngày
+      this.birthInfo.day++;
+      if (this.birthInfo.day > 30) {
+        this.birthInfo.day = 1;
+        this.birthInfo.month++;
+        if (this.birthInfo.month > 12) {
+          this.birthInfo.month = 1;
+          this.birthInfo.year++;
+        }
+      }
+    } else {
+      // Chuyển từ giờ Tý sang giờ khác -> trừ 1 ngày (khôi phục)
+      this.birthInfo.day = this.lastLunarDay;
+      this.birthInfo.month = this.lastLunarMonth;
+      this.birthInfo.year = this.lastLunarYear;
+    }
+
+    this.lastHourWasNight = isNightHour;
+  }
+  
+  /**
+   * Cập nhật hiển thị địa chi từ giờ sinh
+   */
+  private updateDisplayHourBranch() {
+    const hour = this.birthInfo.hour;
+    
+    // Tìm địa chi dựa vào giờ
+    if (hour >= 23 || hour < 1) {
+      this.displayHourBranchName = 'Tý';
+    } else if (hour >= 1 && hour < 3) {
+      this.displayHourBranchName = 'Sửu';
+    } else if (hour >= 3 && hour < 5) {
+      this.displayHourBranchName = 'Dần';
+    } else if (hour >= 5 && hour < 7) {
+      this.displayHourBranchName = 'Mão';
+    } else if (hour >= 7 && hour < 9) {
+      this.displayHourBranchName = 'Thìn';
+    } else if (hour >= 9 && hour < 11) {
+      this.displayHourBranchName = 'Tỵ';
+    } else if (hour >= 11 && hour < 13) {
+      this.displayHourBranchName = 'Ngọ';
+    } else if (hour >= 13 && hour < 15) {
+      this.displayHourBranchName = 'Mùi';
+    } else if (hour >= 15 && hour < 17) {
+      this.displayHourBranchName = 'Thân';
+    } else if (hour >= 17 && hour < 19) {
+      this.displayHourBranchName = 'Dậu';
+    } else if (hour >= 19 && hour < 21) {
+      this.displayHourBranchName = 'Tuất';
+    } else if (hour >= 21 && hour < 23) {
+      this.displayHourBranchName = 'Hợi';
+    } else {
+      this.displayHourBranchName = '';
     }
   }
 
   onMonthChange() {
     this.updateDaysInMonth();
+    // Reset tracking state khi thay đổi ngày/tháng/năm
+    this.resetLunarTracking();
   }
 
   updateDaysInMonth() {
@@ -140,6 +235,22 @@ export class BirthFormComponent {
     this.days = Array.from({ length: 30 }, (_, i) => i + 1);
     if (this.birthInfo.day > 30) {
       this.birthInfo.day = 30;
+    }
+    // Reset tracking state khi thay đổi ngày
+    this.resetLunarTracking();
+  }
+
+  /**
+   * Reset tracking state cho âm lịch
+   * Gọi khi user thay đổi ngày/tháng/năm âm lịch
+   */
+  resetLunarTracking() {
+    if (this.calendarType === 'lunar') {
+      this.lastLunarDay = this.birthInfo.day;
+      this.lastLunarMonth = this.birthInfo.month;
+      this.lastLunarYear = this.birthInfo.year;
+      // Reset flag giờ Tý
+      this.lastHourWasNight = false;
     }
   }
 
@@ -167,8 +278,15 @@ export class BirthFormComponent {
       isValid = false;
     }
 
-    if (!this.selectedHourBranch) {
-      this.errors['hourBranch'] = 'Vui lòng chọn giờ sinh';
+    if (this.birthInfo.hour === null || this.birthInfo.hour === undefined || 
+        this.birthInfo.hour < 0 || this.birthInfo.hour > 23) {
+      this.errors['hour'] = 'Giờ sinh không hợp lệ (0-23)';
+      isValid = false;
+    }
+    
+    if (this.birthInfo.minute === null || this.birthInfo.minute === undefined || 
+        this.birthInfo.minute < 0 || this.birthInfo.minute > 59) {
+      this.errors['minute'] = 'Phút sinh không hợp lệ (0-59)';
       isValid = false;
     }
 
@@ -212,9 +330,8 @@ export class BirthFormComponent {
     };
     this.fullName = '';
     this.viewYear = new Date().getFullYear();
-    this.selectedHourBranch = 'Tý';
     this.errors = {};
-    // Đặt lại giờ phút từ địa chi
-    this.onHourBranchChange();
+    // Update display địa chi
+    this.updateDisplayHourBranch();
   }
 }

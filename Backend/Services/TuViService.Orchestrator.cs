@@ -69,6 +69,24 @@ public class TuViService : ITuViService
             lunarDay = lunar[0];
             lunarMonth = lunar[1];
             lunarYear = lunar[2];
+            
+            // LOGIC FIX: Giờ Tý (23h-1h) của ngày X dương lịch phải được tính as ngày X+1 âm lịch
+            // Vì giờ Tý bắt đầu từ 23h của ngày X và kéo dài đến 1h của ngày X+1
+            if (request.Hour >= 23 || request.Hour < 1)
+            {
+                // Cộng thêm 1 ngày vào âm lịch
+                lunarDay++;
+                if (lunarDay > 30)  // Âm lịch tháng có tối đa 30 ngày
+                {
+                    lunarDay = 1;
+                    lunarMonth++;
+                    if (lunarMonth > 12)
+                    {
+                        lunarMonth = 1;
+                        lunarYear++;
+                    }
+                }
+            }
         }
 
         var birthTime = new TimeSpan(request.Hour, request.Minute, 0);

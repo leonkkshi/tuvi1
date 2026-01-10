@@ -68,7 +68,7 @@
         <div class="date-row" *ngIf="calendarType === 'lunar'">
           <div class="input-group">
             <label for="day">Ngày</label>
-            <select id="day" name="day" [(ngModel)]="birthInfo.day" [class.error]="errors['day']">
+            <select id="day" name="day" [(ngModel)]="birthInfo.day" (change)="resetLunarTracking()" [class.error]="errors['day']">
               <option *ngFor="let d of days" [value]="d">{{ d }}</option>
             </select>
           </div>
@@ -113,21 +113,41 @@
         </div>
 
         <!-- Time Input -->
-         <div class="input-group full-width">
-            <label>Giờ sinh</label>
-            <div class="time-selector">
-                <select 
-                  id="hourBranch" 
-                  name="hourBranch" 
-                  [(ngModel)]="selectedHourBranch"
-                  (change)="onHourBranchChange()"
-                  [class.error]="errors['hourBranch']">
-                  <option *ngFor="let branch of hourBranches" [value]="branch.name">
-                    {{ branch.name }} ({{ branch.displayTime }})
-                  </option>
-                </select>
+        <div class="input-group full-width">
+          <label for="birthTime">Giờ sinh (chính xác)</label>
+          <div class="time-input-group">
+            <div class="time-input">
+              <input 
+                type="number" 
+                id="birthHour" 
+                name="birthHour" 
+                [(ngModel)]="birthInfo.hour"
+                (change)="onTimeChange()"
+                min="0" 
+                max="23"
+                placeholder="HH"
+                class="hour-input"
+                [class.error]="errors['hour']">
+              <span class="time-separator">:</span>
+              <input 
+                type="number" 
+                id="birthMinute" 
+                name="birthMinute" 
+                [(ngModel)]="birthInfo.minute"
+                (change)="onTimeChange()"
+                min="0" 
+                max="59"
+                placeholder="MM"
+                class="minute-input"
+                [class.error]="errors['minute']">
             </div>
-         </div>
+            <div class="hour-branch-display" *ngIf="displayHourBranchName">
+              <span class="label">Địa chi:</span>
+              <span class="value">{{ displayHourBranchName }}</span>
+            </div>
+          </div>
+          <span class="error-msg" *ngIf="errors['hour']">{{ errors['hour'] }}</span>
+        </div>
       </div>
 
       <!-- Section: View Year & Actions -->

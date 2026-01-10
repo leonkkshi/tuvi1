@@ -186,4 +186,33 @@ export class LunarConverterService {
       };
     }
   }
+
+  /**
+   * Chuyển đổi từ dương lịch sang âm lịch với xét đến giờ sinh
+   * FIX: Giờ Tý (23h-1h) của ngày X dương lịch phải được tính as ngày X+1 âm lịch
+   * @param dd Ngày dương lịch (1-31)
+   * @param mm Tháng dương lịch (1-12)
+   * @param yy Năm dương lịch
+   * @param hh Giờ sinh (0-23)
+   * @returns Ngày tháng năm âm lịch có xét đến giờ Tý
+   */
+  convertSolarToLunarWithHour(dd: number, mm: number, yy: number, hh: number): LunarDateResult {
+    // Chuyển đổi cơ bản
+    let result = this.convertSolarToLunar(dd, mm, yy);
+    
+    // Nếu sinh vào giờ Tý (23h-1h), cộng thêm 1 ngày vào âm lịch
+    if (hh >= 23 || hh < 1) {
+      result.day++;
+      if (result.day > 30) {
+        result.day = 1;
+        result.month++;
+        if (result.month > 12) {
+          result.month = 1;
+          result.year++;
+        }
+      }
+    }
+    
+    return result;
+  }
 }

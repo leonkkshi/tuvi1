@@ -261,6 +261,81 @@ select {
     font-weight: 500;
 }
 
+/* Time Input Group */
+.time-input-group {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.time-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    background: #f8f9fa;
+    border: 2px solid #e0e6ed;
+    border-radius: 8px;
+    padding: 8px 12px;
+    transition: all 0.3s ease;
+}
+
+.time-input:focus-within {
+    border-color: #d32f2f;
+    background: #fff5f5;
+}
+
+.time-input input {
+    width: 50px;
+    padding: 8px 6px;
+    border: none;
+    background: transparent;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    color: #1a1a1a;
+    outline: none;
+}
+
+.time-input input::-webkit-outer-spin-button,
+.time-input input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.time-input input[type=number] {
+    -moz-appearance: textfield;
+}
+
+.time-separator {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #d32f2f;
+}
+
+.hour-branch-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #fff3e0;
+    border: 2px solid #ffb74d;
+    border-radius: 8px;
+    min-width: 120px;
+}
+
+.hour-branch-display .label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #666;
+}
+
+.hour-branch-display .value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #d32f2f;
+}
+
 /* Footer & Actions */
 .footer-section {
     margin-top: 10px;
