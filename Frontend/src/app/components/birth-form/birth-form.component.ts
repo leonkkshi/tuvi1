@@ -16,11 +16,11 @@ export class BirthFormComponent {
   @Output() chartGenerated = new EventEmitter<ChartRequest>();
 
   birthInfo: ChartRequest = {
-    year: 2005,
-    month: 8,
-    day: 17,
-    hour: 14,
-    minute: 30,
+    year: 2008,
+    month: 5,
+    day: 15,
+    hour: 10,
+    minute: 0,
     isMale: true,
     isLunar: true  // Luôn dùng âm lịch
   };
@@ -35,15 +35,15 @@ export class BirthFormComponent {
   
   // Track trạng thái giờ Tý để xử lý âm lịch
   private lastHourWasNight: boolean = false;  // True = giờ Tý (23h-1h)
-  private lastLunarDay: number = 17;  // Lưu lại ngày âm lịch gốc
-  private lastLunarMonth: number = 8;
-  private lastLunarYear: number = 2005;
+  private lastLunarDay: number = 15;  // Lưu lại ngày âm lịch gốc
+  private lastLunarMonth: number = 5;
+  private lastLunarYear: number = 2008;
   
   // Solar date inputs (for conversion)
   solarDate = {
-    year: 2005,
-    month: 8,
-    day: 17
+    year: 2008,
+    month: 5,
+    day: 15
   };
   
   solarDays: number[] = [];
