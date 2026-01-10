@@ -11,6 +11,8 @@
   z-index: 1000;
   backdrop-filter: blur(4px);
   animation: fadeIn 0.2s ease-in-out;
+  overflow: auto;
+  padding: 20px 0;
 }
 
 @keyframes fadeIn {
@@ -32,6 +34,7 @@
   flex-direction: column;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.3s ease-out;
+  margin: auto;
 }
 
 @keyframes slideUp {
@@ -56,10 +59,23 @@
   border-radius: 16px 16px 0 0;
 }
 
+@media (max-width: 768px) {
+  .modal-header {
+    padding: 16px;
+    gap: 12px;
+  }
+}
+
 .modal-header h2 {
   margin: 0;
   font-size: 24px;
   font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .modal-header h2 {
+    font-size: 18px;
+  }
 }
 
 .close-btn {
@@ -70,6 +86,15 @@
   cursor: pointer;
   width: 40px;
   height: 40px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .close-btn {
+    font-size: 24px;
+    width: 32px;
+    height: 32px;
+  }
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -88,6 +113,12 @@
   padding: 30px;
   overflow-y: auto;
   flex: 1;
+}
+
+@media (max-width: 768px) {
+  .modal-body {
+    padding: 16px;
+  }
 }
 
 /* Loading */
@@ -164,6 +195,13 @@
   padding: 20px;
   border-radius: 12px;
   margin-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+  .palace-info {
+    padding: 12px;
+    margin-bottom: 16px;
+  }
 }
 
 .palace-info h3, .interpretation-content h3 {
@@ -277,7 +315,14 @@
   margin-bottom: 24px;
 }
 
-.interpretation-text {
+.
+
+@media (max-width: 768px) {
+  .interpretation-text {
+    padding: 12px;
+    font-size: 14px;
+  }
+}interpretation-text {
   background: #f8f9fa;
   padding: 20px;
   border-radius: 12px;
@@ -345,6 +390,12 @@
   border-radius: 0 0 16px 16px;
 }
 
+@media (max-width: 768px) {
+  .modal-footer {
+    padding: 12px;
+  }
+}
+
 .close-footer-btn {
   background: #667eea;
   color: white;
@@ -403,5 +454,62 @@
 
   .info-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    width: 98%;
+    max-height: 98vh;
+  }
+
+  .modal-header {
+    padding: 12px;
+  }
+
+  .modal-header h2 {
+    font-size: 16px;
+  }
+
+  .modal-body {
+    padding: 12px;
+  }
+
+  .close-btn {
+    font-size: 20px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .modal-footer {
+    padding: 10px;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .close-footer-btn {
+    width: 100%;
+  }
+
+  .palace-info h3, .interpretation-content h3 {
+    font-size: 16px;
+  }
+
+  .info-item .label {
+    font-size: 12px;
+  }
+
+  .info-item .value {
+    font-size: 14px;
+  }
+
+  .interpretation-text {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  .star-tag {
+    font-size: 11px;
+    padding: 4px 8px;
   }
 }

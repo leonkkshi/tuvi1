@@ -35,6 +35,16 @@
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
+@media (max-width: 768px) {
+    .chart-container {
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(4, minmax(100px, auto));
+        max-width: calc(100vw - 10px);
+        margin: 10px 5px;
+        border: 1px solid #000;
+    }
+}
+
 /* Palace Cell */
 .palace-cell {
     border: 1px solid #777;
@@ -45,6 +55,15 @@
     display: flex;
     flex-direction: column;
     /* overflow: hidden; Removed to allow barrier to overlap border */
+    font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+    .palace-cell {
+        padding: 4px;
+        padding-bottom: 20px;
+        font-size: 0.8rem;
+    }
 }
 
 .barrier-label {
@@ -116,6 +135,14 @@
     height: 24px;
 }
 
+@media (max-width: 768px) {
+    .palace-header {
+        margin-bottom: 4px;
+        height: 20px;
+        font-size: 0.8rem;
+    }
+}
+
 .header-left .palace-branch-label,
 .header-right .daivan-number {
     font-weight: bold;
@@ -131,7 +158,14 @@
 .palace-name {
     display: block;
     font-weight: 700;
-    color: #cc0000; /* Header Red */
+ 
+
+@media (max-width: 768px) {
+    .palace-name {
+        font-size: 0.75rem;
+        padding: 1px 3px;
+    }
+}   color: #cc0000; /* Header Red */
     text-transform: uppercase;
     font-size: 1rem;
     line-height: 1;
@@ -175,6 +209,14 @@
     text-shadow: 0px 0px 1px rgba(0,0,0,0.1);
 }
 
+@media (max-width: 768px) {
+    .star-main {
+        font-size: 0.95rem;
+        margin: 1px 0;
+        letter-spacing: 0px;
+    }
+}
+
 /* Minor Stars Split */
 .minor-stars-container {
     display: flex;
@@ -202,6 +244,13 @@
     font-size: 0.85rem;
     margin-bottom: 2px;
     line-height: 1.2;
+}
+
+@media (max-width: 768px) {
+    .star-item {
+        font-size: 0.7rem;
+        margin-bottom: 1px;
+    }
 }
 
 .star-good {
@@ -288,7 +337,15 @@
 .center-header h3 {
     text-align: center;
     font-size: 1.8rem;
-    margin: 0 0 15px 0;
+ 
+
+@media (max-width: 768px) {
+    .center-header h3 {
+        font-size: 1.2rem;
+        margin: 0 0 10px 0;
+        padding-bottom: 3px;
+    }
+}   margin: 0 0 15px 0;
     color: #b30000;
     font-family: 'Courier New', Courier, monospace; /* Seal script vibe? */
     border-bottom: 2px solid #b30000;
@@ -328,6 +385,36 @@
 }
 
 /* --- Mobile Responsiveness --- */
+
+.chart-header-mobile {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .chart-header-mobile {
+        display: block;
+        background: white;
+        padding: 12px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .chart-header-mobile h2 {
+        margin: 0 0 10px 0;
+        font-size: 1.3rem;
+        color: #b30000;
+    }
+    
+    .download-btn {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+        background: #b30000;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+}
 
 /* Tablet and smaller - keep grid but make it responsive */
 @media (max-width: 1200px) {
