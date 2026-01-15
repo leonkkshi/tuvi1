@@ -6,7 +6,17 @@
     </div>
 
     <div class="modal-body">
-    
+
+      <!-- API Key input & manual load -->
+      <div *ngIf="!interpretation && !isLoading" class="api-input">
+        <label for="modalApiKey">API Key của bạn:</label>
+        <input id="modalApiKey" type="password" [(ngModel)]="editableApiKey" placeholder="Dán API key Gemini vào đây..." class="modal-api-input" />
+        <div class="api-actions">
+          <button class="btn-load" (click)="loadInterpretation()" [disabled]="isLoading || !(editableApiKey?.trim())">🔮 Luận giải cung này</button>
+        </div>
+        <div *ngIf="!editableApiKey?.trim()" class="api-hint">Bạn chưa nhập API key. Bạn có thể dùng API key đã nhập ở trang chính hoặc dán key vào đây.</div>
+      </div>
+
       <!-- Loading state -->
       <div *ngIf="isLoading" class="loading-container">
         <div class="spinner"></div>
@@ -16,7 +26,7 @@
       <!-- Error state -->
       <div *ngIf="error && !isLoading" class="error-container">
         <p class="error-message">{{ error }}</p>
-        <button class="retry-btn" (click)="loadInterpretation()">Thử lại</button>
+        <button class="retry-btn" (click)="loadInterpretation()" [disabled]="!(editableApiKey?.trim())">Thử lại</button>
       </div>
 
       <!-- Content -->

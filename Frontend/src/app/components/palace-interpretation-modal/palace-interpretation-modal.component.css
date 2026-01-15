@@ -179,6 +179,47 @@
   animation: fadeInContent 0.4s ease-in-out;
 }
 
+/* API input area */
+.api-input {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.api-input label {
+  font-weight: 600;
+  color: #333;
+}
+.modal-api-input {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  min-width: 220px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.api-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.btn-load {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.btn-load[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.api-hint {
+  font-size: 0.9rem;
+  color: #666;
+}
+
 @keyframes fadeInContent {
   from {
     opacity: 0;
@@ -315,14 +356,14 @@
   margin-bottom: 24px;
 }
 
-.
-
 @media (max-width: 768px) {
   .interpretation-text {
     padding: 12px;
     font-size: 14px;
   }
-}interpretation-text {
+}
+
+.interpretation-text {
   background: #f8f9fa;
   padding: 20px;
   border-radius: 12px;

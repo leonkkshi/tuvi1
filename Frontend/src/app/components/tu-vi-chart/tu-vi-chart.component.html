@@ -1,10 +1,6 @@
 <div class="tu-vi-chart" *ngIf="chart">
   <div class="chart-header-mobile">
     <h2>LÁ SỐ TỬ VI</h2>
-    <button class="download-btn" (click)="downloadChart()" [disabled]="isDownloading">
-      <span *ngIf="!isDownloading">📥 Tải xuống</span>
-      <span *ngIf="isDownloading">⏳ Đang xử lý...</span>
-    </button>
   </div>
   
   <div class="chart-scroll-hint">
@@ -149,6 +145,13 @@
     <ng-container *ngTemplateOutlet="palaceTemplate; context: {id: 12}"></ng-container>
   </div>
 
+  <div class="chart-actions">
+    <button class="download-btn chart-download-btn" (click)="downloadChart()" [disabled]="isDownloading" aria-label="Tải xuống lá số">
+      <span *ngIf="!isDownloading">📥 Tải xuống lá số</span>
+      <span *ngIf="isDownloading">⏳ Đang xử lý...</span>
+    </button>
+  </div>
+
   <!-- Palace Interpretation Modal -->
   <app-palace-interpretation-modal
     [chart]="chart"
@@ -215,10 +218,20 @@
             class="api-key-input">
         </div>
         <div class="api-key-help">
-          <small class="help-text">
-            🔑 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" class="help-link">Lấy API key Gemini tại đây</a> 
-            (miễn phí với hạn mức sử dụng)
-          </small>
+          <div class="api-key-help-top">
+            🔑 <a href="https://aistudio.google.com/api-keys" target="_blank" rel="noopener noreferrer" class="help-link">Lấy API key Gemini</a> 
+
+          <details class="api-key-details">
+            <summary>Hướng dẫn nhanh: cách lấy & dùng API key</summary>
+            <ol>
+              <li>Đăng nhập vào AI Studio hoặc Google Cloud Console.</li>
+              <li>Tạo Project mới (nếu chưa có) và bật Generative AI / AI Studio API.</li>
+              <li>Trong phần Credentials, tạo <strong>API key</strong> và copy (thường bắt đầu bằng <code>AIza</code>).</li>
+              <li>Dán API key vào ô trên trang này và bấm "Bắt đầu luận giải hoặc chọn các cung ở trên".</li>
+             
+            </ol>
+            
+          </details>
         </div>
       </div>
       

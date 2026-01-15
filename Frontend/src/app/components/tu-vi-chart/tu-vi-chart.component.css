@@ -334,10 +334,21 @@
 }
 
 /* --- Center Panel Styling --- */
+.center-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .center-header h3 {
-    text-align: center;
+    text-align: left;
     font-size: 1.8rem;
- 
+    margin: 0 0 15px 0;
+    color: #b30000;
+    font-family: 'Courier New', Courier, monospace; /* Seal script vibe? */
+    border-bottom: 2px solid #b30000;
+    padding-bottom: 5px;
+}
 
 @media (max-width: 768px) {
     .center-header h3 {
@@ -345,13 +356,23 @@
         margin: 0 0 10px 0;
         padding-bottom: 3px;
     }
-}   margin: 0 0 15px 0;
-    color: #b30000;
-    font-family: 'Courier New', Courier, monospace; /* Seal script vibe? */
-    border-bottom: 2px solid #b30000;
-    display: inline-block;
-    padding-bottom: 5px;
-    align-self: center;
+}
+
+/* Desktop download button (in center header) */
+.download-btn-desktop {
+    padding: 8px 14px;
+    font-size: 0.9rem;
+    background: #b30000;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+@media (max-width: 768px) {
+    /* Hide desktop button on small screens (mobile uses mobile header) */
+    .download-btn-desktop { display: none; }
 }
 
 .personal-info-grid {
@@ -384,6 +405,42 @@
     font-weight: bold;
 }
 
+/* API Key help box */
+.api-key-help {
+    margin-top: 8px;
+    border-left: 4px solid #b30000;
+    background: #fff7f7;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 6px rgba(179,0,0,0.06);
+}
+.api-key-help-top {
+    margin-bottom: 6px;
+}
+.api-key-details summary {
+    cursor: pointer;
+    font-weight: 600;
+    outline: none;
+}
+.api-key-details ol {
+    margin: 8px 0 6px 18px;
+    padding: 0;
+}
+.api-key-details .small-note {
+    font-size: 0.85rem;
+    color: #555;
+    margin-top: 6px;
+}
+.api-key-help .help-link {
+    text-decoration: none;
+    color: #b30000;
+    font-weight: 600;
+}
+@media (max-width: 768px) {
+    .api-key-help { padding: 8px; font-size: 0.9rem; }
+}
+
 /* --- Mobile Responsiveness --- */
 
 .chart-header-mobile {
@@ -413,6 +470,31 @@
         border: none;
         border-radius: 4px;
         cursor: pointer;
+    }
+
+    .chart-actions {
+        margin: 18px 0 8px;
+        text-align: center;
+    }
+
+    .chart-download-btn {
+        padding: 10px 18px;
+        font-size: 1rem;
+        background: #b30000;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+
+    .chart-download-btn[disabled] {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    @media (max-width: 768px) {
+        .chart-download-btn { width: 100%; }
     }
 }
 

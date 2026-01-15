@@ -1,14 +1,15 @@
 import { Component, EventEmitter, Input, Output, SimpleChanges, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { TuViChart, PalaceStar } from '../../models/tu-vi.models';
 import { TuViService, PalaceInterpretationResult } from '../../services/tu-vi.service';
 
 @Component({
   selector: 'app-palace-interpretation-modal',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './palace-interpretation-modal.component.html',
-  styleUrl: './palace-interpretation-modal.component.css'
+  styleUrls: ['./palace-interpretation-modal.component.css']
 })
 export class PalaceInterpretationModalComponent implements OnChanges {
   @Input() chart: TuViChart | null = null;
@@ -23,6 +24,7 @@ export class PalaceInterpretationModalComponent implements OnChanges {
   interpretation: PalaceInterpretationResult | null = null;
   isLoading: boolean = false;
   error: string = '';
+  editableApiKey: string = '';
   private lastLoadedPalaceName: string = '';
 
   constructor(private tuViService: TuViService) {}
@@ -40,6 +42,9 @@ export class PalaceInterpretationModalComponent implements OnChanges {
       return;
     }
 
+    // Sync editable key from parent input
+    this.editableApiKey = this.apiKey || '';
+
     // Khi modal mở và có palace
     if (this.isOpen && this.palace && this.chart) {
       const currentPalaceName = this.palace.palaceName;
@@ -54,10 +59,18 @@ export class PalaceInterpretationModalComponent implements OnChanges {
         return;
       }
       
-      // Nếu chưa load cung này thì load
+      // Nếu chưa load cung này thì load, nhưng chỉ khi có API key
       if (this.lastLoadedPalaceName !== currentPalaceName) {
-        console.log('[Modal] Need to load interpretation for:', currentPalaceName);
-        this.loadInterpretation();
+        if ((this.editableApiKey || '').trim()) {
+          console.log('[Modal] Need to load interpretation for:', currentPalaceName);
+          this.loadInterpretation();
+        } else {
+          console.log('[Modal] API key missing - waiting for user input to load interpretation for:', currentPalaceName);
+          this.interpretation = null;
+          this.isLoading = false;
+          this.error = '';
+          // Do not set lastLoadedPalaceName so user can attempt load later
+        }
       }
     }
   }
@@ -74,14 +87,20 @@ export class PalaceInterpretationModalComponent implements OnChanges {
     }
 
     const palaceName = this.palace.palaceName;
+    const key = (this.editableApiKey || this.apiKey || '').trim();
+    if (!key) {
+      this.error = 'Vui lòng nhập API key để luận giải cung này.';
+      return;
+    }
+
     this.lastLoadedPalaceName = palaceName;
     this.isLoading = true;
     this.error = '';
     this.interpretation = null;
 
-    console.log(`[Modal] Starting API call for: ${palaceName}`);
+    console.log(`[Modal] Starting API call for: ${palaceName} using provided API key`);
 
-    this.tuViService.interpretPalace(this.chart, palaceName, this.apiKey, this.provider).subscribe({
+    this.tuViService.interpretPalace(this.chart, palaceName, key, this.provider).subscribe({
       next: (result) => {
         console.log(`[Modal] API response for ${palaceName}:`, result);
         // Chỉ cập nhật nếu vẫn đang xem cùng cung
