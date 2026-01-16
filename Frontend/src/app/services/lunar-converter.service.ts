@@ -189,7 +189,7 @@ export class LunarConverterService {
 
   /**
    * Chuyển đổi từ dương lịch sang âm lịch với xét đến giờ sinh
-   * FIX: Giờ Tý (23h-1h) của ngày X dương lịch phải được tính as ngày X+1 âm lịch
+   * FIX: Giờ Tý chỉ khi giờ = 23h (23:00-23:59) thì ngày âm lịch tăng 1
    * @param dd Ngày dương lịch (1-31)
    * @param mm Tháng dương lịch (1-12)
    * @param yy Năm dương lịch
@@ -200,8 +200,8 @@ export class LunarConverterService {
     // Chuyển đổi cơ bản
     let result = this.convertSolarToLunar(dd, mm, yy);
     
-    // Nếu sinh vào giờ Tý (23h-1h), cộng thêm 1 ngày vào âm lịch
-    if (hh >= 23 || hh < 1) {
+    // Nếu sinh vào giờ Tý (23:00-23:59), cộng thêm 1 ngày vào âm lịch
+    if (hh === 23) {
       result.day++;
       if (result.day > 30) {
         result.day = 1;

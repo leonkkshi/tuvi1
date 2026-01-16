@@ -34,7 +34,7 @@ export class BirthFormComponent {
   calendarType: 'lunar' | 'solar' = 'lunar';
   
   // Track trạng thái giờ Tý để xử lý âm lịch
-  private lastHourWasNight: boolean = false;  // True = giờ Tý (23h-1h)
+  private lastHourWasNight: boolean = false;  // True = giờ Tý (23h)
   private lastLunarDay: number = 15;  // Lưu lại ngày âm lịch gốc
   private lastLunarMonth: number = 5;
   private lastLunarYear: number = 2008;
@@ -138,8 +138,8 @@ export class BirthFormComponent {
     // Update display địa chi
     this.updateDisplayHourBranch();
     
-    // Xử lý giờ Tý (23h-1h)
-    const isNightHour = this.birthInfo.hour >= 23 || this.birthInfo.hour < 1;
+    // Xử lý giờ Tý: chỉ khi giờ = 23 (23:00-23:59) mới cộng sang ngày âm lịch
+    const isNightHour = this.birthInfo.hour === 23;
     
     if (this.calendarType === 'solar') {
       // Dương lịch: cập nhật conversion sang âm lịch
@@ -152,7 +152,7 @@ export class BirthFormComponent {
 
   /**
    * Xử lý thay đổi giờ cho âm lịch
-   * Khi giờ Tý (23h-1h), ngày âm lịch phải cộng thêm 1
+   * Khi giờ = 23h (23:00-23:59), ngày âm lịch phải cộng thêm 1
    */
   private handleLunarHourChange(isNightHour: boolean) {
     // Nếu trạng thái giờ Tý không thay đổi, không cần xử lý
