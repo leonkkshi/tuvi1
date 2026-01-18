@@ -17,7 +17,7 @@ services:
       - key: Gemini__ApiKey
         sync: false # Set này trong Render Dashboard
       - key: AI__MaxConcurrentRequests
-        value: 3
+        sync: false
     
   # Frontend (Angular Static Site)
   - type: web
