@@ -1248,3 +1248,73 @@
 .star-bold {
     font-weight: bold;
 }
+
+/* QR Promo Section */
+.qr-promo-section {
+    margin: 20px auto;
+    text-align: center;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border: 2px solid #ffe0b2;
+    max-width: 600px;
+}
+
+.qr-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.qr-text {
+    font-size: 1.1rem;
+    color: #c62828;
+    font-weight: 500;
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.qr-image-container {
+    padding: 10px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border: 1px solid #ffecb3;
+    transition: transform 0.3s ease;
+}
+
+.qr-image-container:hover {
+    transform: scale(1.05);
+}
+
+.qr-code {
+    width: 180px;
+    height: 180px;
+    object-fit: contain;
+    display: block;
+}
+
+.qr-handle {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #bf360c;
+    margin: 0;
+    background: #fff3e0;
+    padding: 5px 15px;
+    border-radius: 20px;
+}
+
+.qr-link {
+    color: #c62828;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.qr-link:hover {
+    text-decoration: underline;
+    color: #b71c1c;
+}
