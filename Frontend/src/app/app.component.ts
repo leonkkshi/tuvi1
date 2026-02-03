@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { BirthFormComponent } from './components/birth-form/birth-form.component';
@@ -13,13 +13,30 @@ import { ChartRequest, TuViChart } from './models/tu-vi.models';
   styleUrl: './app.component.css',
   providers: [TuViService]
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'Tử Vi Đẩu Số';
   chart: TuViChart | null = null;
   loading = false;
   error: string | null = null;
 
+  greetings = [
+    'Năm mới Bính Ngọ - Mã Đáo Thành Công 🐎',
+    'Tấn Tài Tấn Lộc - Vạn Sự Như Ý 🧧',
+    'Phúc Lộc Thọ Tài - An Khang Thịnh Vượng 🌸',
+    'Cung Chúc Tân Xuân - Tiền Vào Như Nước 💰',
+    'Xuân Sang Đắc Lộc - Gia Đạo Bình An 🏠'
+  ];
+  currentGreeting = this.greetings[0];
+
   constructor(private tuViService: TuViService) {}
+
+  ngOnInit() {
+    let i = 0;
+    setInterval(() => {
+      i = (i + 1) % this.greetings.length;
+      this.currentGreeting = this.greetings[i];
+    }, 4000);
+  }
 
   onChartGenerated(request: ChartRequest) {
     this.loading = true;

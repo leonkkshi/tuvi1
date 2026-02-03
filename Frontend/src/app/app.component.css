@@ -8,16 +8,85 @@
 header {
   text-align: center;
   padding: 30px 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+  color: #ffeb3b;
   border-radius: 10px;
   margin-bottom: 30px;
+  border: 2px solid #ffc107;
+  box-shadow: 0 4px 15px rgba(211, 47, 47, 0.3);
+  position: relative;
+  overflow: hidden;
 }
 
 header h1 {
   margin: 0;
-  font-size: 2.5rem;
+  font-size: 3rem;
+  font-family: 'Playfair Display', serif;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
 }
+
+.subtitle {
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.8rem;
+  margin: 10px 0 0;
+  color: #ffe082;
+}
+
+.greeting-banner {
+  margin-top: 15px;
+  min-height: 1.5rem;
+}
+
+.greeting-text {
+  font-size: 1.2rem;
+  color: #fff;
+  font-weight: 500;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+  display: inline-block;
+  animation: fadeInOut 4s infinite;
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; transform: translateY(10px); }
+  20%, 80% { opacity: 1; transform: translateY(0); }
+}
+
+.golden-horse-bg {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80vmin;
+  height: 80vmin;
+  z-index: -1;
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+.horse-svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 10px rgba(255, 193, 7, 0.5));
+}
+
+.tet-decoration {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 3rem;
+  animation: float 3s ease-in-out infinite;
+}
+
+.tet-decoration.left { left: 20px; }
+.tet-decoration.right { right: 20px; }
+
+@keyframes float {
+  0% { transform: translateY(-50%); }
+  50% { transform: translateY(-60%); }
+  100% { transform: translateY(-50%); }
+}
+
 
 .content {
   display: grid;

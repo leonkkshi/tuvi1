@@ -28,11 +28,11 @@
     /* Fixed aspect ratio or min height for rows to look square-ishly */
     grid-template-rows: repeat(4, minmax(160px, auto));
     max-width: 1200px;
+    border: 3px double #d32f2f;
+    background-color: #fffde7;
+    box-shadow: 0 0 20px rgba(183, 28, 28, 0.2);
     margin: 20px auto;
-    border: 2px solid #000;
-    background-color: #fffef8; /* Slight paper tint */
     color: #333;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
 @media (max-width: 768px) {
@@ -999,6 +999,45 @@
     transition: all 0.3s;
     box-shadow: 0 4px 6px rgba(179, 0, 0, 0.2);
     height: 42px; /* Match select height approximately */
+}
+
+/* Social Promo in Center Panel */
+.social-promo {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px dashed #d32f2f;
+    text-align: center;
+}
+
+.promo-text {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 5px;
+    font-style: italic;
+}
+
+.instagram-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    color: white;
+    text-decoration: none;
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.95rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.instagram-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.instagram-link .ig-icon {
+    font-size: 1.2em;
 }
 
 .btn-interpret:hover:not(:disabled) {
