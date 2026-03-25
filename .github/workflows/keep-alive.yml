@@ -1,0 +1,32 @@
+name: Keep Render Server Alive
+
+on:
+  schedule:
+    # Chạy mỗi 14 phút để tránh server bị tắt (Render tắt sau 15 phút)
+    - cron: '*/14 * * * *'
+  # Cho phép chạy thủ công
+  workflow_dispatch:
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Backend URL from environment
+        run: echo "Backend server keep-alive started"
+
+      - name: Ping Backend Health Endpoint
+        run: |
+          BACKEND_URL="https://tuvi1.onrender.com"
+          
+          echo "🔄 Pinging: $BACKEND_URL/api/tuvi/health"
+          curl -s -f -m 10 "$BACKEND_URL/api/tuvi/health" || echo "⚠️ Health check failed, but continuing..."
+
+      - name: Ping Frontend
+        run: |
+          FRONTEND_URL="https://tuvi1.onrender.com"
+          
+          echo "🔄 Pinging: $FRONTEND_URL"
+          curl -s -f -m 10 "$FRONTEND_URL" || echo "⚠️ Frontend check failed, but continuing..."
+
+      - name: Log Success
+        run: echo "✅ Keep-alive ping completed at $(date)"
