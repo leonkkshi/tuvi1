@@ -6,7 +6,7 @@
 param(
     [string]$BackendUrl = "https://tuvi1.onrender.com",
     [string]$FrontendUrl = "https://tuvi1.onrender.com",
-    [int]$IntervalMinutes = 10
+    [int]$IntervalMinutes = 7
 )
 
 Write-Host "🔄 Keep Render Server Alive Script" -ForegroundColor Cyan

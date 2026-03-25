@@ -2,8 +2,8 @@ name: Keep Render Server Alive
 
 on:
   schedule:
-    # Chạy mỗi 14 phút để tránh server bị tắt (Render tắt sau 15 phút)
-    - cron: '*/14 * * * *'
+    # Chạy mỗi 7 phút để tránh server bị tắt (Render tắt sau 15 phút)
+    - cron: '*/7 * * * *'
   # Cho phép chạy thủ công
   workflow_dispatch:
 
